@@ -3,21 +3,21 @@
 
   <url>
     <loc>https://typixel.vercel.app/</loc>
-    <lastmod>2026-07-09</lastmod>
+    <lastmod>2026-07-09T00:00:00Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
 
   <url>
     <loc>https://typixel.vercel.app/price.html</loc>
-    <lastmod>2026-07-09</lastmod>
+    <lastmod>2026-07-09T00:00:00Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
     <loc>https://typixel.vercel.app/team.html</loc>
-    <lastmod>2026-07-09</lastmod>
+    <lastmod>2026-07-09T00:00:00Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
