@@ -335,22 +335,31 @@
             </div>
         </section>
 
-        <!-- Video Showcase -->
-<section class="relative w-full bg-black py-10">
-    <div class="max-w-7xl mx-auto px-6">
-        <video
-            class="w-full rounded-2xl shadow-2xl"
-            autoplay
-            muted
-            loop
-            playsinline
-            controls="false"
-            preload="auto">
-            <source src="assets/upscaled-video.mp4" type="video/mp4">
-            Your browser does not support the video tag.
-        </video>
-    </div>
-</section>
+<video
+    id="showcaseVideo"
+    autoplay
+    muted
+    loop
+    playsinline
+    preload="auto"
+    oncontextmenu="return false;"
+    class="w-full h-auto">
+    <source src="assets/newvideo.mp4" type="video/mp4">
+</video>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const video = document.getElementById("showcaseVideo");
+
+    // Prevent pause
+    video.addEventListener("pause", function () {
+        video.play();
+    });
+
+    // Disable mouse interaction
+    video.style.pointerEvents = "none";
+});
+</script>
 
         <!-- ========== PORTFOLIO ========== -->
         <section id="portfolio" class="py-24 bg-black/30">
