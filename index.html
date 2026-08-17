@@ -58,249 +58,116 @@
 
     <!-- 3. CRITICAL CSS -->
     <style>
-        /* Force Dark Mode Immediately */
         html, body {
             background-color: #0a0a0a;
             color: #ffffff;
             font-family: 'Inter', sans-serif;
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            overflow-x: hidden;
+            margin: 0; padding: 0; width: 100%; overflow-x: hidden;
         }
-
-        /* Scrollbar */
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #0a0a0a; }
         ::-webkit-scrollbar-thumb { background: #dc2626; border-radius: 4px; }
 
-        /* Loader */
         #app-loader {
-            position: fixed; inset: 0; z-index: 60;
-            background: #0a0a0a; display: flex;
-            align-items: center; justify-content: center;
-            transition: opacity 0.5s ease;
+            position: fixed; inset: 0; z-index: 60; background: #0a0a0a; display: flex; 
+            align-items: center; justify-content: center; transition: opacity 0.5s ease;
         }
-
-        /* Animation Utilities */
         .fade-in { animation: fadeIn 0.8s ease-out forwards; opacity: 0; transform: translateY(20px); }
         @keyframes fadeIn { to { opacity: 1; transform: translateY(0); } }
-
         .hover-lift { transition: transform 0.3s ease, box-shadow 0.3s ease; }
         .hover-lift:hover { transform: translateY(-5px); box-shadow: 0 10px 30px -10px rgba(220, 38, 38, 0.3); }
-
-        /* Logo Spin */
-        .logo-spin:hover {
-            animation: gentleSpin 3s linear infinite;
-        }
-        @keyframes gentleSpin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        /* Marquee / Moving Text Animation */
-        .marquee-wrapper {
-            overflow: hidden;
-            white-space: nowrap;
-            position: relative;
-        }
-        .marquee-content {
-            display: inline-block;
-            animation: scroll 25s linear infinite;
-        }
-        @keyframes scroll {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-        }
-
-        /* Glassmorphism */
-        .glass {
-            background: rgba(255,255,255, 0.03);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        /* Toast Notification */
+        .logo-spin:hover { animation: gentleSpin 3s linear infinite; }
+        @keyframes gentleSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .marquee-wrapper { overflow: hidden; white-space: nowrap; position: relative; }
+        .marquee-content { display: inline-block; animation: scroll 25s linear infinite; }
+        @keyframes scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+        .glass { background: rgba(255,255,255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        
+        /* Toast */
         .toast {
-            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-            background: #171717; color: #fff; padding: 12px 24px;
-            border-radius: 50px; border: 1px solid #333;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5); z-index: 100;
-            display: flex; align-items: center; gap: 10px;
-            opacity: 0; pointer-events: none; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #171717; color: #fff; 
+            padding: 12px 24px; border-radius: 50px; border: 1px solid #333; box-shadow: 0 10px 40px rgba(0,0,0,0.5); 
+            z-index: 200; display: flex; align-items: center; gap: 10px; opacity: 0; pointer-events: none; 
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         .toast.active { opacity: 1; transform: translateX(-50%) translateY(0); }
         .toast.success { border-color: #dc2626; }
         .toast.error { border-color: #ef4444; }
 
         /* ========================================================
-           ANNIVERSARY CAMPAIGN STYLES
+           ANNIVERSARY DROP - PREMIUM UI STYLES
            ======================================================== */
-
-        /* Slow pulse for ambient glows */
-        @keyframes ambientPulse {
-            0%, 100% { opacity: 0.4; transform: scale(1); }
-            50% { opacity: 0.7; transform: scale(1.05); }
+        :root {
+            --drop-bg: #050505;
+            --drop-border: rgba(255,255,255,0.08);
+            --drop-red: #dc2626;
         }
-        .ambient-glow { animation: ambientPulse 8s ease-in-out infinite; }
 
-        /* Slow drifting light */
-        @keyframes drift {
-            0%   { transform: translate(0,0) scale(1); }
-            33%  { transform: translate(40px,-30px) scale(1.1); }
-            66%  { transform: translate(-30px,40px) scale(0.95); }
-            100% { transform: translate(0,0) scale(1); }
+        /* Top Announcement Bar */
+        .announce-bar {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 40; height: 32px;
+            background: #000; border-bottom: 1px solid var(--drop-red); display: flex;
+            align-items: center; justify-content: center; font-size: 11px; font-weight: 600;
+            text-transform: uppercase; letter-spacing: 0.1em; color: #fff;
         }
-        .drift-light { animation: drift 18s ease-in-out infinite; }
+        .announce-bar span { color: var(--drop-red); margin: 0 8px; }
+        body { padding-top: 32px; } /* Offset for announce bar */
+        nav { top: 32px !important; } /* Offset nav */
 
-        /* Fine grain noise */
+        /* Floating Button */
+        .anniv-fab {
+            position: fixed; bottom: 88px; right: 24px; z-index: 40;
+            display: flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 50px;
+            background: linear-gradient(135deg, #dc2626, #b91c1c); color: #fff; font-size: 0.75rem; font-weight: 700;
+            letter-spacing: 0.05em; text-transform: uppercase; box-shadow: 0 10px 30px -5px rgba(220,38,38,0.5);
+            border: 1px solid rgba(255,255,255,0.15); transition: transform 0.3s ease; cursor: pointer;
+        }
+        .anniv-fab:hover { transform: translateY(-3px) scale(1.05); }
+        @media (max-width: 640px) { .anniv-fab { bottom: 80px; right: 16px; padding: 8px 12px; font-size: 0.65rem; } }
+
+        /* Overlays */
+        .drop-overlay {
+            position: fixed; inset: 0; z-index: 100; background: var(--drop-bg);
+            display: none; align-items: center; justify-content: center; padding: 1rem;
+            backdrop-filter: blur(12px); opacity: 0; transition: opacity 0.5s ease;
+        }
+        .drop-overlay.open { display: flex; opacity: 1; }
         .fine-grain {
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
         }
 
-        /* Countdown unit */
-        .countdown-unit {
-            display: flex; flex-direction: column; align-items: center;
-            min-width: 64px; padding: 8px 6px; border-radius: 12px;
-            background: rgba(255,255,255,0.03); border: 1px solid rgba(220,38,38,0.15);
-        }
-        .countdown-number {
-            font-size: 1.9rem; font-weight: 900; color: #fff;
-            font-variant-numeric: tabular-nums; line-height: 1;
-            transition: transform 0.3s ease;
-        }
-        .countdown-number.tick { transform: scale(1.15); color: #dc2626; }
-        .countdown-label {
-            font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.18em;
-            color: #dc2626; margin-top: 6px; font-weight: 700;
-        }
-        @media (max-width: 480px) {
-            .countdown-unit { min-width: 56px; padding: 6px 4px; }
-            .countdown-number { font-size: 1.4rem; }
-            .countdown-label { font-size: 0.55rem; }
-        }
+        /* Intro Sequence */
+        #anniv-intro .intro-text { opacity: 0; transform: translateY(20px); transition: all 0.8s cubic-bezier(0.16,1,0.3,1); position: absolute; }
+        #anniv-intro .intro-text.visible { opacity: 1; transform: translateY(0); }
+        .confetti-piece { position: absolute; width: 8px; height 12px; background: #fff; opacity: 0; }
 
-        /* Spin Wheel */
-        .wheel-wrapper {
-            position: relative; width: 100%; max-width: 420px; margin: 0 auto;
-            aspect-ratio: 1 / 1;
+        /* Drop UI Elements */
+        .drop-card {
+            background: rgba(255,255,255,0.03); border: 1px solid var(--drop-border); border-radius: 24px;
+            backdrop-filter: blur(16px); box-shadow: 0 20px 50px rgba(0,0,0,0.5);
         }
-        .wheel-glow-ring {
-            position: absolute; inset: -14px; border-radius: 50%;
-            background: radial-gradient(circle, rgba(220,38,38,0.35) 0%, rgba(220,38,38,0) 70%);
-            filter: blur(14px); pointer-events: none; z-index: 0;
-            animation: ambientPulse 4s ease-in-out infinite;
-        }
-        .wheel-border-ring {
-            position: absolute; inset: -4px; border-radius: 50%;
-            border: 2px solid rgba(220,38,38,0.6);
-            box-shadow: 0 0 30px rgba(220,38,38,0.25), inset 0 0 20px rgba(220,38,38,0.1);
-            pointer-events: none; z-index: 1;
-        }
-        .wheel-svg {
-            position: relative; z-index: 2;
-            transition: transform 5.5s cubic-bezier(0.17, 0.67, 0.12, 0.99);
-            will-change: transform;
-            filter: drop-shadow(0 20px 40px rgba(0,0,0,0.6));
-        }
-        .wheel-pointer {
-            position: absolute; top: -8px; left: 50%; transform: translateX(-50%);
-            z-index: 5; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
-        }
+        .progress-step { transition: all 0.3s ease; }
+        .progress-step.active { color: #fff; }
+        .progress-step.active .step-dot { background: var(--drop-red); box-shadow: 0 0 15px var(--drop-red); }
+        .progress-step.completed .step-dot { background: #fff; }
+        .progress-step.completed .step-icon { color: #fff; }
 
-        /* Anniversary card hover */
-        .anniv-card {
-            transition: transform 0.4s cubic-bezier(0.16,1,0.3,1), border-color 0.4s ease, box-shadow 0.4s ease;
-        }
-        .anniv-card:hover {
-            transform: translateY(-6px);
-            border-color: rgba(220,38,38,0.5);
-            box-shadow: 0 25px 50px -20px rgba(220,38,38,0.25);
-        }
+        /* Share Circles */
+        .share-circle { width: 16px; height: 16px; border-radius: 50%; border: 2px solid #444; transition: all 0.4s ease; }
+        .share-circle.filled { border-color: var(--drop-red); background: var(--drop-red); box-shadow: 0 0 10px var(--drop-red); transform: scale(1.2); }
 
-        /* Timeline */
-        .timeline-item {
-            position: relative; padding-left: 2.5rem;
-        }
-        .timeline-item::before {
-            content: ''; position: absolute; left: 0; top: 6px;
-            width: 14px; height: 14px; border-radius: 50%;
-            background: #dc2626; box-shadow: 0 0 0 4px rgba(220,38,38,0.2);
-        }
-        .timeline-item::after {
-            content: ''; position: absolute; left: 6px; top: 22px; bottom: -32px;
-            width: 2px; background: linear-gradient(to bottom, rgba(220,38,38,0.5), transparent);
-        }
-        .timeline-item:last-child::after { display: none; }
+        /* Wheel */
+        .wheel-svg { transition: transform 5.5s cubic-bezier(0.17, 0.67, 0.12, 0.99); will-change: transform; filter: drop-shadow(0 20px 40px rgba(0,0,0,0.6)); }
+        .wheel-glow { position: absolute; inset: -20px; border-radius: 50%; background: radial-gradient(circle, rgba(220,38,38,0.3) 0%, transparent 70%); pointer-events: none; animation: ambientPulse 4s infinite; }
+        @keyframes ambientPulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
 
-        /* Modal */
-        .modal-backdrop {
-            position: fixed; inset: 0; z-index: 100;
-            display: none; align-items: center; justify-content: center;
-            padding: 1rem; backdrop-filter: blur(12px);
-            background: rgba(0,0,0,0.8);
-        }
-        .modal-backdrop.open { display: flex; }
-        .modal-card {
-            transform: scale(0.92) translateY(20px); opacity: 0;
-            transition: transform 0.45s cubic-bezier(0.16,1,0.3,1), opacity 0.3s ease;
-        }
-        .modal-backdrop.open .modal-card { transform: scale(1) translateY(0); opacity: 1; }
+        /* Suspense */
+        @keyframes scanLine { 0% { top: 0; } 100% { top: 100%; } }
+        .scan-line { position: absolute; left: 0; width: 100%; height: 2px; background: rgba(220,38,38,0.5); animation: scanLine 1.5s linear infinite; }
 
-        /* Fade up on scroll */
-        .fade-up {
-            opacity: 0; transform: translateY(40px);
-            transition: opacity 0.9s ease, transform 0.9s cubic-bezier(0.16,1,0.3,1);
-        }
-        .fade-up.visible { opacity: 1; transform: translateY(0); }
-
-        /* Floating anniversary badge */
-        .anniv-fab {
-            position: fixed; bottom: 88px; right: 24px; z-index: 50;
-            display: flex; align-items: center; gap: 8px;
-            padding: 10px 16px; border-radius: 50px;
-            background: linear-gradient(135deg, #dc2626, #b91c1c);
-            color: #fff; font-size: 0.78rem; font-weight: 700;
-            letter-spacing: 0.05em; text-transform: uppercase;
-            box-shadow: 0 10px 30px -5px rgba(220,38,38,0.5);
-            border: 1px solid rgba(255,255,255,0.15);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            cursor: pointer;
-        }
-        .anniv-fab:hover { transform: translateY(-3px) scale(1.05); box-shadow: 0 14px 36px -5px rgba(220,38,38,0.65); }
-        .anniv-fab .pulse-dot {
-            width: 8px; height: 8px; border-radius: 50%; background: #fff;
-            box-shadow: 0 0 0 0 rgba(255,255,255,0.7);
-            animation: pulseDot 2s infinite;
-        }
-        @keyframes pulseDot {
-            0% { box-shadow: 0 0 0 0 rgba(255,255,255,0.7); }
-            70% { box-shadow: 0 0 0 8px rgba(255,255,255,0); }
-            100% { box-shadow: 0 0 0 0 rgba(255,255,255,0); }
-        }
-        @media (max-width: 640px) {
-            .anniv-fab { bottom: 80px; right: 16px; padding: 8px 14px; font-size: 0.7rem; }
-        }
-
-        /* Nav anniversary link */
-        .nav-anniversary {
-            position: relative;
-        }
-        .nav-anniversary::after {
-            content: ''; position: absolute; left: 0; right: 0; bottom: -6px;
-            height: 2px; background: #dc2626; transform: scaleX(0);
-            transition: transform 0.3s ease; transform-origin: left;
-        }
-        .nav-anniversary:hover::after { transform: scaleX(1); }
-
-        /* Reduced motion */
+        /* Reduced Motion */
         @media (prefers-reduced-motion: reduce) {
-            *, *::before, *::after {
-                animation-duration: 0.001ms !important;
-                animation-iteration-count: 1 !important;
-                transition-duration: 0.001ms !important;
-            }
-            .ambient-glow, .drift-light, .anniv-fab .pulse-dot { animation: none !important; }
+            *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
         }
     </style>
 </head>
@@ -314,246 +181,102 @@
         </div>
     </div>
 
-    <!-- TOAST NOTIFICATION CONTAINER -->
+    <!-- TOAST NOTIFICATION -->
     <div id="toast" class="toast">
         <iconify-icon icon="lucide:check-circle" class="text-green-500"></iconify-icon>
         <span id="toast-msg" class="text-sm font-medium">Notification</span>
     </div>
 
+    <!-- ANNIVERSARY TOP BANNER -->
+    <div class="announce-bar cursor-pointer" onclick="openAnniversaryDrop()">
+        <span class="hidden sm:inline">🎁 TYPOPIXEL ANNIVERSARY DROP IS LIVE</span>
+        <span class="sm:hidden">🎁 ANNIVERSARY DROP</span>
+        <span class="mx-2 hidden sm:inline">•</span>
+        <span class="hidden sm:inline">UNLOCK YOUR SURPRISE →</span>
+    </div>
+
     <!-- MAIN CONTAINER -->
     <div id="main-content" style="display:none;">
 
-        <!-- ========================================================
-             ANNIVERSARY POPUP MODAL (First visit only)
-             ======================================================== -->
-        <div id="anniversary-popup" class="modal-backdrop">
-            <div class="modal-card relative bg-dark-800 border border-brand-600/30 rounded-3xl p-8 sm:p-10 max-w-md w-full text-center overflow-hidden">
-                <div class="absolute -top-20 -right-20 w-60 h-60 bg-brand-600/20 rounded-full blur-3xl pointer-events-none"></div>
-                <button onclick="closeAnniversaryPopup(false)" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-gray-400 hover:text-white transition-colors z-10">
-                    <iconify-icon icon="lucide:x"></iconify-icon>
-                </button>
-                <div class="relative z-10">
-                    <span class="inline-flex items-center gap-2 py-1.5 px-4 rounded-full bg-brand-600/15 border border-brand-600/40 text-brand-500 text-xs font-bold uppercase tracking-widest mb-6">
-                        <span class="w-1.5 h-1.5 bg-brand-500 rounded-full"></span>
-                        Typixel Anniversary
-                    </span>
-                    <h3 class="text-3xl sm:text-4xl font-black mb-3 leading-tight">Something special<br>just dropped.</h3>
-                    <p class="text-gray-400 mb-8">Spin the wheel.<br>Unlock your surprise.</p>
-                    <div class="flex flex-col gap-3">
-                        <button onclick="closeAnniversaryPopup(true)" class="w-full py-3.5 bg-brand-600 hover:bg-brand-700 text-white font-bold uppercase tracking-wider rounded-full transition-all hover:scale-[1.02]">
-                            Spin Now
-                        </button>
-                        <button onclick="closeAnniversaryPopup(false)" class="w-full py-2 text-gray-400 hover:text-white text-sm font-medium transition-colors">
-                            Maybe Later
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ========================================================
-             REWARD MODAL (After wheel spin)
-             ======================================================== -->
-        <div id="reward-modal" class="modal-backdrop">
-            <div class="modal-card relative bg-dark-800 border border-brand-600/30 rounded-3xl p-8 sm:p-10 max-w-md w-full text-center overflow-hidden">
-                <div class="absolute -top-24 -left-24 w-60 h-60 bg-brand-600/25 rounded-full blur-3xl pointer-events-none"></div>
-                <button onclick="closeRewardModal()" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-gray-400 hover:text-white transition-colors z-10">
-                    <iconify-icon icon="lucide:x"></iconify-icon>
-                </button>
-                <div class="relative z-10">
-                    <div class="text-5xl mb-4">🎉</div>
-                    <p class="text-xs text-brand-500 font-bold uppercase tracking-widest mb-3">You Unlocked a Surprise</p>
-                    <h3 id="reward-modal-title" class="text-4xl sm:text-5xl font-black mb-2 text-transparent bg-clip-text bg-gradient-to-r from-brand-400 via-brand-500 to-brand-700">25% OFF</h3>
-                    <p class="text-xs text-gray-400 uppercase tracking-widest mb-6">Your Anniversary Reward</p>
-
-                    <div class="bg-black/40 border border-dashed border-brand-600/40 rounded-2xl p-5 mb-6">
-                        <p class="text-[10px] text-gray-500 uppercase tracking-widest mb-2">Coupon Code</p>
-                        <p id="reward-coupon-code" class="text-2xl sm:text-3xl font-mono font-black text-white tracking-wider">TYPE25-XXXX</p>
-                    </div>
-
-                    <div class="flex flex-col sm:flex-row gap-3">
-                        <button onclick="copyCouponCode()" id="copy-coupon-btn" class="flex-1 py-3 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold uppercase tracking-wider rounded-full transition-all flex items-center justify-center gap-2 text-sm">
-                            <iconify-icon icon="lucide:copy" class="text-base"></iconify-icon>
-                            <span id="copy-coupon-text">Copy Code</span>
-                        </button>
-                        <button onclick="claimRewardWhatsApp()" id="claim-reward-btn" class="flex-1 py-3 bg-brand-600 hover:bg-brand-700 text-white font-bold uppercase tracking-wider rounded-full transition-all flex items-center justify-center gap-2 text-sm">
-                            <iconify-icon icon="lucide:message-circle" class="text-base"></iconify-icon>
-                            Claim Reward
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <!-- ========== HEADER ========== -->
-        <nav class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 backdrop-blur-xl bg-dark-900/80 border-b border-white/5">
+        <nav class="fixed top-8 left-0 right-0 z-50 transition-all duration-300 backdrop-blur-xl bg-dark-900/80 border-b border-white/5">
             <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 h-20 flex items-center justify-between">
-
-                <!-- LEFT: Logo -->
                 <div class="flex items-center gap-3 cursor-pointer group" onclick="window.scrollTo(0,0)">
                     <div class="relative w-10 h-10 flex items-center justify-center logo-spin">
-                        <img src="https://z-cdn-media.chatglm.cn/files/db59a431-5745-42ec-8575-eda0a0d7d874.png?auth_key=1877803378-171e0b259fba4a18b98bd102cd7552e3-0-9f785a189e477354911412f66e12d36d"
-                             alt="Typixel Logo"
-                             class="w-full h-full object-contain">
+                        <img src="https://z-cdn-media.chatglm.cn/files/db59a431-5745-42ec-8575-eda0a0d7d874.png?auth_key=1877803378-171e0b259fba4a18b98bd102cd7552e3-0-9f785a189e477354911412f66e12d36d" alt="Typixel Logo" class="w-full h-full object-contain">
                     </div>
                     <div>
                         <span class="text-xl font-bold tracking-tight text-white group-hover:text-brand-600 transition-colors">Typixel</span>
-                        <span class="block text-[10px] font-medium tracking-[0.15em] text-gray-400 uppercase">Built
-                            to
-                            Be
-                            Remembered</span>
+                        <span class="block text-[10px] font-medium tracking-[0.15em] text-gray-400 uppercase">Built to Be Remembered</span>
                     </div>
                 </div>
-
-                <!-- CENTER: Navigation -->
                 <div class="hidden md:flex items-center gap-8">
                     <a href="#home" class="nav-link text-sm font-medium text-gray-300 hover:text-white transition-colors">Home</a>
                     <a href="#services" class="nav-link text-sm font-medium text-gray-300 hover:text-white transition-colors">Services</a>
                     <a href="#portfolio" class="nav-link text-sm font-medium text-gray-300 hover:text-white transition-colors">Portfolio</a>
-                    <!-- NEW: Anniversary nav link -->
-                    <a href="#anniversary-offers" class="nav-anniversary nav-link text-sm font-bold text-brand-500 hover:text-brand-400 transition-colors flex items-center gap-1.5">
-                        <span class="w-1.5 h-1.5 bg-brand-500 rounded-full animate-pulse"></span>
-                        Anniversary
+                    <a href="#anniversary-offers" class="nav-link text-sm font-bold text-brand-500 hover:text-brand-400 transition-colors flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 bg-brand-500 rounded-full animate-pulse"></span>Anniversary
                     </a>
                     <a href="#reviews" class="nav-link text-sm font-medium text-gray-300 hover:text-white transition-colors">Reviews</a>
                     <a href="#team" class="nav-link text-sm font-medium text-gray-300 hover:text-white transition-colors">Team</a>
                     <a href="#contact" class="nav-link text-sm font-medium text-gray-300 hover:text-white transition-colors">Contact</a>
                 </div>
-
-                <!-- RIGHT: Button Only -->
                 <div class="flex items-center gap-4">
-                    <a href="#contact"
-                       class="hidden sm:flex bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold uppercase tracking-wider px-6 py-3 rounded-full items-center gap-2 transition-all transform hover:scale-105 shadow-lg shadow-brand-600/20">
-                        Let's Talk
-                    </a>
+                    <button onclick="openAnniversaryDrop()" class="hidden sm:flex bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold uppercase tracking-wider px-6 py-3 rounded-full items-center gap-2 transition-all transform hover:scale-105 shadow-lg shadow-brand-600/20">Enter Drop</button>
                     <button onclick="toggleMenu()" class="md:hidden w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white">
                         <iconify-icon icon="lucide:menu" class="text-xl"></iconify-icon>
                     </button>
                 </div>
             </div>
-
-            <!-- Mobile Menu -->
             <div id="mobile-menu" class="hidden absolute top-20 left-0 w-full bg-brand-600 border-b border-brand-700 p-6 flex-col gap-4 md:hidden shadow-2xl z-40">
                 <a onclick="toggleMenu()" href="#home" class="nav-link-mobile text-lg font-medium text-white hover:text-black transition-colors">Home</a>
                 <a onclick="toggleMenu()" href="#services" class="nav-link-mobile text-lg font-medium text-white hover:text-black transition-colors">Services</a>
                 <a onclick="toggleMenu()" href="#portfolio" class="nav-link-mobile text-lg font-medium text-white hover:text-black transition-colors">Portfolio</a>
-                <!-- NEW: Anniversary mobile link -->
-                <a onclick="toggleMenu()" href="#anniversary-offers" class="nav-link-mobile text-lg font-bold text-white hover:text-black transition-colors flex items-center gap-2">
-                    <span class="w-2 h-2 bg-white rounded-full"></span>
-                    Anniversary
-                </a>
+                <a onclick="toggleMenu()" href="#anniversary-offers" class="nav-link-mobile text-lg font-bold text-white hover:text-black transition-colors">Anniversary</a>
                 <a onclick="toggleMenu()" href="#reviews" class="nav-link-mobile text-lg font-medium text-white hover:text-black transition-colors">Reviews</a>
-                <a onclick="toggleMenu()" href="#team" class="nav-link-mobile text-lg font-medium text-white hover:text-black transition-colors">Our Team</a>
+                <a onclick="toggleMenu()" href="#team" class="nav-link-mobile text-lg font-medium text-white hover:text-black transition-colors">Team</a>
                 <a onclick="toggleMenu()" href="#contact" class="nav-link-mobile text-lg font-medium text-white hover:text-black transition-colors">Contact</a>
-                <a href="https://wa.me/919072891142?text=Hi%20Typixel" class="w-full py-3 bg-black/20 text-white text-center rounded-full font-bold uppercase tracking-wider mt-4 border border-white/20">Let's Talk</a>
             </div>
         </nav>
 
-<!-- ========== HOME / ANNIVERSARY HERO (upgraded) ========== -->
-<section id="home" class="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden">
-    <!-- Background video (existing) -->
-    <div class="absolute inset-0 -z-20 overflow-hidden">
-        <video autoplay muted loop playsinline class="absolute inset-0 w-full h-full object-cover object-center">
-            <source src="assets/video.mp4" type="video/mp4">
-        </video>
-        <div class="absolute inset-0 bg-black/70"></div>
-    </div>
+        <!-- ========== HOME / ANNIVERSARY HERO ========== -->
+        <section id="home" class="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden">
+            <div class="absolute inset-0 -z-20 overflow-hidden">
+                <video autoplay muted loop playsinline class="absolute inset-0 w-full h-full object-cover object-center">
+                    <source src="assets/video.mp4" type="video/mp4">
+                </video>
+                <div class="absolute inset-0 bg-black/80"></div>
+            </div>
 
-    <!-- ANNIVERSARY: Large transparent background typography -->
-    <div class="absolute inset-0 -z-10 flex items-center justify-center pointer-events-none overflow-hidden">
-        <span class="text-[22vw] sm:text-[20vw] lg:text-[18vw] font-black text-white/[0.025] tracking-tighter select-none whitespace-nowrap">ANNIVERSARY</span>
-    </div>
-    <div class="absolute -bottom-10 right-2 sm:right-10 -z-10 pointer-events-none">
-        <span class="text-[18vw] sm:text-[14vw] lg:text-[12vw] font-black text-brand-600/[0.06] tracking-tighter select-none">2026</span>
-    </div>
+            <!-- Huge Background Typography -->
+            <div class="absolute inset-0 -z-10 flex items-center justify-center pointer-events-none overflow-hidden">
+                <span class="text-[22vw] font-black text-white/[0.02] tracking-tighter select-none whitespace-nowrap">ANNIVERSARY</span>
+            </div>
+            <div class="absolute -bottom-10 right-2 -z-10 pointer-events-none">
+                <span class="text-[18vw] font-black text-brand-600/[0.05] tracking-tighter select-none">2026</span>
+            </div>
+            <div class="absolute top-1/3 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-brand-600/15 rounded-full blur-[130px] -z-10"></div>
+            <div class="absolute inset-0 opacity-[0.03] mix-blend-overlay pointer-events-none fine-grain -z-10"></div>
 
-    <!-- ANNIVERSARY: Subtle red ambient glow + slow drifting light -->
-    <div class="absolute top-1/3 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-brand-600/15 rounded-full blur-[130px] -z-10 ambient-glow"></div>
-    <div class="absolute top-1/4 left-1/4 w-72 h-72 bg-brand-700/10 rounded-full blur-[90px] -z-10 drift-light"></div>
-
-    <!-- ANNIVERSARY: Fine grain noise overlay -->
-    <div class="absolute inset-0 opacity-[0.035] mix-blend-overlay pointer-events-none fine-grain -z-10"></div>
-
-    <div class="max-w-7xl mx-auto px-5 text-center relative z-10">
-
-        <!-- ANNIVERSARY BADGE -->
-        <span class="inline-flex items-center gap-2 py-1.5 px-4 rounded-full bg-brand-600/15 border border-brand-600/40 text-brand-500 text-xs font-bold uppercase tracking-widest mb-8 fade-in">
-            <span class="w-1.5 h-1.5 bg-brand-500 rounded-full animate-pulse"></span>
-            Typixel Anniversary
-        </span>
-
-        <!-- ANNIVERSARY MAIN HEADING -->
-        <h1 class="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black leading-[0.95] mb-6 fade-in tracking-tight">
-            ANOTHER YEAR.<br>
-            <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 via-brand-500 to-brand-700">ANOTHER CHAPTER.</span>
-        </h1>
-
-        <!-- ANNIVERSARY SUBTEXT -->
-        <p class="text-base sm:text-lg md:text-xl text-gray-300 max-w-3xl mx-auto mb-3 font-light fade-in">
-            To celebrate our journey, we're opening a limited Anniversary Drop with exclusive offers and surprise rewards.
-        </p>
-
-        <!-- SEO supporting line (keeps agency keywords for SEO) -->
-        <p class="text-xs sm:text-sm text-gray-500 max-w-2xl mx-auto mb-10 font-medium tracking-wide fade-in">
-            Typixel — Professional Graphic Design, Branding & Website Design Agency.
-        </p>
-
-        <!-- CTA Buttons -->
-        <div class="flex flex-col sm:flex-row gap-4 justify-center fade-in">
-            <a href="#anniversary-offers"
-               class="px-8 py-4 rounded-full bg-brand-600 hover:bg-brand-700 text-white font-bold uppercase tracking-wider shadow-lg shadow-brand-600/30 transition-all hover:scale-105 text-sm">
-                Claim Anniversary Offer
-            </a>
-            <a href="#portfolio"
-               class="px-8 py-4 rounded-full border border-white/20 hover:border-white text-white font-semibold transition-all hover:bg-white hover:text-black text-sm">
-                Explore Our Work
-            </a>
-        </div>
-
-        <!-- ANNIVERSARY SPECIAL line -->
-        <p class="mt-12 text-[10px] sm:text-xs text-gray-500 uppercase tracking-[0.25em] fade-in">
-            Anniversary Special • Limited-Time Offers • Surprise Gifts • Exclusive Deals
-        </p>
-
-    </div>
-</section>
-
-        <!-- ========================================================
-             ANNIVERSARY OFFER BAR + COUNTDOWN
-             ======================================================== -->
-        <section id="anniversary-offer-bar" class="relative py-8 border-y border-brand-600/20 bg-gradient-to-r from-dark-900 via-dark-800 to-dark-900 overflow-hidden">
-            <div class="absolute inset-0 bg-brand-600/5 pointer-events-none"></div>
-            <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[1px] bg-gradient-to-r from-transparent via-brand-600 to-transparent"></div>
-            <div class="max-w-7xl mx-auto px-5 relative z-10">
-                <div class="flex flex-col lg:flex-row items-center justify-between gap-6">
-                    <div class="text-center lg:text-left">
-                        <p class="text-xs font-bold uppercase tracking-widest text-brand-500 mb-1 flex items-center justify-center lg:justify-start gap-2">
-                            <span class="w-1.5 h-1.5 bg-brand-500 rounded-full animate-pulse"></span>
-                            Anniversary Drop is Live
-                        </p>
-                        <p class="text-sm text-gray-400">Limited Time • Limited Slots</p>
-                    </div>
-                    <div id="countdown-timer" class="flex gap-2 sm:gap-3">
-                        <div class="countdown-unit">
-                            <span id="countdown-days" class="countdown-number">00</span>
-                            <span class="countdown-label">Days</span>
-                        </div>
-                        <div class="countdown-unit">
-                            <span id="countdown-hours" class="countdown-number">00</span>
-                            <span class="countdown-label">Hours</span>
-                        </div>
-                        <div class="countdown-unit">
-                            <span id="countdown-minutes" class="countdown-number">00</span>
-                            <span class="countdown-label">Minutes</span>
-                        </div>
-                        <div class="countdown-unit">
-                            <span id="countdown-seconds" class="countdown-number">00</span>
-                            <span class="countdown-label">Seconds</span>
-                        </div>
-                    </div>
-                    <div id="countdown-ended-msg" class="hidden text-center">
-                        <p class="text-sm font-bold uppercase tracking-widest text-gray-500">The Anniversary Drop Has Ended</p>
-                    </div>
+            <div class="max-w-7xl mx-auto px-5 text-center relative z-10">
+                <span class="inline-flex items-center gap-2 py-1.5 px-4 rounded-full bg-brand-600/15 border border-brand-600/40 text-brand-500 text-xs font-bold uppercase tracking-widest mb-8 fade-in">
+                    <span class="w-1.5 h-1.5 bg-brand-500 rounded-full animate-pulse"></span>
+                    TYPOPIXEL ANNIVERSARY / 2026
+                </span>
+                <h1 class="text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-black leading-[0.95] mb-6 fade-in tracking-tighter">
+                    THE DROP<br>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 via-brand-500 to-brand-700">IS LIVE.</span>
+                </h1>
+                <p class="text-lg sm:text-xl text-gray-300 max-w-2xl mx-auto mb-10 font-light fade-in">
+                    Complete the journey. Unlock your surprise.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center fade-in">
+                    <button onclick="openAnniversaryDrop()" class="px-10 py-4 rounded-full bg-brand-600 hover:bg-brand-700 text-white font-bold uppercase tracking-wider shadow-lg shadow-brand-600/30 transition-all hover:scale-105 text-sm">
+                        Enter The Drop
+                    </button>
+                    <a href="#services" class="px-10 py-4 rounded-full border border-white/20 hover:border-white text-white font-semibold transition-all hover:bg-white hover:text-black text-sm">
+                        See How It Works
+                    </a>
                 </div>
             </div>
         </section>
@@ -569,8 +292,7 @@
                     <span class="text-xl font-bold mx-12 opacity-50 hover:opacity-100 transition-opacity cursor-default">ZEST-ON</span>
                     <span class="text-xl font-bold mx-12 opacity-50 hover:opacity-100 transition-opacity cursor-default">QUICK RESUME</span>
                     <span class="text-xl font-bold mx-12 opacity-50 hover:opacity-100 transition-opacity cursor-default">AHSAN</span>
-                    <span class="text-xl font-bold mx-12 opacity:opacity-50 hover:opacity-100 transition-opacity cursor-default">SWAHWA</span>
-                    <!-- Duplicate -->
+                    <span class="text-xl font-bold mx-12 opacity-50 hover:opacity-100 transition-opacity cursor-default">SWAHWA</span>
                     <span class="text-xl font-bold mx-12 opacity-50 hover:opacity-100 transition-opacity cursor-default">CHAMAYAM</span>
                     <span class="text-xl font-bold mx-12 opacity-50 hover:opacity-100 transition-opacity cursor-default">SKILLOVIA</span>
                     <span class="text-xl font-bold mx-12 opacity-50 hover:opacity-100 transition-opacity cursor-default">AKBAR TRADES</span>
@@ -584,7 +306,6 @@
 
         <!-- ========== SERVICES ========== -->
         <section id="services" class="py-24 relative">
-            <div class="absolute top-0 right-0 w-72 h-72 bg-brand-700/5 rounded-full blur-3xl"></div>
             <div class="max-w-7xl mx-auto px-5 sm:px-8 relative z-10">
                 <div class="text-center mb-16">
                     <span class="text-brand-600 font-bold uppercase tracking-widest text-xs">Expertise</span>
@@ -594,571 +315,113 @@
                     <div class="bg-white/5 border border-white/5 rounded-2xl p-8 hover:bg-white/10 transition-colors group hover-lift">
                         <div class="w-12 h-12 bg-brand-600 rounded-lg flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform"><iconify-icon icon="lucide:pen-tool"></iconify-icon></div>
                         <h3 class="text-xl font-bold mb-2">Branding & Identity</h3>
-                        <p class="text-sm text-gray-400 mb-4">Complete visual identities — logos, color systems, typography, and brand guidelines.</p>
+                        <p class="text-sm text-gray-400 mb-4">Complete visual identities.</p>
                         <span class="text-brand-500 font-bold text-sm">From ₹2,999</span>
                     </div>
                     <div class="bg-white/5 border border-white/5 rounded-2xl p-8 hover:bg-white/10 transition-colors group hover-lift">
                         <div class="w-12 h-12 bg-brand-600 rounded-lg flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform"><iconify-icon icon="lucide:layout"></iconify-icon></div>
-                        <h3 class="text-xl font-bold mb-2">YouTube Thumbnail Design</h3>
-                        <p class="text-sm text-gray-400 mb-4">Modern, user-focused interfaces for websites and apps.</p>
+                        <h3 class="text-xl font-bold mb-2">YouTube Thumbnails</h3>
+                        <p class="text-sm text-gray-400 mb-4">Modern interfaces.</p>
                         <span class="text-brand-500 font-bold text-sm">From ₹499</span>
                     </div>
                     <div class="bg-white/5 border border-white/5 rounded-2xl p-8 hover:bg-white/10 transition-colors group hover-lift">
                         <div class="w-12 h-12 bg-brand-600 rounded-lg flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform"><iconify-icon icon="lucide:instagram"></iconify-icon></div>
                         <h3 class="text-xl font-bold mb-2">Social Media</h3>
-                        <p class="text-sm text-gray-400 mb-4">Scroll-stopping social media designs — posts, stories, banners.</p>
+                        <p class="text-sm text-gray-400 mb-4">Scroll-stopping designs.</p>
                         <span class="text-brand-500 font-bold text-sm">From ₹399</span>
                     </div>
                     <div class="bg-white/5 border border-white/5 rounded-2xl p-8 hover:bg-white/10 transition-colors group hover-lift">
                         <div class="w-12 h-12 bg-brand-600 rounded-lg flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform"><iconify-icon icon="lucide:megaphone"></iconify-icon></div>
                         <h3 class="text-xl font-bold mb-2">Ad & Promo</h3>
-                        <p class="text-sm text-gray-400 mb-4">Advertising and promotional designs — flyers, banners, posters.</p>
+                        <p class="text-sm text-gray-400 mb-4">Promotional designs.</p>
                         <span class="text-brand-500 font-bold text-sm">From ₹499</span>
                     </div>
                 </div>
             </div>
         </section>
 
-<video
-    id="showcaseVideo"
-    autoplay
-    muted
-    loop
-    playsinline
-    preload="auto"
-    oncontextmenu="return false;"
-    class="w-full h-auto">
-    <source src="assets/upscaled-video.mp4" type="video/mp4">
-</video>
-
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    const video = document.getElementById("showcaseVideo");
-    video.addEventListener("pause", function () { video.play(); });
-    video.style.pointerEvents = "none";
-});
-</script>
-
-        <!-- ========================================================
-             ANNIVERSARY OFFERS SECTION (3 Premium Cards)
-             ======================================================== -->
-        <section id="anniversary-offers" class="py-24 relative overflow-hidden">
-            <div class="absolute top-1/2 left-0 w-96 h-96 bg-brand-700/10 rounded-full blur-3xl -translate-y-1/2"></div>
-            <div class="absolute bottom-0 right-0 w-96 h-96 bg-brand-600/5 rounded-full blur-3xl"></div>
-            <div class="max-w-7xl mx-auto px-5 sm:px-8 relative z-10">
-                <div class="text-center mb-16 fade-up">
-                    <span class="inline-flex items-center gap-2 text-brand-500 font-bold uppercase tracking-widest text-xs mb-3">
-                        <span class="w-6 h-px bg-brand-500"></span>
-                        Anniversary Drop
-                        <span class="w-6 h-px bg-brand-500"></span>
-                    </span>
-                    <h2 class="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight mb-4">THE ANNIVERSARY DROP</h2>
-                    <p class="text-gray-400 max-w-2xl mx-auto">Better design. Special pricing. One limited-time campaign.</p>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
-
-                    <!-- CARD 01: QUICK DESIGN -->
-                    <div class="anniv-card fade-up bg-gradient-to-b from-white/[0.06] to-white/[0.02] border border-white/10 rounded-3xl p-8 relative overflow-hidden">
-                        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-brand-600 to-brand-700"></div>
-                        <div class="absolute -top-12 -right-12 w-32 h-32 bg-brand-600/10 rounded-full blur-2xl"></div>
-                        <div class="relative z-10">
-                            <div class="flex items-center justify-between mb-6">
-                                <span class="text-xs font-bold uppercase tracking-widest text-gray-500">Card 01</span>
-                                <span class="text-xs font-bold uppercase tracking-widest text-brand-500 px-3 py-1 rounded-full bg-brand-600/10 border border-brand-600/30">Popular</span>
-                            </div>
-                            <h3 class="text-2xl font-black mb-2">QUICK DESIGN</h3>
-                            <div class="flex items-end gap-2 mb-6">
-                                <span class="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-brand-600">30%</span>
-                                <span class="text-xl font-bold text-brand-500 mb-1">OFF</span>
-                            </div>
-                            <ul class="space-y-3 mb-8">
-                                <li class="flex items-center gap-3 text-sm text-gray-300"><iconify-icon icon="lucide:check" class="text-brand-500"></iconify-icon> Posters</li>
-                                <li class="flex items-center gap-3 text-sm text-gray-300"><iconify-icon icon="lucide:check" class="text-brand-500"></iconify-icon> Social Media Creatives</li>
-                                <li class="flex items-center gap-3 text-sm text-gray-300"><iconify-icon icon="lucide:check" class="text-brand-500"></iconify-icon> Flyers</li>
-                                <li class="flex items-center gap-3 text-sm text-gray-300"><iconify-icon icon="lucide:check" class="text-brand-500"></iconify-icon> YouTube Thumbnails</li>
-                            </ul>
-                            <button onclick="claimAnniversaryOffer('Quick Design', '30% OFF')" class="anniv-claim-btn w-full py-3.5 bg-brand-600 hover:bg-brand-700 text-white font-bold uppercase tracking-wider rounded-full transition-all text-sm">
-                                Claim Offer
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- CARD 02: BRAND BUILDER -->
-                    <div class="anniv-card fade-up bg-gradient-to-b from-brand-600/[0.12] to-white/[0.02] border border-brand-600/30 rounded-3xl p-8 relative overflow-hidden md:scale-105 md:-translate-y-2">
-                        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-brand-500 via-brand-600 to-brand-700"></div>
-                        <div class="absolute -top-12 -right-12 w-40 h-40 bg-brand-600/20 rounded-full blur-2xl"></div>
-                        <div class="relative z-10">
-                            <div class="flex items-center justify-between mb-6">
-                                <span class="text-xs font-bold uppercase tracking-widest text-brand-400">Card 02</span>
-                                <span class="text-xs font-bold uppercase tracking-widest text-white px-3 py-1 rounded-full bg-brand-600">Best Value</span>
-                            </div>
-                            <h3 class="text-2xl font-black mb-2">BRAND BUILDER</h3>
-                            <div class="flex items-end gap-2 mb-6">
-                                <span class="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-brand-600">25%</span>
-                                <span class="text-xl font-bold text-brand-500 mb-1">OFF</span>
-                            </div>
-                            <ul class="space-y-3 mb-8">
-                                <li class="flex items-center gap-3 text-sm text-gray-300"><iconify-icon icon="lucide:check" class="text-brand-500"></iconify-icon> Logo Design</li>
-                                <li class="flex items-center gap-3 text-sm text-gray-300"><iconify-icon icon="lucide:check" class="text-brand-500"></iconify-icon> Brand Identity</li>
-                                <li class="flex items-center gap-3 text-sm text-gray-300"><iconify-icon icon="lucide:check" class="text-brand-500"></iconify-icon> Brand Kit</li>
-                                <li class="flex items-center gap-3 text-sm text-gray-300"><iconify-icon icon="lucide:check" class="text-brand-500"></iconify-icon> Social Profile Setup</li>
-                            </ul>
-                            <button onclick="claimAnniversaryOffer('Brand Builder', '25% OFF')" class="anniv-claim-btn w-full py-3.5 bg-brand-600 hover:bg-brand-700 text-white font-bold uppercase tracking-wider rounded-full transition-all text-sm shadow-lg shadow-brand-600/30">
-                                Claim Offer
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- CARD 03: DIGITAL LAUNCH -->
-                    <div class="anniv-card fade-up bg-gradient-to-b from-white/[0.06] to-white/[0.02] border border-white/10 rounded-3xl p-8 relative overflow-hidden">
-                        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-brand-600 to-brand-700"></div>
-                        <div class="absolute -top-12 -right-12 w-32 h-32 bg-brand-600/10 rounded-full blur-2xl"></div>
-                        <div class="relative z-10">
-                            <div class="flex items-center justify-between mb-6">
-                                <span class="text-xs font-bold uppercase tracking-widest text-gray-500">Card 03</span>
-                                <span class="text-xs font-bold uppercase tracking-widest text-brand-500 px-3 py-1 rounded-full bg-brand-600/10 border border-brand-600/30">Premium</span>
-                            </div>
-                            <h3 class="text-2xl font-black mb-2">DIGITAL LAUNCH</h3>
-                            <div class="flex items-end gap-2 mb-6">
-                                <span class="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-brand-600">20%</span>
-                                <span class="text-xl font-bold text-brand-500 mb-1">OFF</span>
-                            </div>
-                            <ul class="space-y-3 mb-8">
-                                <li class="flex items-center gap-3 text-sm text-gray-300"><iconify-icon icon="lucide:check" class="text-brand-500"></iconify-icon> Website Design</li>
-                                <li class="flex items-center gap-3 text-sm text-gray-300"><iconify-icon icon="lucide:check" class="text-brand-500"></iconify-icon> Landing Pages</li>
-                                <li class="flex items-center gap-3 text-sm text-gray-300"><iconify-icon icon="lucide:check" class="text-brand-500"></iconify-icon> UI Design</li>
-                                <li class="flex items-center gap-3 text-sm text-gray-300"><iconify-icon icon="lucide:check" class="text-brand-500"></iconify-icon> Digital Assets</li>
-                            </ul>
-                            <button onclick="claimAnniversaryOffer('Digital Launch', '20% OFF')" class="anniv-claim-btn w-full py-3.5 bg-brand-600 hover:bg-brand-700 text-white font-bold uppercase tracking-wider rounded-full transition-all text-sm">
-                                Claim Offer
-                            </button>
-                        </div>
-                    </div>
-
-                </div>
-                <p class="text-center text-xs text-gray-500 mt-10 fade-up">All offers are valid during the anniversary campaign window. Limited slots available.</p>
-            </div>
-        </section>
-
-        <!-- ========================================================
-             SPIN & SURPRISE SECTION (Main Anniversary Feature)
-             ======================================================== -->
-        <section id="spin-surprise" class="py-24 relative overflow-hidden bg-gradient-to-b from-dark-900 via-black to-dark-900">
-            <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-brand-600/10 rounded-full blur-[120px] pointer-events-none"></div>
-            <div class="absolute inset-0 opacity-[0.03] fine-grain pointer-events-none mix-blend-overlay"></div>
-
-            <div class="max-w-5xl mx-auto px-5 sm:px-8 relative z-10">
-                <div class="text-center mb-12 fade-up">
-                    <span class="inline-flex items-center gap-2 text-brand-500 font-bold uppercase tracking-widest text-xs mb-3">
-                        <span class="w-6 h-px bg-brand-500"></span>
-                        Spin & Surprise
-                        <span class="w-6 h-px bg-brand-500"></span>
-                    </span>
-                    <h2 class="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight mb-4">SPIN. WIN. CELEBRATE.</h2>
-                    <p class="text-gray-400 max-w-2xl mx-auto">Every anniversary deserves a surprise.<br>Spin the Typixel wheel and unlock your reward.</p>
-                </div>
-
-                <!-- WHEEL CONTAINER -->
-                <div class="flex flex-col items-center fade-up">
-                    <div class="wheel-wrapper">
-                        <!-- Pointer at top -->
-                        <svg class="wheel-pointer" width="28" height="36" viewBox="0 0 28 36" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M 14 36 L 2 6 Q 14 0 26 6 Z" fill="#dc2626" stroke="#ffffff" stroke-width="2" stroke-linejoin="round"/>
-                            <circle cx="14" cy="6" r="3" fill="#ffffff"/>
-                        </svg>
-                        <div class="wheel-glow-ring"></div>
-                        <div class="wheel-border-ring"></div>
-                        <svg id="wheel-svg" class="wheel-svg w-full h-full" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
-                            <!-- Generated by JS -->
-                        </svg>
-                    </div>
-
-                    <!-- SPIN BUTTON + STATE -->
-                    <div class="mt-10 text-center">
-                        <button id="spin-btn" onclick="spinWheel()" class="group relative inline-flex items-center gap-3 px-10 py-4 bg-brand-600 hover:bg-brand-700 text-white font-bold uppercase tracking-wider rounded-full shadow-lg shadow-brand-600/30 transition-all hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100">
-                            <iconify-icon icon="lucide:rotate-cw" class="text-lg group-hover:rotate-180 transition-transform duration-500"></iconify-icon>
-                            Spin the Wheel
-                        </button>
-                        <p id="spin-status" class="mt-4 text-sm text-gray-400 min-h-[1.5rem]">One spin per visitor.</p>
-                        <div id="previous-reward" class="hidden mt-4 max-w-md mx-auto p-4 rounded-2xl bg-white/5 border border-brand-600/30">
-                            <p class="text-xs text-gray-500 uppercase tracking-widest mb-1">Your Previous Reward</p>
-                            <p id="previous-reward-label" class="text-lg font-bold text-brand-500 mb-1">25% OFF</p>
-                            <p id="previous-reward-code" class="text-sm font-mono text-white">TYPE25-XXXX</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- SURPRISE GIFT CARD -->
-                <div class="mt-20 fade-up">
-                    <div class="text-center mb-8">
-                        <h3 class="text-2xl sm:text-3xl font-black mb-2">THINK YOU'VE SEEN EVERYTHING?</h3>
-                        <p class="text-gray-400">Some rewards aren't discounts.</p>
-                    </div>
-                    <div class="max-w-2xl mx-auto anniv-card group relative bg-gradient-to-br from-dark-800 via-dark-800 to-brand-900/30 border border-brand-600/30 rounded-3xl p-8 sm:p-10 overflow-hidden cursor-pointer" onclick="scrollToWheel()">
-                        <div class="absolute -top-20 -right-20 w-60 h-60 bg-brand-600/20 rounded-full blur-3xl group-hover:bg-brand-600/30 transition-colors duration-500"></div>
-                        <div class="absolute -bottom-20 -left-20 w-60 h-60 bg-brand-700/10 rounded-full blur-3xl"></div>
-                        <div class="relative z-10 flex items-center gap-6">
-                            <div class="text-5xl sm:text-6xl">🎁</div>
-                            <div>
-                                <p class="text-xs font-bold uppercase tracking-widest text-brand-500 mb-2">Surprise Gift</p>
-                                <h4 class="text-2xl sm:text-3xl font-black mb-2">SURPRISE GIFT</h4>
-                                <p class="text-gray-400 text-sm">Your reward could unlock something completely unexpected.</p>
-                            </div>
-                            <iconify-icon icon="lucide:arrow-right" class="hidden sm:block text-2xl text-brand-500 group-hover:translate-x-2 transition-transform"></iconify-icon>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ========================================================
-             ANNIVERSARY STORY (Timeline)
-             ======================================================== -->
-        <section id="anniversary-story" class="py-24 relative bg-black/30">
-            <div class="absolute top-0 right-0 w-96 h-96 bg-brand-700/5 rounded-full blur-3xl"></div>
-            <div class="max-w-5xl mx-auto px-5 sm:px-8 relative z-10">
-                <div class="text-center mb-16 fade-up">
-                    <span class="text-brand-500 font-bold uppercase tracking-widest text-xs">The Journey</span>
-                    <h2 class="text-3xl sm:text-4xl md:text-5xl font-black mt-2">FROM AN IDEA TO TYPIXEL</h2>
-                </div>
-
-                <div class="space-y-8 max-w-2xl mx-auto">
-                    <div class="timeline-item fade-up pl-10">
-                        <span class="text-brand-600 font-black text-2xl">2021</span>
-                        <h3 class="text-xl font-bold mt-1">THE IDEA</h3>
-                        <p class="text-sm text-gray-400 mt-1">Where it all began — a spark to craft memorable brands.</p>
-                    </div>
-                    <div class="timeline-item fade-up pl-10">
-                        <span class="text-brand-600 font-bold text-sm uppercase tracking-widest">Early Days</span>
-                        <h3 class="text-xl font-bold mt-1">FIRST PROJECTS</h3>
-                        <p class="text-sm text-gray-400 mt-1">Building trust, one design at a time.</p>
-                    </div>
-                    <div class="timeline-item fade-up pl-10">
-                        <span class="text-brand-600 font-bold text-sm uppercase tracking-widest">Growing</span>
-                        <h3 class="text-xl font-bold mt-1">FIRST CLIENTS</h3>
-                        <p class="text-sm text-gray-400 mt-1">Brands that chose Typixel to tell their story.</p>
-                    </div>
-                    <div class="timeline-item fade-up pl-10">
-                        <span class="text-brand-600 font-bold text-sm uppercase tracking-widest">Together</span>
-                        <h3 class="text-xl font-bold mt-1">THE TEAM</h3>
-                        <p class="text-sm text-gray-400 mt-1">A creative crew shaping every chapter.</p>
-                    </div>
-                    <div class="timeline-item fade-up pl-10">
-                        <span class="text-brand-600 font-bold text-sm uppercase tracking-widest">Today</span>
-                        <h3 class="text-xl font-bold mt-1">THE JOURNEY</h3>
-                        <p class="text-sm text-gray-400 mt-1">Every project, every client — part of the story.</p>
-                    </div>
-                    <div class="timeline-item fade-up pl-10">
-                        <span class="text-brand-600 font-black text-2xl">2026</span>
-                        <h3 class="text-xl font-bold mt-1">THE NEXT CHAPTER</h3>
-                        <p class="text-sm text-gray-400 mt-1">Built to be remembered — and we're just getting started.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ========================================================
-             ANNIVERSARY STATS (Qualitative)
-             ======================================================== -->
-        <section id="anniversary-stats" class="py-20 relative">
-            <div class="absolute inset-0 bg-grid-white/5 [mask-image:linear-gradient(to_bottom,transparent,black,transparent)] [mask-size:contain]"></div>
-            <div class="max-w-7xl mx-auto px-5 sm:px-8 relative z-10">
-                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-                    <div class="fade-up text-center p-6 rounded-2xl bg-white/5 border border-white/5 hover:border-brand-600/30 transition-colors">
-                        <div class="w-12 h-12 mx-auto mb-4 bg-brand-600/10 rounded-full flex items-center justify-center text-brand-500">
-                            <iconify-icon icon="lucide:sparkles" class="text-xl"></iconify-icon>
-                        </div>
-                        <h3 class="text-lg font-bold mb-1">Creative Projects</h3>
-                        <p class="text-xs text-gray-500">Crafted with intent</p>
-                    </div>
-                    <div class="fade-up text-center p-6 rounded-2xl bg-white/5 border border-white/5 hover:border-brand-600/30 transition-colors">
-                        <div class="w-12 h-12 mx-auto mb-4 bg-brand-600/10 rounded-full flex items-center justify-center text-brand-500">
-                            <iconify-icon icon="lucide:users" class="text-xl"></iconify-icon>
-                        </div>
-                        <h3 class="text-lg font-bold mb-1">Growing Community</h3>
-                        <p class="text-xs text-gray-500">Built on trust</p>
-                    </div>
-                    <div class="fade-up text-center p-6 rounded-2xl bg-white/5 border border-white/5 hover:border-brand-600/30 transition-colors">
-                        <div class="w-12 h-12 mx-auto mb-4 bg-brand-600/10 rounded-full flex items-center justify-center text-brand-500">
-                            <iconify-icon icon="lucide:gem" class="text-xl"></iconify-icon>
-                        </div>
-                        <h3 class="text-lg font-bold mb-1">Brand Experiences</h3>
-                        <p class="text-xs text-gray-500">Designed to last</p>
-                    </div>
-                    <div class="fade-up text-center p-6 rounded-2xl bg-white/5 border border-white/5 hover:border-brand-600/30 transition-colors">
-                        <div class="w-12 h-12 mx-auto mb-4 bg-brand-600/10 rounded-full flex items-center justify-center text-brand-500">
-                            <iconify-icon icon="lucide:calendar" class="text-xl"></iconify-icon>
-                        </div>
-                        <h3 class="text-lg font-bold mb-1">Years of Design</h3>
-                        <p class="text-xs text-gray-500">A journey in progress</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ========== PORTFOLIO (upgraded with anniversary heading) ========== -->
+        <!-- ========== PORTFOLIO ========== -->
         <section id="portfolio" class="py-24 bg-black/30">
-            <div class="absolute bottom-0 left-0 w-96 h-96 bg-brand-700/5 rounded-full blur-3xl"></div>
             <div class="max-w-7xl mx-auto px-5 sm:px-8 relative z-10">
                 <div class="flex justify-between items-end mb-16">
                     <div>
-                        <span class="text-brand-600 font-bold uppercase tracking-widest text-xs">The Work Behind the Journey</span>
-                        <h2 class="text-5xl sm:text-7xl md:text-8xl font-black text-white tracking-tight">Portfolio</h2>
-                        <p class="text-sm text-gray-400 mt-3">Some of the work that shaped Typixel.</p>
+                        <span class="text-brand-600 font-bold uppercase tracking-widest text-xs">Portfolio</span>
+                        <h2 class="text-5xl sm:text-7xl md:text-8xl font-black text-white tracking-tight">Work</h2>
                     </div>
-                    <a href="https://www.instagram.com/typixelofficial/" class="hidden sm:inline-block px-6 py-2 border border-white/20 rounded-full hover:bg-white hover:text-black transition-all">View All</a>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <a href="#contact" class="group block overflow-hidden rounded-2xl relative aspect-[4/3] cursor-pointer hover-lift"><img src="https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/poster.jpg" alt="Project" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"><div class="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6"><h3 class="text-xl font-bold text-white transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">Posters</h3><p class="text-gray-300 text-sm transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-100">View Details &rarr;</p></div></a>
-                    <a href="#contact" class="group block overflow-hidden rounded-2xl relative aspect-[4/3] cursor-pointer hover-lift"><img src="https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/Brouchere.jpg" alt="Project" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"><div class="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6"><h3 class="text-xl font-bold text-white transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">Brochure</h3><p class="text-gray-300 text-sm transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-100">View Details &rarr;</p></div></a>
-                    <a href="#contact" class="group block overflow-hidden rounded-2xl relative aspect-[4/3] cursor-pointer hover-lift"><img src="https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/website.png" alt="Project" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"><div class="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6"><h3 class="text-xl font-bold text-white transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">Websites</h3><p class="text-gray-300 text-sm transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-100">View Details &rarr;</p></div></a>
-                    <a href="#contact" class="group block overflow-hidden rounded-2xl relative aspect-[4/3] cursor-pointer hover-lift"><img src="https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/Menu Card.jpg" alt="Project" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"><div class="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6"><h3 class="text-xl font-bold text-white transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">Menu Card</h3><p class="text-gray-300 text-sm transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-100">View Details &rarr;</p></div></a>
-                    <a href="#contact" class="group block overflow-hidden rounded-2xl relative aspect-[4/3] cursor-pointer hover-lift"><img src="https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/logo.jpg" alt="Project" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"><div class="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6"><h3 class="text-xl font-bold text-white transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">Logo</h3><p class="text-gray-300 text-sm transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-100">View Details &rarr;</p></div></a>
-                    <a href="#contact" class="group block overflow-hidden rounded-2xl relative aspect-[4/3] cursor-pointer hover-lift"><img src="https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/Branding.jpg" alt="Project" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"><div class="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6"><h3 class="text-xl font-bold text-white transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">Branding</h3><p class="text-gray-300 text-sm transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-100">View Details &rarr;</p></div></a>
-                    <a href="#contact" class="group block overflow-hidden rounded-2xl relative aspect-[4/3] cursor-pointer hover-lift"><img src="https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/YouTube.jpg" alt="Project" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"><div class="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6"><h3 class="text-xl font-bold text-white transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">YouTube Thumbnail Design</h3><p class="text-gray-300 text-sm transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-100">View Details &rarr;</p></div></a>
-                    <a href="#contact" class="group block overflow-hidden rounded-2xl relative aspect-[4/3] cursor-pointer hover-lift"><img src="https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/Coupon.jpg" alt="Project" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"><div class="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6"><h3 class="text-xl font-bold text-white transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">Coupon</h3><p class="text-gray-300 text-sm transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-100">View Details &rarr;</p></div></a>
-                    <a href="#contact" class="group block overflow-hidden rounded-2xl relative aspect-[4/3] cursor-pointer hover-lift"><img src="https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/Cinema.jpg" alt="Project" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"><div class="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6"><h3 class="text-xl font-bold text-white transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">Cinematic Poster</h3><p class="text-gray-300 text-sm transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-100">View Details &rarr;</p></div></a>
+                    <a href="#contact" class="group block overflow-hidden rounded-2xl relative aspect-[4/3] cursor-pointer hover-lift"><img src="https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/poster.jpg" alt="Project" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"><div class="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6"><h3 class="text-xl font-bold text-white">Posters</h3></div></a>
+                    <a href="#contact" class="group block overflow-hidden rounded-2xl relative aspect-[4/3] cursor-pointer hover-lift"><img src="https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/Brouchere.jpg" alt="Project" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"><div class="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6"><h3 class="text-xl font-bold text-white">Brochure</h3></div></a>
+                    <a href="#contact" class="group block overflow-hidden rounded-2xl relative aspect-[4/3] cursor-pointer hover-lift"><img src="https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/website.png" alt="Project" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"><div class="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6"><h3 class="text-xl font-bold text-white">Websites</h3></div></a>
                 </div>
             </div>
         </section>
 
         <!-- ========== REVIEWS SECTION ========== -->
         <section id="reviews" class="py-24 relative">
-            <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-dark-900 via-black to-dark-900 -z-10"></div>
             <div class="max-w-7xl mx-auto px-5">
                 <div class="text-center mb-16">
                     <span class="text-brand-600 font-bold uppercase tracking-widest text-xs">Feedback</span>
                     <h2 class="text-3xl sm:text-4xl font-bold mt-2">Client Love</h2>
                 </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
                     <div class="bg-white/5 border border-white/10 rounded-2xl p-6 hover-lift">
-                        <div class="flex items-center gap-1 mb-4">
-                            <iconify-icon icon="lucide:star" class="text-amber-400 text-sm"></iconify-icon>
-                            <iconify-icon icon="lucide:star" class="text-amber-400 text-sm"></iconify-icon>
-                            <iconify-icon icon="lucide:star" class="text-amber-400 text-sm"></iconify-icon>
-                            <iconify-icon icon="lucide:star" class="text-amber-400 text-sm"></iconify-icon>
-                            <iconify-icon icon="lucide:star" class="text-amber-400 text-sm"></iconify-icon>
-                        </div>
-                        <p class="text-sm text-gray-300 leading-relaxed mb-6">Typixel elevated our brand to new heights. Her attention to detail is unmatched.</p>
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-full bg-brand-700/20 flex items-center justify-center"><iconify-icon icon="lucide:store" class="text-brand-600 text-lg"></iconify-icon></div>
-                            <div><p class="text-sm font-bold text-white">Chamayam</p><p class="text-xs text-gray-500">Textiles Brand</p></div>
-                        </div>
+                        <p class="text-sm text-gray-300 leading-relaxed mb-6">Typixel elevated our brand to new heights.</p>
+                        <p class="text-sm font-bold text-white">Chamayam</p>
                     </div>
                     <div class="bg-white/5 border border-white/10 rounded-2xl p-6 hover-lift">
-                        <div class="flex items-center gap-1 mb-4">
-                            <iconify-icon icon="lucide:star" class="text-amber-400 text-sm"></iconify-icon>
-                            <iconify-icon icon="lucide:star" class="text-amber-400 text-sm"></iconify-icon>
-                            <iconify-icon icon="lucide:star" class="text-amber-400 text-sm"></iconify-icon>
-                            <iconify-icon icon="lucide:star" class="text-amber-400 text-sm"></iconify-icon>
-                        </div>
-                        <p class="text-sm text-gray-300 leading-relaxed mb-6">TyPixel delivered clean, professional designs with a strong brand sense. Our promotions now look premium.</p>
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-full bg-brand-700/20 flex items-center justify-center"><iconify-icon icon="lucide:briefcase" class="text-brand-600 text-lg"></iconify-icon></div>
-                            <div><p class="text-sm font-bold text-white">Skillovia</p><p class="text-xs text-gray-500">Growing Brand</p></div>
-                        </div>
+                        <p class="text-sm text-gray-300 leading-relaxed mb-6">Delivered clean, professional designs with a strong brand sense.</p>
+                        <p class="text-sm font-bold text-white">Skillovia</p>
                     </div>
                     <div class="bg-white/5 border border-white/10 rounded-2xl p-6 hover-lift">
-                        <div class="flex items-center gap-1 mb-4">
-                            <iconify-icon icon="lucide:star" class="text-amber-400 text-sm"></iconify-icon>
-                            <iconify-icon icon="lucide:star" class="text-amber-400 text-sm"></iconify-icon>
-                            <iconify-icon icon="lucide:star" class="text-amber-400 text-sm"></iconify-icon>
-                            <iconify-icon icon="lucide:star" class="text-amber-400 text-sm"></iconify-icon>
-                            <iconify-icon icon="lucide:star" class="text-amber-400 text-sm"></iconify-icon>
-                        </div>
-                        <p class="text-sm text-gray-300 leading-relaxed mb-6">Fast delivery and amazing concepts. Highly recommended for Resume Design work.</p>
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-full bg-brand-700/20 flex items-center justify-center"><iconify-icon icon="lucide:monitor" class="text-brand-600 text-lg"></iconify-icon></div>
-                            <div><p class="text-sm font-bold text-white">Quick Resume</p><p class="text-xs text-gray-500">Creative Agency</p></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="border-t border-white/10 pt-20">
-                    <div class="text-center mb-12">
-                        <span class="text-brand-600 font-bold uppercase tracking-widest text-xs">Benefits</span>
-                        <h2 class="text-3xl sm:text-4xl font-bold mt-2">Why Choose Typixel</h2>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                        <div class="text-center p-6 rounded-2xl bg-white/5 border border-white/5 hover:border-brand-600/30 transition-colors">
-                            <div class="w-14 h-14 mx-auto mb-6 bg-brand-600/10 rounded-full flex items-center justify-center text-brand-500">
-                                <iconify-icon icon="lucide:zap" class="text-2xl"></iconify-icon>
-                            </div>
-                            <h3 class="text-xl font-bold mb-2">Fast Delivery</h3>
-                            <p class="text-sm text-gray-400">We understand deadlines. Get your designs quickly without compromising quality.</p>
-                        </div>
-                        <div class="text-center p-6 rounded-2xl bg-white/5 border border-white/5 hover:border-brand-600/30 transition-colors">
-                            <div class="w-14 h-14 mx-auto mb-6 bg-brand-600/10 rounded-full flex items-center justify-center text-brand-500">
-                                <iconify-icon icon="lucide:diamond" class="text-2xl"></iconify-icon>
-                            </div>
-                            <h3 class="text-xl font-bold mb-2">Premium Quality</h3>
-                            <p class="text-sm text-gray-400">High-resolution, pixel-perfect designs that look professional on all devices.</p>
-                        </div>
-                        <div class="text-center p-6 rounded-2xl bg-white/5 border border-white/5 hover:border-brand-600/30 transition-colors">
-                            <div class="w-14 h-14 mx-auto mb-6 bg-brand-600/10 rounded-full flex items-center justify-center text-brand-500">
-                                <iconify-icon icon="lucide:headphones" class="text-2xl"></iconify-icon>
-                            </div>
-                            <h3 class="text-xl font-bold mb-2">24/7 Support</h3>
-                            <p class="text-sm text-gray-400">We are always available to discuss your project and make revisions.</p>
-                        </div>
-                        <div class="text-center p-6 rounded-2xl bg-white/5 border border-white/5 hover:border-brand-600/30 transition-colors">
-                            <div class="w-14 h-14 mx-auto mb-6 bg-brand-600/10 rounded-full flex items-center justify-center text-brand-500">
-                                <iconify-icon icon="lucide:wallet" class="text-2xl"></iconify-icon>
-                            </div>
-                            <h3 class="text-xl font-bold mb-2">Best Pricing</h3>
-                            <p class="text-sm text-gray-400">Affordable packages for startups and businesses of all sizes.</p>
-                        </div>
+                        <p class="text-sm text-gray-300 leading-relaxed mb-6">Fast delivery and amazing concepts.</p>
+                        <p class="text-sm font-bold text-white">Quick Resume</p>
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- ========== TEAM SECTION ========== -->
-<section id="team" class="py-24 bg-black/30">
-    <div class="max-w-7xl mx-auto px-5 sm:px-8 text-center">
-        <span class="text-brand-600 font-bold uppercase tracking-widest text-xs">The Crew</span>
-        <h2 class="text-3xl sm:text-4xl font-bold mt-2 mb-16">Who Are We</h2>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-
-            <!-- Hashim — CEO & Founder -->
-            <div class="group relative rounded-2xl overflow-hidden aspect-[3/4] hover-lift">
-                <img
-                    src="/images/hashim-typixel-ceo-founder.jpg"
-                    alt="Hashim, CEO and Founder of Typixel"
-                    loading="lazy"
-                    class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 grayscale group-hover:grayscale-0"
-                >
-                <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-80 flex flex-col justify-end p-4">
-                    <h3 class="text-white font-bold text-lg">Hashim</h3>
-                    <p class="text-brand-500 text-xs font-bold uppercase tracking-wider mb-2">CEO & FOUNDER</p>
-                    <p class="sr-only">Hashim is the CEO and Founder of Typixel.</p>
-                </div>
-            </div>
-
-            <!-- Rifad — CEO & Founder -->
-            <div class="group relative rounded-2xl overflow-hidden aspect-[3/4] hover-lift">
-                <img src="https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/rifad.jpg" alt="Co-Founder" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 grayscale group-hover:grayscale-0">
-                <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-80 flex flex-col justify-end p-4">
-                    <h3 class="text-white font-bold text-lg">Rifad</h3>
-                    <p class="text-brand-500 text-xs font-bold uppercase tracking-wider mb-2">CEO & FOUNDER</p>
-                </div>
-            </div>
-
-            <!-- Nidal — Marketing Manager -->
-            <div class="group relative rounded-2xl overflow-hidden aspect-[3/4] hover-lift">
-                <img src="https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/nidal.jpg" alt="Marketing" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 grayscale group-hover:grayscale-0">
-                <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-80 flex flex-col justify-end p-4">
-                    <h3 class="text-white font-bold text-lg">Nidal</h3>
-                    <p class="text-brand-500 text-xs font-bold uppercase tracking-wider mb-2">MARKETING MANAGER</p>
-                </div>
-            </div>
-
-            <!-- Shadin — Creative Director -->
-            <div class="group relative rounded-2xl overflow-hidden aspect-[3/4] hover-lift">
-                <img src="https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/shadin.jpg" alt="Creative Director" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 grayscale group-hover:grayscale-0">
-                <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-80 flex flex-col justify-end p-4">
-                    <h3 class="text-white font-bold text-lg">Shadin</h3>
-                    <p class="text-brand-500 text-xs font-bold uppercase tracking-wider mb-2">CREATIVE DIRECTOR</p>
-                </div>
-            </div>
-
-            <!-- Afsal — Brand Strategist -->
-            <div class="group relative rounded-2xl overflow-hidden aspect-[3/4] hover-lift">
-                <img src="https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/afsal.jpg" alt="Brand Strategist" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 grayscale group-hover:grayscale-0">
-                <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-80 flex flex-col justify-end p-4">
-                    <h3 class="text-white font-bold text-lg">Afsal</h3>
-                    <p class="text-brand-500 text-xs font-bold uppercase tracking-wider mb-2">BRAND STRATEGIST</p>
-                </div>
-            </div>
-
-        </div>
-    </div>
-</section>
-
-
-        <!-- ========== HOW WE WORK ========== -->
-        <section class="py-24 relative bg-dark-900">
-            <div class="absolute top-0 left-0 w-full h-full bg-grid-white/5 [mask-image:linear-gradient(to_bottom,transparent,black)] [mask-size:contain]"></div>
-            <div class="max-w-7xl mx-auto px-5 relative z-10">
-                <div class="text-center mb-16">
-                    <span class="text-brand-600 font-bold uppercase tracking-widest text-xs">Workflow</span>
-                    <h2 class="text-3xl sm:text-4xl font-bold mt-2">How We Work</h2>
-                    <p class="text-gray-400 mt-4 max-w-2xl mx-auto">A streamlined 4-step process to bring your vision to life.</p>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                    <div class="relative group">
-                        <div class="absolute top-0 left-0 w-full h-1 bg-brand-600 rounded-full"></div>
-                        <div class="bg-white/5 border border-white/10 rounded-2xl p-8 hover:bg-white/10 transition-all hover:border-brand-600/50 h-full">
-                            <div class="w-12 h-12 rounded-full bg-brand-600/20 flex items-center justify-center text-brand-500 mb-6 group-hover:bg-brand-600 group-hover:text-white transition-colors">
-                                <span class="text-xl font-bold">01</span>
-                            </div>
-                            <h3 class="text-xl font-bold mb-3">Discovery</h3>
-                            <p class="text-sm text-gray-400 leading-relaxed">We discuss your goals, target audience, and project requirements in detail.</p>
+        <section id="team" class="py-24 bg-black/30">
+            <div class="max-w-7xl mx-auto px-5 sm:px-8 text-center">
+                <span class="text-brand-600 font-bold uppercase tracking-widest text-xs">The Crew</span>
+                <h2 class="text-3xl sm:text-4xl font-bold mt-2 mb-16">Who Are We</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+                    <div class="group relative rounded-2xl overflow-hidden aspect-[3/4] hover-lift">
+                        <img src="/images/hashim-typixel-ceo-founder.jpg" alt="Hashim" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 grayscale group-hover:grayscale-0">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-80 flex flex-col justify-end p-4">
+                            <h3 class="text-white font-bold text-lg">Hashim</h3>
+                            <p class="text-brand-500 text-xs font-bold uppercase tracking-wider mb-2">CEO & FOUNDER</p>
                         </div>
                     </div>
-                    <div class="relative group">
-                        <div class="absolute top-0 left-0 w-full h-1 bg-brand-600 rounded-full"></div>
-                        <div class="bg-white/5 border border-white/10 rounded-2xl p-8 hover:bg-white/10 transition-all hover:border-brand-600/50 h-full">
-                            <div class="w-12 h-12 rounded-full bg-brand-600/20 flex items-center justify-center text-brand-500 mb-6 group-hover:bg-brand-600 group-hover:text-white transition-colors">
-                                <span class="text-xl font-bold">02</span>
-                            </div>
-                            <h3 class="text-xl font-bold mb-3">Strategy</h3>
-                            <p class="text-sm text-gray-400 leading-relaxed">We create a roadmap and select best design approach for your brand.</p>
+                    <div class="group relative rounded-2xl overflow-hidden aspect-[3/4] hover-lift">
+                        <img src="https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/rifad.jpg" alt="Rifad" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 grayscale group-hover:grayscale-0">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-80 flex flex-col justify-end p-4">
+                            <h3 class="text-white font-bold text-lg">Rifad</h3>
+                            <p class="text-brand-500 text-xs font-bold uppercase tracking-wider mb-2">CEO & FOUNDER</p>
                         </div>
                     </div>
-                    <div class="relative group">
-                        <div class="absolute top-0 left-0 w-full h-1 bg-brand-600 rounded-full"></div>
-                        <div class="bg-white/5 border border-white/10 rounded-2xl p-8 hover:bg-white/10 transition-all hover:border-brand-600/50 h-full">
-                            <div class="w-12 h-12 rounded-full bg-brand-600/20 flex items-center justify-center text-brand-500 mb-6 group-hover:bg-brand-600 group-hover:text-white transition-colors">
-                                <span class="text-xl font-bold">03</span>
-                            </div>
-                            <h3 class="text-xl font-bold mb-3">Design</h3>
-                            <p class="text-sm text-gray-400 leading-relaxed">Our creative team builds your visuals with iterative feedback loops.</p>
+                    <div class="group relative rounded-2xl overflow-hidden aspect-[3/4] hover-lift">
+                        <img src="https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/nidal.jpg" alt="Nidal" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 grayscale group-hover:grayscale-0">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-80 flex flex-col justify-end p-4">
+                            <h3 class="text-white font-bold text-lg">Nidal</h3>
+                            <p class="text-brand-500 text-xs font-bold uppercase tracking-wider mb-2">MARKETING</p>
                         </div>
                     </div>
-                    <div class="relative group">
-                        <div class="absolute top-0 left-0 w-full h-1 bg-brand-600 rounded-full"></div>
-                        <div class="bg-white/5 border border-white/10 rounded-2xl p-8 hover:bg-white/10 transition-all hover:border-brand-600/50 h-full">
-                            <div class="w-12 h-12 rounded-full bg-brand-600/20 flex items-center justify-center text-brand-500 mb-6 group-hover:bg-brand-600 group-hover:text-white transition-colors">
-                                <span class="text-xl font-bold">04</span>
-                            </div>
-                            <h3 class="text-xl font-bold mb-3">Launch</h3>
-                            <p class="text-sm text-gray-400 leading-relaxed">Final delivery of assets and go-live support for your project.</p>
+                    <div class="group relative rounded-2xl overflow-hidden aspect-[3/4] hover-lift">
+                        <img src="https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/shadin.jpg" alt="Shadin" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 grayscale group-hover:grayscale-0">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-80 flex flex-col justify-end p-4">
+                            <h3 class="text-white font-bold text-lg">Shadin</h3>
+                            <p class="text-brand-500 text-xs font-bold uppercase tracking-wider mb-2">CREATIVE DIR.</p>
                         </div>
                     </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ========================================================
-             THANK YOU SECTION (Before Contact)
-             ======================================================== -->
-        <section id="thank-you" class="py-24 relative overflow-hidden">
-            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-brand-600/10 rounded-full blur-[120px] pointer-events-none"></div>
-            <div class="max-w-4xl mx-auto px-5 sm:px-8 relative z-10 text-center">
-                <div class="fade-up">
-                    <span class="inline-flex items-center gap-2 text-brand-500 font-bold uppercase tracking-widest text-xs mb-6">
-                        <span class="w-6 h-px bg-brand-500"></span>
-                        Thank You
-                        <span class="w-6 h-px bg-brand-500"></span>
-                    </span>
-                    <h2 class="text-4xl sm:text-5xl md:text-6xl font-black leading-tight mb-4">
-                        THIS MILESTONE ISN'T JUST OURS.
-                    </h2>
-                    <p class="text-2xl sm:text-3xl text-brand-500 font-bold mb-10">It's yours too.</p>
-                    <div class="max-w-2xl mx-auto space-y-2 text-gray-400 text-base sm:text-lg leading-relaxed mb-12">
-                        <p>To every client who trusted us,</p>
-                        <p>every project that challenged us,</p>
-                        <p>and everyone who supported Typixel,</p>
-                        <p class="text-white font-semibold pt-4">Thank you.</p>
+                    <div class="group relative rounded-2xl overflow-hidden aspect-[3/4] hover-lift">
+                        <img src="https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/afsal.jpg" alt="Afsal" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 grayscale group-hover:grayscale-0">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-80 flex flex-col justify-end p-4">
+                            <h3 class="text-white font-bold text-lg">Afsal</h3>
+                            <p class="text-brand-500 text-xs font-bold uppercase tracking-wider mb-2">STRATEGIST</p>
+                        </div>
                     </div>
-                    <h3 class="text-5xl sm:text-7xl md:text-8xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-200 to-gray-500">
-                        BUILT TO BE REMEMBERED.
-                    </h3>
                 </div>
             </div>
         </section>
@@ -1170,8 +433,6 @@ document.addEventListener("DOMContentLoaded", function () {
                     <div>
                         <p class="text-brand-600 font-bold uppercase tracking-widest text-xs mb-3">Get In Touch</p>
                         <h2 class="text-3xl sm:text-4xl font-bold text-white tracking-tight mb-6">Let's Collaborate</h2>
-                        <p class="text-base text-gray-400 font-light leading-relaxed mb-10">Have a project in mind? Fill out form below. It will send an email and also open WhatsApp for a quick collaboration chat.</p>
-
                         <div class="space-y-6">
                             <a href="https://wa.me/919072891142?text=Hi%20Typixel,%20I%20want%20to%20collaborate." target="_blank" class="flex items-center gap-4 group">
                                 <div class="w-12 h-12 rounded-xl bg-green-600/10 flex items-center justify-center group-hover:bg-green-600 transition-all duration-300">
@@ -1182,70 +443,42 @@ document.addEventListener("DOMContentLoaded", function () {
                                     <p class="text-sm text-gray-400">+91 90728 91142</p>
                                 </div>
                             </a>
-                            <a href="mailto:typixelofficial@gmail.com?subject=Collaboration%20Inquiry" class="flex items-center gap-4 group">
-                                <div class="w-12 h-12 rounded-xl bg-brand-600/10 flex items-center justify-center group-hover:bg-brand-600 transition-all duration-300">
-                                    <iconify-icon icon="lucide:mail" class="text-brand-600 group-hover:text-white text-xl transition-colors"></iconify-icon>
-                                </div>
-                                <div>
-                                    <p class="text-sm font-bold text-white">Email</p>
-                                    <p class="text-sm text-gray-400">typixelofficial@gmail.com</p>
-                                </div>
-                            </a>
-                        </div>
-
-                        <!-- HIGHLIGHTED LINKS -->
-                        <div class="grid grid-cols-2 gap-4 mt-8">
-                            <a href="price.html" class="group flex flex-col items-center justify-center gap-2 p-4 rounded-xl border border-brand-500/30 bg-brand-500/5 hover:bg-brand-600 hover:border-brand-600 transition-all duration-300 text-brand-400 hover:text-white">
-                                <iconify-icon icon="lucide:list" class="text-xl transition-transform group-hover:scale-110"></iconify-icon>
-                                <span class="text-sm font-bold uppercase tracking-wider">Price List</span>
-                            </a>
-                            <a href="team.html" class="group flex flex-col items-center justify-center gap-2 p-4 rounded-xl border border-brand-500/30 bg-brand-500/5 hover:bg-brand-600 hover:border-brand-600 transition-all duration-300 text-brand-400 hover:text-white">
-                                <iconify-icon icon="lucide:users" class="text-xl transition-transform group-hover:scale-110"></iconify-icon>
-                                <span class="text-sm font-bold uppercase tracking-wider">Join Our Team</span>
-                            </a>
                         </div>
                     </div>
-
                     <div>
                         <div class="bg-white/5 border border-white/10 rounded-3xl p-8 backdrop-blur-xl">
                             <form action="https://api.web3forms.com/submit" method="POST" id="contact-form" class="space-y-5">
                                 <input type="hidden" name="access_key" value="d350e23d-beb1-4d69-a2d2-6e83681ecb14">
-
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                                     <div>
-                                        <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">Your Name *</label>
-                                        <input type="text" id="contact-name" name="name" required placeholder="Your name" class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white text-sm placeholder:text-gray-600 focus:outline-none focus:border-brand-600 transition-colors">
+                                        <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">Name *</label>
+                                        <input type="text" id="contact-name" name="name" required class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white text-sm focus:outline-none focus:border-brand-600 transition-colors">
                                     </div>
                                     <div>
-                                        <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">Phone / WhatsApp *</label>
-                                        <input type="tel" id="contact-phone" name="phone" required placeholder="+91 XXXXX XXXXX" class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white text-sm placeholder:text-gray-600 focus:outline-none focus:border-brand-600 transition-colors">
+                                        <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">Phone *</label>
+                                        <input type="tel" id="contact-phone" name="phone" required class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white text-sm focus:outline-none focus:border-brand-600 transition-colors">
                                     </div>
                                 </div>
                                 <div>
                                     <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">Email *</label>
-                                    <input type="email" id="contact-email" name="email" required placeholder="your@email.com" class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white text-sm placeholder:text-gray-600 focus:outline-none focus:border-brand-600 transition-colors">
+                                    <input type="email" id="contact-email" name="email" required class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white text-sm focus:outline-none focus:border-brand-600 transition-colors">
                                 </div>
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                                    <div>
-                                        <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">Service Needed *</label>
-                                        <select id="contact-service" name="service" required class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white text-sm focus:outline-none focus:border-brand-600 transition-all appearance-none">
-                                            <option value="" class="bg-black">Select service</option>
-                                            <option value="Branding">Branding & Identity</option>
-                                            <option value="YouTube Thumbnail Design">YouTube Thumbnail Design</option>
-                                            <option value="Website">Website Design</option>
-                                            <option value="Social Media">Social Media Creatives</option>
-                                            <option value="Packaging">Packaging Design</option>
-                                        </select>
-                                    </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">Service Needed *</label>
+                                    <select id="contact-service" name="service" required class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white text-sm focus:outline-none focus:border-brand-600 transition-all appearance-none">
+                                        <option value="" class="bg-black">Select service</option>
+                                        <option value="Branding">Branding & Identity</option>
+                                        <option value="YouTube Thumbnail">YouTube Thumbnail Design</option>
+                                        <option value="Website">Website Design</option>
+                                        <option value="Social Media">Social Media Creatives</option>
+                                    </select>
                                 </div>
                                 <div>
                                     <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">Message</label>
-                                    <textarea id="contact-message" name="message" rows="4" placeholder="Describe your brand, what you need..." class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white text-sm placeholder:text-gray-600 focus:outline-none focus:border-brand-600 transition-all resize-none"></textarea>
+                                    <textarea id="contact-message" name="message" rows="4" class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white text-sm focus:outline-none focus:border-brand-600 transition-all resize-none"></textarea>
                                 </div>
-
                                 <button type="submit" id="contact-btn" class="w-full bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold uppercase tracking-widest py-4 rounded-xl flex items-center justify-center gap-2 transition-all">
-                                    <iconify-icon icon="lucide:send" class="text-base"></iconify-icon>
-                                    Send Collaboration Inquiry
+                                    <iconify-icon icon="lucide:send" class="text-base"></iconify-icon> Send Inquiry
                                 </button>
                             </form>
                         </div>
@@ -1257,623 +490,703 @@ document.addEventListener("DOMContentLoaded", function () {
         <!-- ========== FOOTER ========== -->
         <footer class="bg-black border-t border-white/10 pt-16 pb-8">
             <div class="max-w-7xl mx-auto px-5">
-                <!-- Top Grid -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
-
-                    <!-- 1. Brand Section -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
                     <div class="space-y-4">
                         <div class="flex items-center gap-3">
                             <img src="https://z-cdn-media.chatglm.cn/files/db59a431-5745-42ec-8575-eda0a0d7d874.png?auth_key=1877803378-171e0b259fba4a18b98bd102cd7552e3-0-9f785a189e477354911412f66e12d36d" alt="Typixel Logo" class="w-10 h-10 object-contain logo-spin">
                             <span class="text-xl font-bold tracking-tight text-white">Typixel</span>
                         </div>
-                        <p class="text-sm text-gray-400 leading-relaxed">
-                            Creative design solutions that bring ideas to life.<br>
-                            We craft visuals that speak, inspire, and convert.
-                        </p>
+                        <p class="text-sm text-gray-400 leading-relaxed">Creative design solutions that bring ideas to life.</p>
                     </div>
-
-                    <!-- 2. Quick Links -->
                     <div>
                         <h4 class="text-white font-bold uppercase tracking-widest text-sm mb-4">Quick Links</h4>
                         <ul class="space-y-2">
                             <li><a href="#home" class="text-sm text-gray-400 hover:text-brand-500 transition-colors">Home</a></li>
                             <li><a href="#services" class="text-sm text-gray-400 hover:text-brand-500 transition-colors">Services</a></li>
                             <li><a href="#portfolio" class="text-sm text-gray-400 hover:text-brand-500 transition-colors">Portfolio</a></li>
-                            <li><a href="#anniversary-offers" class="text-sm text-brand-500 hover:text-brand-400 transition-colors font-medium">Anniversary</a></li>
-                            <li><a href="#reviews" class="text-sm text-gray-400 hover:text-brand-500 transition-colors">Reviews</a></li>
-                            <li><a href="#team" class="text-sm text-gray-400 hover:text-brand-500 transition-colors">Team</a></li>
                             <li><a href="#contact" class="text-sm text-gray-400 hover:text-brand-500 transition-colors">Contact</a></li>
                         </ul>
                     </div>
-
-                    <!-- 3. Services -->
                     <div>
                         <h4 class="text-white font-bold uppercase tracking-widest text-sm mb-4">Services</h4>
                         <ul class="space-y-2">
                             <li><span class="text-sm text-gray-400">Logo Design</span></li>
                             <li><span class="text-sm text-gray-400">Branding & Identity</span></li>
                             <li><span class="text-sm text-gray-400">Social Media Design</span></li>
-                            <li><span class="text-sm text-gray-400">YouTube Thumbnail Design</span></li>
-                            <li><span class="text-sm text-gray-400">Print Design</span></li>
-                            <li><span class="text-sm text-gray-400">Packaging Design</span></li>
                         </ul>
                     </div>
-
-                    <!-- 4. Contact Info & Socials -->
                     <div>
                         <h4 class="text-white font-bold uppercase tracking-widest text-sm mb-4">Contact</h4>
                         <ul class="space-y-3 text-sm text-gray-400 mb-6">
-                            <li class="flex items-center gap-2">
-                                <iconify-icon icon="lucide:map-pin" class="text-brand-500"></iconify-icon>
-                                <span>Kotakkal, Malappuram, Kerala, India</span>
-                            </li>
-                            <li class="flex items-center gap-2">
-                                <iconify-icon icon="lucide:mail" class="text-brand-500"></iconify-icon>
-                                <a href="mailto:typixelofficial@gmail.com" class="hover:text-white transition-colors">typixelofficial@gmail.com</a>
-                            </li>
-                            <li class="flex items-center gap-2">
-                                <iconify-icon icon="lucide:phone" class="text-brand-500"></iconify-icon>
-                                <a href="tel:+919072891142" class="hover:text-white transition-colors">+91 9072891142</a>
-                            </li>
+                            <li class="flex items-center gap-2"><iconify-icon icon="lucide:mail" class="text-brand-500"></iconify-icon> typixelofficial@gmail.com</li>
+                            <li class="flex items-center gap-2"><iconify-icon icon="lucide:phone" class="text-brand-500"></iconify-icon> +91 9072891142</li>
                         </ul>
-
-                        <h4 class="text-white font-bold uppercase tracking-widest text-sm mb-3">Follow Us</h4>
-                        <div class="flex gap-4">
-                            <a href="https://www.instagram.com/typixelofficial/" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-brand-600 hover:text-white text-gray-400 transition-all">
-                                <iconify-icon icon="lucide:instagram"></iconify-icon>
-                            </a>
-                            <a href="https://www.behance.net/hashimmhd" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-brand-600 hover:text-white text-gray-400 transition-all">
-                                <iconify-icon icon="mdi:behance"></iconify-icon>
-                            </a>
-                        </div>
                     </div>
                 </div>
-
-                <!-- 5. Newsletter Section -->
-                <div class="border-t border-white/5 py-10 mb-8">
-                    <div class="max-w-lg mx-auto text-center">
-                        <h4 class="text-white font-bold mb-2">Stay Updated</h4>
-                        <p class="text-sm text-gray-500 mb-4">Subscribe to our newsletter for the latest designs & offers.</p>
-
-                        <form id="newsletter-form" class="flex gap-2" action="https://api.web3forms.com/submit" method="POST">
-                            <input type="hidden" name="access_key" value="d350e23d-beb1-4d69-a2d2-6e83681ecb14">
-                            <input type="hidden" name="subject" value="New Newsletter Subscription from Typixel">
-                            <input type="text" name="from_name" value="Newsletter Subscriber" style="display:none;">
-
-                            <input type="email" name="email" placeholder="your email" required class="flex-1 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-brand-600 transition-colors">
-                            <button type="submit" id="newsletter-btn" class="px-6 py-2 bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold uppercase rounded-full transition-colors">Subscribe</button>
-                        </form>
-                    </div>
-                </div>
-
-                <!-- 6. Bottom Bar -->
                 <div class="border-t border-white/5 pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-gray-500 gap-4">
                     <p>© 2026 Typixel. All Rights Reserved.</p>
-                    <div class="flex gap-6">
-                        <a href="#" class="hover:text-white transition-colors">Privacy Policy</a>
-                        <a href="#" class="hover:text-white transition-colors">Terms & Conditions</a>
-                    </div>
                 </div>
             </div>
         </footer>
 
-        <!-- ========== FLOATING WHATSAPP (existing, untouched) ========== -->
-        <a href="https://wa.me/919072891142?text=Hi%20Typixel,%20I%20am%20interested%20in%20a%20design%20collaboration." target="_blank" class="fixed bottom-6 right-6 z-50 w-14 h-14 bg-green-500 hover:bg-green-600 rounded-full flex items-center justify-center shadow-2xl shadow-green-500/30 hover:shadow-green-500/50 hover:scale-110 transition-all duration-300">
+        <!-- FLOATING WHATSAPP -->
+        <a href="https://wa.me/919072891142?text=Hi%20Typixel" target="_blank" class="fixed bottom-6 right-6 z-50 w-14 h-14 bg-green-500 hover:bg-green-600 rounded-full flex items-center justify-center shadow-2xl hover:scale-110 transition-all duration-300">
             <iconify-icon icon="lucide:message-circle" class="text-white text-2xl"></iconify-icon>
         </a>
 
-        <!-- ========== FLOATING ANNIVERSARY CTA (NEW) ========== -->
-        <button onclick="scrollToWheel()" class="anniv-fab" aria-label="Win a surprise">
-            <span class="pulse-dot"></span>
-            <span>🎁 Win a Surprise</span>
+        <!-- FLOATING ANNIVERSARY DROP BUTTON -->
+        <button onclick="openAnniversaryDrop()" class="anniv-fab" aria-label="Open Anniversary Drop">
+            <span>🎁 Anniversary Drop</span>
         </button>
 
         <!-- ========================================================
-             ANNIVERSARY CAMPAIGN JAVASCRIPT
+             ANNIVERSARY DROP OVERLAYS & UI
+             ======================================================== -->
+
+        <!-- 1. INTRO SEQUENCE OVERLAY -->
+        <div id="anniv-intro" class="drop-overlay" style="z-index: 150;">
+            <div id="intro-bg-glow" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-brand-600/0 rounded-full blur-[120px] transition-all duration-1000"></div>
+            
+            <div id="intro-stage-1" class="intro-text text-center">
+                <div class="w-20 h-20 mx-auto mb-8 animate-pulse">
+                    <img src="https://z-cdn-media.chatglm.cn/files/db59a431-5745-42ec-8575-eda0a0d7d874.png?auth_key=1877803378-171e0b259fba4a18b98bd102cd7552e3-0-9f785a189e477354911412f66e12d36d" alt="Typixel" class="w-full h-full object-contain">
+                </div>
+                <p class="text-2xl font-black tracking-[0.2em] text-white mb-2">TYPOPIXEL</p>
+                <p class="text-sm font-bold tracking-[0.4em] text-brand-600">ANNIVERSARY</p>
+                <p class="text-6xl font-black text-white mt-4">2026</p>
+            </div>
+
+            <div id="intro-stage-2" class="intro-text text-center max-w-md">
+                <h2 class="text-5xl md:text-6xl font-black mb-4 text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-500">THE DROP IS LIVE.</h2>
+                <p class="text-gray-400 mb-8">Your anniversary surprise is waiting.</p>
+                <button onclick="closeIntroAndOpenDrop()" class="px-10 py-4 bg-brand-600 hover:bg-brand-700 text-white font-bold uppercase tracking-wider rounded-full transition-all hover:scale-105 shadow-lg shadow-brand-600/30 mb-4">
+                    Enter The Drop →
+                </button>
+                <br>
+                <button onclick="closeAnniversaryOverlay('anniv-intro')" class="text-sm text-gray-500 hover:text-white transition-colors">Explore Typixel</button>
+            </div>
+
+            <div id="confetti-container" class="absolute inset-0 pointer-events-none overflow-hidden"></div>
+        </div>
+
+        <!-- 2. MAIN DROP EXPERIENCE OVERLAY -->
+        <div id="anniv-drop" class="drop-overlay" style="z-index: 140;">
+            <div class="absolute inset-0 bg-black/90"></div>
+            <div class="absolute inset-0 fine-grain opacity-[0.03] mix-blend-overlay pointer-events-none"></div>
+            <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-brand-600/10 rounded-full blur-[100px] pointer-events-none"></div>
+
+            <!-- Top Bar -->
+            <div class="relative z-10 w-full max-w-5xl mx-auto p-6 flex justify-between items-center">
+                <div>
+                    <p class="text-xs font-black tracking-widest text-white">TYPOPIXEL</p>
+                    <p class="text-[10px] font-bold tracking-widest text-brand-600">ANNIVERSARY DROP</p>
+                </div>
+                <div class="flex items-center gap-6">
+                    <div class="hidden md:flex items-center gap-4">
+                        <div class="progress-step flex flex-col items-center" data-step="1">
+                            <div class="step-dot w-3 h-3 rounded-full bg-gray-700 transition-all"></div>
+                            <span class="text-[9px] mt-1 text-gray-600">01</span>
+                        </div>
+                        <div class="h-px w-8 bg-gray-800"></div>
+                        <div class="progress-step flex flex-col items-center" data-step="2">
+                            <div class="step-dot w-3 h-3 rounded-full bg-gray-700 transition-all"></div>
+                            <span class="text-[9px] mt-1 text-gray-600">02</span>
+                        </div>
+                        <div class="h-px w-8 bg-gray-800"></div>
+                        <div class="progress-step flex flex-col items-center" data-step="3">
+                            <div class="step-dot w-3 h-3 rounded-full bg-gray-700 transition-all"></div>
+                            <span class="text-[9px] mt-1 text-gray-600">03</span>
+                        </div>
+                        <div class="h-px w-8 bg-gray-800"></div>
+                        <div class="progress-step flex flex-col items-center" data-step="4">
+                            <div class="step-dot w-3 h-3 rounded-full bg-gray-700 transition-all"></div>
+                            <span class="text-[9px] mt-1 text-gray-600">04</span>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p id="drop-level-text" class="text-xs font-black tracking-widest text-white">LEVEL 01 / 04</p>
+                        <div class="w-24 h-1 bg-gray-800 rounded-full mt-1 overflow-hidden">
+                            <div id="drop-progress-bar" class="h-full bg-brand-600 transition-all duration-500" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <button onclick="closeAnniversaryOverlay('anniv-drop')" class="text-gray-500 hover:text-white transition-colors">
+                        <iconify-icon icon="lucide:x" class="text-xl"></iconify-icon>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="relative z-10 w-full max-w-2xl mx-auto px-6 py-8 text-center">
+                
+                <!-- LEVEL 01: DISCOVER -->
+                <div id="level-01-content" class="drop-content hidden">
+                    <p class="text-xs font-bold tracking-widest text-brand-600 mb-2">LEVEL 01</p>
+                    <h2 class="text-4xl md:text-5xl font-black mb-4">DISCOVER THE DROP</h2>
+                    <p class="text-gray-400 mb-10">Every anniversary starts with a first surprise.</p>
+                    <div id="discover-card" class="drop-card p-10 cursor-pointer transition-all duration-500 hover:border-brand-600/50" onclick="revealLevel1()">
+                        <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-brand-600/10 flex items-center justify-center">
+                            <iconify-icon icon="lucide:gift" class="text-2xl text-brand-600"></iconify-icon>
+                        </div>
+                        <p class="font-bold text-white text-lg">REVEAL</p>
+                    </div>
+                    <div id="discover-revealed" class="hidden">
+                        <div class="drop-card p-10 border-brand-600/30">
+                            <p class="text-xs font-bold tracking-widest text-brand-600 mb-2">LEVEL 01 COMPLETE</p>
+                            <h3 class="text-3xl font-black text-white mb-1">EARLY ACCESS</h3>
+                            <p class="text-gray-400 text-sm mb-8">You're in. The journey begins.</p>
+                            <button onclick="goToLevel(2)" class="px-8 py-3 bg-brand-600 hover:bg-brand-700 text-white font-bold uppercase tracking-wider rounded-full text-sm">Continue →</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- LEVEL 02: SHARE -->
+                <div id="level-02-content" class="drop-content hidden">
+                    <p class="text-xs font-bold tracking-widest text-brand-600 mb-2">LEVEL 02</p>
+                    <h2 class="text-4xl md:text-5xl font-black mb-4">UNLOCK THE NEXT LEVEL</h2>
+                    <p class="text-gray-400 mb-10">Share the Typixel Anniversary Drop with 5 people to continue.</p>
+                    
+                    <div class="text-8xl font-black text-white mb-6 transition-all" id="share-counter">0 / 5</div>
+                    <div class="flex justify-center gap-4 mb-10" id="share-circles">
+                        <div class="share-circle"></div><div class="share-circle"></div><div class="share-circle"></div><div class="share-circle"></div><div class="share-circle"></div>
+                    </div>
+                    <p id="share-status" class="text-sm font-bold text-brand-600 mb-8">5 SHARES LEFT</p>
+
+                    <button onclick="openShareModal()" class="px-10 py-4 bg-white text-black font-bold uppercase tracking-wider rounded-full hover:scale-105 transition-all">Share & Unlock</button>
+                    <p class="text-[10px] text-gray-600 mt-4 max-w-xs mx-auto">Note: Represents share actions initiated on this device.</p>
+                </div>
+
+                <!-- LEVEL 03: SPIN -->
+                <div id="level-03-content" class="drop-content hidden">
+                    <p class="text-xs font-bold tracking-widest text-brand-600 mb-2">LEVEL 03</p>
+                    <h2 class="text-4xl md:text-5xl font-black mb-4">YOUR SURPRISE AWAITS.</h2>
+                    <p class="text-gray-400 mb-10">Spin the Typixel Anniversary Wheel.</p>
+                    
+                    <div class="relative w-64 h-64 mx-auto mb-10">
+                        <div class="wheel-glow"></div>
+                        <svg class="wheel-pointer absolute -top-2 left-1/2 -translate-x-1/2 z-10" width="24" height="32" viewBox="0 0 24 32" xmlns="http://www.w3.org/2000/svg"><path d="M 12 32 L 2 6 Q 12 0 22 6 Z" fill="#dc2626" stroke="#fff" stroke-width="2"/></svg>
+                        <svg id="wheel-svg" class="wheel-svg w-full h-full" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg"></svg>
+                        <button id="spin-btn" onclick="spinWheel()" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 bg-black border-2 border-brand-600 rounded-full text-white font-black text-xs uppercase tracking-wider hover:scale-110 transition-transform z-20">SPIN</button>
+                    </div>
+                </div>
+
+                <!-- LEVEL 04: FINAL DROP -->
+                <div id="level-04-content" class="drop-content hidden">
+                    <p class="text-xs font-bold tracking-widest text-brand-600 mb-2">LEVEL 04 / 04</p>
+                    <h2 class="text-4xl md:text-5xl font-black mb-4">ONE LAST SURPRISE.</h2>
+                    <p class="text-gray-400 mb-10">YOU'VE COME THIS FAR.</p>
+                    
+                    <div id="final-vault" class="drop-card p-12 cursor-pointer hover:border-brand-600/50 transition-all" onclick="triggerFinalDrop()">
+                        <div class="w-20 h-20 mx-auto mb-4 rounded-full bg-brand-600/10 flex items-center justify-center animate-pulse">
+                            <iconify-icon icon="lucide:lock" class="text-3xl text-brand-600"></iconify-icon>
+                        </div>
+                        <p class="font-bold text-white text-lg">OPEN THE FINAL DROP →</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- 3. SHARE MODAL -->
+        <div id="anniv-share-modal" class="drop-overlay" style="z-index: 160;">
+            <div class="drop-card max-w-md w-full p-8 relative">
+                <button onclick="closeAnniversaryOverlay('anniv-share-modal')" class="absolute top-4 right-4 text-gray-500 hover:text-white"><iconify-icon icon="lucide:x"></iconify-icon></button>
+                <h3 class="text-2xl font-black mb-2 text-center">CHOOSE YOUR SHARE</h3>
+                <p class="text-center text-sm text-gray-400 mb-6">Progress: <span id="modal-share-count">0</span> / 5</p>
+                <div class="grid grid-cols-2 gap-4">
+                    <button onclick="performShare('whatsapp')" class="flex flex-col items-center justify-center gap-2 p-4 bg-white/5 hover:bg-green-600/20 border border-white/10 rounded-xl transition-colors">
+                        <iconify-icon icon="mdi:whatsapp" class="text-2xl text-green-500"></iconify-icon>
+                        <span class="text-xs font-bold uppercase">WhatsApp</span>
+                    </button>
+                    <button onclick="performShare('telegram')" class="flex flex-col items-center justify-center gap-2 p-4 bg-white/5 hover:bg-blue-600/20 border border-white/10 rounded-xl transition-colors">
+                        <iconify-icon icon="mdi:telegram" class="text-2xl text-blue-400"></iconify-icon>
+                        <span class="text-xs font-bold uppercase">Telegram</span>
+                    </button>
+                    <button onclick="performShare('copy')" class="flex flex-col items-center justify-center gap-2 p-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-colors">
+                        <iconify-icon icon="lucide:link" class="text-2xl text-white"></iconify-icon>
+                        <span class="text-xs font-bold uppercase">Copy Link</span>
+                    </button>
+                    <button onclick="performShare('instagram')" class="flex flex-col items-center justify-center gap-2 p-4 bg-white/5 hover:bg-pink-600/20 border border-white/10 rounded-xl transition-colors">
+                        <iconify-icon icon="mdi:instagram" class="text-2xl text-pink-500"></iconify-icon>
+                        <span class="text-xs font-bold uppercase">Instagram</span>
+                    </button>
+                    <button onclick="performShare('facebook')" class="flex flex-col items-center justify-center gap-2 p-4 bg-white/5 hover:bg-blue-600/20 border border-white/10 rounded-xl transition-colors col-span-2">
+                        <iconify-icon icon="mdi:facebook" class="text-2xl text-blue-600"></iconify-icon>
+                        <span class="text-xs font-bold uppercase">Facebook</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. SUSPENSE & REWARD MODAL -->
+        <div id="anniv-suspense" class="drop-overlay" style="z-index: 160;">
+            <div class="text-center relative w-full max-w-md">
+                <div class="scan-line hidden" id="scan-line"></div>
+                <p id="suspense-text-1" class="text-2xl font-black tracking-widest text-white mb-4 opacity-0 transition-opacity duration-500">ANALYZING YOUR DROP...</p>
+                <p id="suspense-text-2" class="text-2xl font-black tracking-widest text-brand-600 mb-4 opacity-0 transition-opacity duration-500">REWARD FOUND.</p>
+                <p id="suspense-text-3" class="text-4xl font-black text-white mb-8 opacity-0 transition-opacity duration-500">READY?</p>
+                
+                <div id="reward-reveal" class="drop-card p-8 opacity-0 transition-opacity duration-700 border-brand-600/40">
+                    <p class="text-xs font-bold tracking-widest text-gray-500 mb-4">YOU UNLOCKED</p>
+                    <h3 id="reward-title" class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-brand-700 mb-2">25% OFF</h3>
+                    <p class="text-xs font-bold tracking-widest text-gray-500 mb-6">TYPOPIXEL ANNIVERSARY REWARD</p>
+                    <div class="bg-black/50 border border-dashed border-brand-600/40 rounded-xl p-4 mb-6">
+                        <p class="text-[10px] text-gray-600 mb-1">CODE</p>
+                        <p id="reward-code" class="text-xl font-mono font-black text-white tracking-wider">TYPE25-X8KQ</p>
+                    </div>
+                    <div class="flex gap-3">
+                        <button onclick="copyCode(document.getElementById('reward-code').innerText)" class="flex-1 py-3 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold uppercase tracking-wider rounded-full text-xs">Copy Code</button>
+                        <button onclick="claimRewardWhatsApp()" class="flex-1 py-3 bg-brand-600 hover:bg-brand-700 text-white font-bold uppercase tracking-wider rounded-full text-xs">Claim Reward</button>
+                    </div>
+                    <button onclick="closeAnniversaryOverlay('anniv-suspense'); goToLevel(4);" class="mt-6 text-sm text-gray-400 hover:text-white transition-colors">Continue to Final Drop →</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. FINAL REWARD MODAL -->
+        <div id="anniv-final-reward" class="drop-overlay" style="z-index: 160;">
+            <div class="text-center relative w-full max-w-md">
+                <div id="final-reveal" class="drop-card p-8 opacity-0 transition-opacity duration-700 border-brand-600/40">
+                    <p class="text-xs font-bold tracking-widest text-gray-500 mb-2">TYPOPIXEL</p>
+                    <p class="text-[10px] font-bold tracking-widest text-brand-600 mb-6">ANNIVERSARY DROP</p>
+                    <p class="text-xs font-bold tracking-widest text-gray-500 mb-4">FINAL REWARD</p>
+                    <h3 id="final-reward-title" class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-brand-700 mb-2">FREE THUMBNAIL</h3>
+                    <div class="bg-black/50 border border-dashed border-brand-600/40 rounded-xl p-4 my-6">
+                        <p class="text-[10px] text-gray-600 mb-1">CODE</p>
+                        <p id="final-reward-code" class="text-xl font-mono font-black text-white tracking-wider">TYPEGIFT-92LX</p>
+                    </div>
+                    <p class="text-[10px] text-gray-600 mb-6">VALID UNTIL 2026-12-31</p>
+                    <div class="flex flex-col gap-3">
+                        <button onclick="copyCode(document.getElementById('final-reward-code').innerText)" class="py-3 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold uppercase tracking-wider rounded-full text-xs">Copy Code</button>
+                        <button onclick="claimFinalRewardWhatsApp()" class="py-3 bg-brand-600 hover:bg-brand-700 text-white font-bold uppercase tracking-wider rounded-full text-xs">Claim on WhatsApp</button>
+                        <button onclick="shareWin()" class="py-3 text-gray-400 hover:text-white text-xs font-bold uppercase transition-colors">Share Your Win</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================================
+             JAVASCRIPT LOGIC
              ======================================================== -->
         <script>
-        // ============================================================
-        //  ANNIVERSARY CONFIG — Edit all campaign values here
-        // ============================================================
         const ANNIVERSARY_CONFIG = {
-            // Campaign end date — easily change later
+            enabled: true,
+            debug: false, // Set to true to test intro repeatedly
             campaignEndDate: "2026-12-31T23:59:59",
-
-            // Existing WhatsApp number from the website
+            requiredShares: 5,
             whatsappNumber: "919072891142",
-
-            // Coupon code prefix
-            couponPrefix: "TYPE",
-
-            // Spin limit per visitor (localStorage based, client-side only)
-            spinLimit: 1,
-            spinStorageKey: "typixelSpinUsed",
-            rewardStorageKey: "typixelSpinReward",
-            couponStorageKey: "typixelSpinCoupon",
-            popupStorageKey: "typixelAnniversarySeen",
-
-            // Wheel rewards with probabilities (must total 100)
-            // Probabilities are easy to edit here.
+            websiteUrl: window.location.origin,
+            storagePrefix: "typixel_anniversary_",
             rewards: [
-                { shortLabel: "10%",  subLabel: "OFF",         fullLabel: "10% OFF",                value: "10",  type: "discount", probability: 25, couponPrefix: "TYPE10" },
-                { shortLabel: "15%",  subLabel: "OFF",         fullLabel: "15% OFF",                value: "15",  type: "discount", probability: 20, couponPrefix: "TYPE15" },
-                { shortLabel: "20%",  subLabel: "OFF",         fullLabel: "20% OFF",                value: "20",  type: "discount", probability: 15, couponPrefix: "TYPE20" },
-                { shortLabel: "25%",  subLabel: "OFF",         fullLabel: "25% OFF",                value: "25",  type: "discount", probability: 10, couponPrefix: "TYPE25" },
-                { shortLabel: "FREE",  subLabel: "THUMBNAIL",  fullLabel: "FREE THUMBNAIL",          value: "Free Thumbnail",        type: "free",      probability: 10, couponPrefix: "TYPEGIFT" },
-                { shortLabel: "FREE",  subLabel: "POST",       fullLabel: "FREE SOCIAL POST",       value: "Free Social Post",      type: "free",      probability: 10, couponPrefix: "TYPEGIFT" },
-                { shortLabel: "FREE",  subLabel: "CONSULT",    fullLabel: "FREE LOGO CONSULTATION",  value: "Free Logo Consultation", type: "free",      probability: 5,  couponPrefix: "TYPEGIFT" },
-                { shortLabel: "GIFT",  subLabel: "SURPRISE",   fullLabel: "SURPRISE GIFT",           value: "Surprise Gift",         type: "surprise",  probability: 5,  couponPrefix: "TYPEGIFT" }
+                { label: "10% OFF", value: "10", type: "discount", probability: 25, code: "TYPE10" },
+                { label: "15% OFF", value: "15", type: "discount", probability: 20, code: "TYPE15" },
+                { label: "20% OFF", value: "20", type: "discount", probability: 15, code: "TYPE20" },
+                { label: "25% OFF", value: "25", type: "discount", probability: 10, code: "TYPE25" },
+                { label: "FREE THUMBNAIL", value: "Thumb", type: "free", probability: 10, code: "TYPEGIFT" },
+                { label: "FREE POST", value: "Post", type: "free", probability: 10, code: "TYPEGIFT" },
+                { label: "FREE CONSULT", value: "Consult", type: "free", probability: 5, code: "TYPEGIFT" },
+                { label: "SURPRISE GIFT", value: "Surprise", type: "surprise", probability: 5, code: "TYPEGIFT" }
             ],
-
-            // Spin animation duration in ms (must match CSS transition)
-            spinDuration: 5500,
-
-            // Number of full rotations during spin
-            spinRotations: 5
+            finalRewards: [
+                { label: "BONUS DISCOUNT", value: "Bonus" },
+                { label: "FREE DESIGN ADD-ON", value: "AddOn" },
+                { label: "FREE THUMBNAIL", value: "Thumb" },
+                { label: "PRIORITY BOOKING", value: "Priority" }
+            ]
         };
 
-        // ============================================================
-        //  GLOBAL STATE
-        // ============================================================
-        let currentWheelRotation = 0;
-        let isSpinning = false;
-        let currentReward = null;       // Holds reward object after spin
-        let currentCouponCode = null;   // Holds coupon code after spin
-        let campaignEnded = false;
+        let annivState = {
+            level: 1,
+            shares: 0,
+            reward: null,
+            coupon: null,
+            finalReward: null,
+            entrySeen: false
+        };
 
-        // ============================================================
-        //  WHEEL SVG BUILDER (Generates segments + labels dynamically)
-        // ============================================================
-        function polarToCartesian(cx, cy, r, angleDeg) {
-            // angleDeg: 0 = top, 90 = right, 180 = bottom, 270 = left
-            const rad = (angleDeg - 90) * Math.PI / 180;
-            return {
-                x: cx + r * Math.cos(rad),
-                y: cy + r * Math.sin(rad)
-            };
+        // --- localStorage Helpers ---
+        function saveAnnivState() {
+            try { localStorage.setItem(ANNIVERSARY_CONFIG.storagePrefix + 'state', JSON.stringify(annivState)); } catch(e) {}
+        }
+        function loadAnnivState() {
+            try {
+                const saved = localStorage.getItem(ANNIVERSARY_CONFIG.storagePrefix + 'state');
+                if (saved) {
+                    annivState = JSON.parse(saved);
+                    annivState.entrySeen = ANNIVERSARY_CONFIG.debug ? false : annivState.entrySeen; // Override for debug
+                }
+            } catch(e) {}
         }
 
+        // --- Overlay Helpers ---
+        function openOverlay(id) { document.getElementById(id).classList.add('open'); }
+        function closeOverlay(id) { document.getElementById(id).classList.remove('open'); }
+
+        function closeAnniversaryOverlay(id) {
+            closeOverlay(id);
+        }
+
+        // --- Toast ---
+        function showToast(msg, type = 'success') {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').innerText = msg;
+            toast.classList.add('active');
+            setTimeout(() => toast.classList.remove('active'), 3000);
+        }
+
+        // --- Init ---
+        function initAnniversaryDrop() {
+            loadAnnivState();
+            buildWheelSVG();
+            
+            if (!annivState.entrySeen) {
+                setTimeout(() => triggerIntroSequence(), 1000);
+            }
+
+            // ESC key listener
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    document.querySelectorAll('.drop-overlay.open').forEach(o => o.classList.remove('open'));
+                }
+            });
+        }
+
+        // --- Intro Sequence ---
+        function triggerIntroSequence() {
+            openOverlay('anniv-intro');
+            
+            setTimeout(() => { document.getElementById('intro-stage-1').classList.add('visible'); }, 300);
+            setTimeout(() => { document.getElementById('intro-bg-glow').style.background = 'rgba(220,38,38,0.4)'; }, 1500);
+            setTimeout(() => { triggerConfetti(); }, 1500);
+            
+            setTimeout(() => {
+                document.getElementById('intro-stage-1').classList.remove('visible');
+                document.getElementById('intro-stage-2').classList.add('visible');
+                annivState.entrySeen = true;
+                saveAnnivState();
+            }, 3500);
+        }
+
+        function closeIntroAndOpenDrop() {
+            closeOverlay('anniv-intro');
+            openAnniversaryDrop();
+        }
+
+        function triggerConfetti() {
+            const container = document.getElementById('confetti-container');
+            container.innerHTML = '';
+            const colors = ['#ffffff', '#dc2626', '#b91c1c', '#a1a1aa'];
+            
+            for (let i = 0; i < 60; i++) {
+                const piece = document.createElement('div');
+                piece.classList.add('confetti-piece');
+                piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+                piece.style.left = Math.random() * 100 + '%';
+                piece.style.top = '-10px';
+                piece.style.transform = `rotate(${Math.random() * 360}deg)`;
+                
+                if (Math.random() > 0.5) {
+                    piece.style.width = '6px';
+                    piece.style.height = '6px';
+                    piece.style.borderRadius = '50%';
+                }
+
+                container.appendChild(piece);
+
+                // Animate
+                const duration = 2000 + Math.random() * 1000;
+                const xMove = (Math.random() - 0.5) * 400;
+                const yMove = 800 + Math.random() * 400;
+
+                piece.animate([
+                    { transform: `translate(0, 0) rotate(0deg)`, opacity: 1 },
+                    { transform: `translate(${xMove}px, ${yMove}px) rotate(${Math.random() * 720}deg)`, opacity: 0 }
+                ], {
+                    duration: duration,
+                    easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+                });
+
+                setTimeout(() => piece.remove(), duration);
+            }
+        }
+
+        // --- Drop Experience ---
+        function openAnniversaryDrop() {
+            openOverlay('anniv-drop');
+            restoreProgress();
+        }
+
+        function restoreProgress() {
+            // If returning, jump to current level
+            goToLevel(annivState.level);
+            
+            if (annivState.level === 2 && annivState.shares > 0) {
+                updateShareUI();
+            }
+            if (annivState.level === 3 && annivState.reward) {
+                showToast("WELCOME BACK. LEVEL 03 READY.", "success");
+            }
+        }
+
+        function goToLevel(level) {
+            annivState.level = level;
+            saveAnnivState();
+
+            document.querySelectorAll('.drop-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`level-0${level}-content`).classList.remove('hidden');
+
+            // Update top bar
+            document.getElementById('drop-level-text').innerText = `LEVEL 0${level} / 04`;
+            document.getElementById('drop-progress-bar').style.width = ((level-1)/3 * 100) + '%';
+
+            // Update steps
+            document.querySelectorAll('.progress-step').forEach(step => {
+                const stepNum = parseInt(step.dataset.step);
+                step.classList.remove('active', 'completed');
+                if (stepNum < level) step.classList.add('completed');
+                if (stepNum === level) step.classList.add('active');
+            });
+        }
+
+        // --- Level 1 ---
+        function revealLevel1() {
+            document.getElementById('discover-card').classList.add('hidden');
+            document.getElementById('discover-revealed').classList.remove('hidden');
+            showToast("LEVEL 01 COMPLETE", "success");
+        }
+
+        // --- Level 2 (Share) ---
+        function openShareModal() {
+            document.getElementById('modal-share-count').innerText = annivState.shares;
+            openOverlay('anniv-share-modal');
+        }
+
+        function performShare(platform) {
+            const msg = `🔥 I just found the Typixel Anniversary Drop.\n\nComplete the journey and unlock a surprise reward.\n\n${ANNIVERSARY_CONFIG.websiteUrl}`;
+            const encMsg = encodeURIComponent(msg);
+            const url = encodeURIComponent(ANNIVERSARY_CONFIG.websiteUrl);
+
+            if (platform === 'whatsapp') window.open(`https://wa.me/?text=${encMsg}`, '_blank');
+            else if (platform === 'telegram') window.open(`https://t.me/share/url?url=${url}&text=${encMsg}`, '_blank');
+            else if (platform === 'facebook') window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
+            else if (platform === 'copy') {
+                const text = `${ANNIVERSARY_CONFIG.websiteUrl} - ${msg}`;
+                navigator.clipboard.writeText(text).then(() => showToast("✓ LINK COPIED", "success")).catch(() => fallbackCopy(text));
+            }
+            else if (platform === 'instagram') {
+                const text = msg;
+                navigator.clipboard.writeText(text).then(() => {
+                    showToast("LINK + MESSAGE COPIED. OPEN INSTAGRAM.", "success");
+                    setTimeout(() => window.open('https://instagram.com', '_blank'), 1000);
+                }).catch(() => fallbackCopy(text));
+            }
+
+            // Increment share action
+            if (annivState.shares < 5) {
+                annivState.shares++;
+                saveAnnivState();
+                updateShareUI();
+                
+                if (annivState.shares === 5) {
+                    triggerShareCompletion();
+                } else {
+                    showToast(`SHARE ${annivState.shares} COMPLETE`, "success");
+                }
+            }
+        }
+
+        function fallbackCopy(text) {
+            const ta = document.createElement('textarea');
+            ta.value = text; document.body.appendChild(ta); ta.select();
+            try { document.execCommand('copy'); showToast("✓ COPIED", "success"); } catch(e) {}
+            document.body.removeChild(ta);
+        }
+
+        function updateShareUI() {
+            const count = annivState.shares;
+            document.getElementById('share-counter').innerText = `${count} / 5`;
+            document.getElementById('modal-share-count').innerText = count;
+            
+            const circles = document.querySelectorAll('#share-circles .share-circle');
+            circles.forEach((c, i) => {
+                if (i < count) c.classList.add('filled'); else c.classList.remove('filled');
+            });
+
+            const left = 5 - count;
+            const status = document.getElementById('share-status');
+            if (left > 0) status.innerText = `${left} SHARE${left > 1 ? 'S' : ''} LEFT`;
+            else status.innerText = "LEVEL UNLOCKED";
+        }
+
+        function triggerShareCompletion() {
+            showToast("LEVEL 02 COMPLETE", "success");
+            triggerConfetti();
+            setTimeout(() => {
+                closeOverlay('anniv-share-modal');
+                goToLevel(3);
+            }, 1500);
+        }
+
+        // --- Level 3 (Spin) ---
+        let currentRotation = 0;
         function buildWheelSVG() {
             const wheelEl = document.getElementById('wheel-svg');
             if (!wheelEl) return;
-            const size = 400, cx = 200, cy = 200, r = 195, innerR = 38;
+            const size = 400, cx = 200, cy = 200, r = 195;
             const rewards = ANNIVERSARY_CONFIG.rewards;
             const segCount = rewards.length;
             const segAngle = 360 / segCount;
 
             let paths = '', labels = '';
-
             rewards.forEach((reward, i) => {
                 const startAngle = i * segAngle - segAngle / 2;
                 const endAngle = i * segAngle + segAngle / 2;
-                const startPt = polarToCartesian(cx, cy, r, startAngle);
-                const endPt = polarToCartesian(cx, cy, r, endAngle);
-                // Alternating dark / dark-red segments (premium look)
-                const fillColor = i % 2 === 0 ? '#181818' : '#241515';
-
-                paths += `<path d="M ${cx} ${cy} L ${startPt.x} ${startPt.y} A ${r} ${r} 0 0 1 ${endPt.x} ${endPt.y} Z"
-                              fill="${fillColor}" stroke="#dc2626" stroke-width="1" stroke-opacity="0.35" />`;
-
-                // Two-line label placed at 0.62*r from center, kept horizontal (readable)
-                const labelPt = polarToCartesian(cx, cy, r * 0.62, i * segAngle);
-                labels += `<text x="${labelPt.x}" y="${labelPt.y - 5}" fill="#ffffff" font-size="14" font-weight="900" text-anchor="middle" dominant-baseline="middle" font-family="Inter, sans-serif">${reward.shortLabel}</text>`;
-                labels += `<text x="${labelPt.x}" y="${labelPt.y + 9}" fill="#dc2626" font-size="8" font-weight="700" text-anchor="middle" dominant-baseline="middle" font-family="Inter, sans-serif" letter-spacing="0.5">${reward.subLabel}</text>`;
+                const startRad = (startAngle - 90) * Math.PI / 180;
+                const endRad = (endAngle - 90) * Math.PI / 180;
+                const x1 = cx + r * Math.cos(startRad), y1 = cy + r * Math.sin(startRad);
+                const x2 = cx + r * Math.cos(endRad), y2 = cy + r * Math.sin(endRad);
+                const fillColor = i % 2 === 0 ? '#121212' : '#1f1010';
+                
+                paths += `<path d="M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 0 1 ${x2} ${y2} Z" fill="${fillColor}" stroke="#dc2626" stroke-width="1" stroke-opacity="0.3" />`;
+                
+                const labelRad = ((i * segAngle) - 90) * Math.PI / 180;
+                const lx = cx + (r * 0.65) * Math.cos(labelRad);
+                const ly = cy + (r * 0.65) * Math.sin(labelRad);
+                
+                labels += `<text x="${lx}" y="${ly}" fill="#ffffff" font-size="10" font-weight="900" text-anchor="middle" dominant-baseline="middle" font-family="Inter">${reward.label.split(' ')[0]}</text>`;
             });
 
-            // Outer rim
-            const outerRim = `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#dc2626" stroke-width="3" stroke-opacity="0.7" />`;
-
-            // Inner hub
-            const hub = `<circle cx="${cx}" cy="${cy}" r="${innerR}" fill="#0a0a0a" stroke="#dc2626" stroke-width="2" />
-                         <text x="${cx}" y="${cy - 5}" fill="#dc2626" font-size="10" font-weight="900" text-anchor="middle" dominant-baseline="middle" font-family="Inter, sans-serif">TYPIXEL</text>
-                         <text x="${cx}" y="${cy + 8}" fill="#888" font-size="6" font-weight="700" text-anchor="middle" dominant-baseline="middle" font-family="Inter, sans-serif" letter-spacing="1.5">SPIN & WIN</text>`;
-
-            // Small decorative dots around rim
-            let dots = '';
-            for (let i = 0; i < segCount; i++) {
-                const pt = polarToCartesian(cx, cy, r - 8, i * segAngle);
-                dots += `<circle cx="${pt.x}" cy="${pt.y}" r="2" fill="#dc2626" opacity="0.8" />`;
-            }
-
-            wheelEl.innerHTML = paths + labels + outerRim + dots + hub;
+            wheelEl.innerHTML = paths + labels + `<circle cx="${cx}" cy="${cy}" r="40" fill="#050505" stroke="#dc2626" stroke-width="2" />`;
         }
 
-        // ============================================================
-        //  PROBABILITY PICKER (Weighted random selection)
-        // ============================================================
         function pickWinningRewardIndex() {
             const rewards = ANNIVERSARY_CONFIG.rewards;
-            const totalProb = rewards.reduce((s, r) => s + r.probability, 0);
-            let rand = Math.random() * totalProb;
+            const total = rewards.reduce((s, r) => s + r.probability, 0);
+            let rand = Math.random() * total;
             for (let i = 0; i < rewards.length; i++) {
                 rand -= rewards[i].probability;
                 if (rand < 0) return i;
             }
-            return rewards.length - 1;
+            return 0;
         }
 
-        // ============================================================
-        //  COUPON CODE GENERATOR
-        // ============================================================
-        function generateCouponCode(reward) {
-            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // no confusing chars
+        function generateCode(prefix) {
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
             let suffix = '';
-            for (let i = 0; i < 4; i++) {
-                suffix += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            return `${reward.couponPrefix}-${suffix}`;
+            for (let i = 0; i < 4; i++) suffix += chars.charAt(Math.floor(Math.random() * chars.length));
+            return `${prefix}-${suffix}`;
         }
 
-        // ============================================================
-        //  SPIN WHEEL — main spin handler
-        // ============================================================
         function spinWheel() {
-            if (isSpinning) return;
-
-            // If campaign ended
-            if (campaignEnded) {
-                showToast("The Anniversary Drop has ended.", "error");
-                return;
-            }
-
-            // Check localStorage spin limit (client-side only, not secure)
-            if (localStorage.getItem(ANNIVERSARY_CONFIG.spinStorageKey) === 'true') {
-                showToast("You've already claimed your anniversary surprise.", "info");
-                return;
-            }
-
-            isSpinning = true;
             const spinBtn = document.getElementById('spin-btn');
-            const spinStatus = document.getElementById('spin-status');
             spinBtn.disabled = true;
-            spinStatus.textContent = "Spinning...";
+            spinBtn.innerText = '...';
 
-            // Pick winning reward via weighted probability
             const winningIndex = pickWinningRewardIndex();
             const reward = ANNIVERSARY_CONFIG.rewards[winningIndex];
+            const segAngle = 360 / ANNIVERSARY_CONFIG.rewards.length;
 
-            const segCount = ANNIVERSARY_CONFIG.rewards.length;
-            const segAngle = 360 / segCount;
-
-            // Calculate target rotation so that the winning segment lands at top (under pointer)
-            const currentEffective = ((currentWheelRotation % 360) + 360) % 360;
-            const targetEffective = (360 - winningIndex * segAngle + 360) % 360;
+            const targetEffective = (360 - winningIndex * segAngle) % 360;
+            const currentEffective = currentRotation % 360;
             let delta = targetEffective - currentEffective;
             if (delta < 0) delta += 360;
+            
+            currentRotation += 360 * 5 + delta;
+            document.getElementById('wheel-svg').style.transform = `rotate(${currentRotation}deg)`;
 
-            // Small random offset within the segment (keeps away from edges)
-            const randomOffset = (Math.random() - 0.5) * (segAngle - 12);
-
-            const additionalRotation = 360 * ANNIVERSARY_CONFIG.spinRotations + delta + randomOffset;
-            currentWheelRotation += additionalRotation;
-
-            const wheel = document.getElementById('wheel-svg');
-            wheel.style.transform = `rotate(${currentWheelRotation}deg)`;
-
-            // After spin animation completes
             setTimeout(() => {
-                isSpinning = false;
-                handleSpinResult(reward);
-            }, ANNIVERSARY_CONFIG.spinDuration + 100);
+                triggerSuspense(reward);
+                spinBtn.disabled = false;
+                spinBtn.innerText = 'SPIN';
+            }, 5500);
         }
 
-        // ============================================================
-        //  HANDLE SPIN RESULT — generate coupon, save to localStorage, show modal
-        // ============================================================
-        function handleSpinResult(reward) {
-            currentReward = reward;
-            currentCouponCode = generateCouponCode(reward);
+        function triggerSuspense(reward) {
+            openOverlay('anniv-suspense');
+            const txt1 = document.getElementById('suspense-text-1');
+            const txt2 = document.getElementById('suspense-text-2');
+            const txt3 = document.getElementById('suspense-text-3');
+            const reveal = document.getElementById('reward-reveal');
+            const scan = document.getElementById('scan-line');
 
-            // Save to localStorage so user can't spin again, and reward persists
-            try {
-                localStorage.setItem(ANNIVERSARY_CONFIG.spinStorageKey, 'true');
-                localStorage.setItem(ANNIVERSARY_CONFIG.rewardStorageKey, JSON.stringify(reward));
-                localStorage.setItem(ANNIVERSARY_CONFIG.couponStorageKey, currentCouponCode);
-            } catch (e) {
-                console.warn('localStorage unavailable:', e);
-            }
+            txt1.style.opacity = '0'; txt2.style.opacity = '0'; txt3.style.opacity = '0'; reveal.style.opacity = '0';
+            scan.classList.remove('hidden');
 
-            // Update UI
-            const spinBtn = document.getElementById('spin-btn');
-            const spinStatus = document.getElementById('spin-status');
-            spinBtn.disabled = true;
-            spinBtn.innerHTML = '<iconify-icon icon="lucide:check" class="text-lg"></iconify-icon> Reward Unlocked';
-            spinStatus.textContent = "You've already claimed your anniversary surprise.";
+            setTimeout(() => { txt1.style.opacity = '1'; }, 200);
+            setTimeout(() => { txt1.style.opacity = '0'; }, 1500);
+            setTimeout(() => { txt2.style.opacity = '1'; scan.classList.add('hidden'); }, 2000);
+            setTimeout(() => { txt2.style.opacity = '0'; }, 3000);
+            setTimeout(() => { txt3.style.opacity = '1'; }, 3500);
+            setTimeout(() => { txt3.style.opacity = '0'; }, 4500);
+            
+            setTimeout(() => {
+                const code = generateCode(reward.code);
+                annivState.reward = reward.label;
+                annivState.coupon = code;
+                saveAnnivState();
 
-            // Show reward in modal
-            document.getElementById('reward-modal-title').textContent = reward.fullLabel;
-            document.getElementById('reward-coupon-code').textContent = currentCouponCode;
-            openModal('reward-modal');
-
-            // Also show inline previous reward (in case they close modal)
-            showPreviousReward(reward, currentCouponCode);
-
-            showToast(`You unlocked: ${reward.fullLabel}`, "success");
+                document.getElementById('reward-title').innerText = reward.label;
+                document.getElementById('reward-code').innerText = code;
+                reveal.style.opacity = '1';
+            }, 5000);
         }
 
-        // ============================================================
-        //  SHOW PREVIOUS REWARD (for returning visitors)
-        // ============================================================
-        function showPreviousReward(reward, coupon) {
-            const container = document.getElementById('previous-reward');
-            const labelEl = document.getElementById('previous-reward-label');
-            const codeEl = document.getElementById('previous-reward-code');
-            if (reward && coupon) {
-                labelEl.textContent = reward.fullLabel;
-                codeEl.textContent = coupon;
-                container.classList.remove('hidden');
-            }
+        // --- Sharing & WhatsApp ---
+        function copyCode(code) {
+            navigator.clipboard.writeText(code).then(() => showToast("✓ CODE COPIED", "success")).catch(() => fallbackCopy(code));
         }
 
-        // ============================================================
-        //  CHECK SPIN STATUS ON PAGE LOAD (returning visitor)
-        // ============================================================
-        function checkExistingSpin() {
-            try {
-                const used = localStorage.getItem(ANNIVERSARY_CONFIG.spinStorageKey) === 'true';
-                if (used) {
-                    const spinBtn = document.getElementById('spin-btn');
-                    const spinStatus = document.getElementById('spin-status');
-                    spinBtn.disabled = true;
-                    spinBtn.innerHTML = '<iconify-icon icon="lucide:check" class="text-lg"></iconify-icon> Reward Unlocked';
-                    spinStatus.textContent = "You've already claimed your anniversary surprise.";
-
-                    const savedReward = JSON.parse(localStorage.getItem(ANNIVERSARY_CONFIG.rewardStorageKey) || 'null');
-                    const savedCoupon = localStorage.getItem(ANNIVERSARY_CONFIG.couponStorageKey);
-                    if (savedReward && savedCoupon) {
-                        currentReward = savedReward;
-                        currentCouponCode = savedCoupon;
-                        showPreviousReward(savedReward, savedCoupon);
-                    }
-                }
-            } catch (e) {
-                console.warn('localStorage check failed:', e);
-            }
-        }
-
-        // ============================================================
-        //  COPY COUPON CODE
-        // ============================================================
-        function copyCouponCode() {
-            if (!currentCouponCode) return;
-            const fallbackCopy = () => {
-                const ta = document.createElement('textarea');
-                ta.value = currentCouponCode;
-                ta.style.position = 'fixed'; ta.style.opacity = '0';
-                document.body.appendChild(ta);
-                ta.select();
-                try { document.execCommand('copy'); } catch (e) {}
-                document.body.removeChild(ta);
-            };
-
-            const onSuccess = () => {
-                const textEl = document.getElementById('copy-coupon-text');
-                const original = textEl.textContent;
-                textEl.textContent = '✓ Code Copied';
-                showToast('Coupon code copied to clipboard', 'success');
-                setTimeout(() => { textEl.textContent = original; }, 2500);
-            };
-
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(currentCouponCode).then(onSuccess).catch(() => {
-                    fallbackCopy(); onSuccess();
-                });
-            } else {
-                fallbackCopy(); onSuccess();
-            }
-        }
-
-        // ============================================================
-        //  CLAIM REWARD → WHATSAPP (uses existing Typixel number)
-        // ============================================================
         function claimRewardWhatsApp() {
-            if (!currentReward || !currentCouponCode) return;
-            const message =
-`Hi Typixel 👋
-
-I just played the Typixel Anniversary Spin & Surprise.
-
-My reward:
- ${currentReward.fullLabel}
-
-My coupon code:
- ${currentCouponCode}
-
-I'd like to claim my anniversary reward.`;
-            const encoded = encodeURIComponent(message);
-            const url = `https://wa.me/${ANNIVERSARY_CONFIG.whatsappNumber}?text=${encoded}`;
-            window.open(url, '_blank');
+            const msg = `Hi Typixel 👋\n\nI just played the Typixel Anniversary Drop.\n\nMy reward:\n${annivState.reward}\n\nMy coupon:\n${annivState.coupon}\n\nI'd like to claim my anniversary reward.`;
+            window.open(`https://wa.me/${ANNIVERSARY_CONFIG.whatsappNumber}?text=${encodeURIComponent(msg)}`, '_blank');
         }
 
-        // ============================================================
-        //  CLAIM ANNIVERSARY OFFER (from offer cards → WhatsApp)
-        // ============================================================
-        function claimAnniversaryOffer(cardName, discount) {
-            if (campaignEnded) {
-                showToast("The Anniversary Drop has ended.", "error");
-                return;
-            }
-            const message =
-`Hi Typixel 👋
+        // --- Level 4 (Final) ---
+        function triggerFinalDrop() {
+            // Simulate cinematic transition
+            document.getElementById('level-04-content').style.opacity = '0';
+            setTimeout(() => {
+                openOverlay('anniv-final-reward');
+                document.getElementById('level-04-content').style.opacity = '1';
+                
+                const finalReward = ANNIVERSARY_CONFIG.finalRewards[Math.floor(Math.random() * ANNIVERSARY_CONFIG.finalRewards.length)];
+                const finalCode = generateCode('TYPEGIFT');
+                
+                annivState.finalReward = finalReward.label;
+                saveAnnivState();
 
-I'd like to claim the Typixel Anniversary Offer.
-
-Offer: ${cardName}
-Discount: ${discount}
-
-Please share the next steps.`;
-            const encoded = encodeURIComponent(message);
-            const url = `https://wa.me/${ANNIVERSARY_CONFIG.whatsappNumber}?text=${encoded}`;
-            window.open(url, '_blank');
-        }
-
-        // ============================================================
-        //  MODAL HELPERS
-        // ============================================================
-        function openModal(id) {
-            const m = document.getElementById(id);
-            if (m) m.classList.add('open');
-        }
-        function closeModal(id) {
-            const m = document.getElementById(id);
-            if (m) m.classList.remove('open');
-        }
-        function closeRewardModal() { closeModal('reward-modal'); }
-
-        // ============================================================
-        //  ANNIVERSARY POPUP (first visit only)
-        // ============================================================
-        function showAnniversaryPopupIfNeeded() {
-            try {
-                if (localStorage.getItem(ANNIVERSARY_CONFIG.popupStorageKey) === 'true') return;
-            } catch (e) { return; }
-
-            setTimeout(() => { openModal('anniversary-popup'); }, 4500);
-        }
-
-        function closeAnniversaryPopup(spinned) {
-            closeModal('anniversary-popup');
-            try {
-                localStorage.setItem(ANNIVERSARY_CONFIG.popupStorageKey, 'true');
-            } catch (e) {}
-            if (spinned) {
+                document.getElementById('final-reward-title').innerText = finalReward.label;
+                document.getElementById('final-reward-code').innerText = finalCode;
+                
+                // Animate reveal
                 setTimeout(() => {
-                    document.getElementById('spin-surprise').scrollIntoView({ behavior: 'smooth' });
-                }, 350);
-            }
+                    document.getElementById('final-reveal').style.opacity = '1';
+                }, 500);
+            }, 1000);
         }
 
-        // ============================================================
-        //  SCROLL TO WHEEL (used by floating badge + surprise card)
-        // ============================================================
-        function scrollToWheel() {
-            // If user already spun, show their reward modal instead
-            try {
-                const used = localStorage.getItem(ANNIVERSARY_CONFIG.spinStorageKey) === 'true';
-                if (used && currentReward && currentCouponCode) {
-                    document.getElementById('reward-modal-title').textContent = currentReward.fullLabel;
-                    document.getElementById('reward-coupon-code').textContent = currentCouponCode;
-                    openModal('reward-modal');
-                    return;
-                }
-            } catch (e) {}
-            document.getElementById('spin-surprise').scrollIntoView({ behavior: 'smooth' });
+        function claimFinalRewardWhatsApp() {
+            const msg = `Hi Typixel 👋\n\nI completed the Typixel Anniversary Drop.\n\nMy reward:\n${annivState.reward}\nMy coupon:\n${annivState.coupon}\n\nFinal Reward:\n${annivState.finalReward}\n\nI'd like to claim my anniversary reward.`;
+            window.open(`https://wa.me/${ANNIVERSARY_CONFIG.whatsappNumber}?text=${encodeURIComponent(msg)}`, '_blank');
         }
 
-        // ============================================================
-        //  COUNTDOWN TIMER
-        // ============================================================
-        function startCountdown() {
-            const endDate = new Date(ANNIVERSARY_CONFIG.campaignEndDate).getTime();
-
-            const update = () => {
-                const now = new Date().getTime();
-                const distance = endDate - now;
-
-                const daysEl = document.getElementById('countdown-days');
-                const hoursEl = document.getElementById('countdown-hours');
-                const minutesEl = document.getElementById('countdown-minutes');
-                const secondsEl = document.getElementById('countdown-seconds');
-
-                if (distance <= 0) {
-                    // Campaign ended
-                    campaignEnded = true;
-                    daysEl.textContent = '00';
-                    hoursEl.textContent = '00';
-                    minutesEl.textContent = '00';
-                    secondsEl.textContent = '00';
-
-                    document.getElementById('countdown-ended-msg').classList.remove('hidden');
-                    document.getElementById('countdown-timer').classList.add('hidden');
-
-                    // Disable anniversary claim buttons
-                    document.querySelectorAll('.anniv-claim-btn').forEach(btn => {
-                        btn.disabled = true;
-                        btn.classList.add('opacity-40', 'cursor-not-allowed');
-                    });
-                    const spinBtn = document.getElementById('spin-btn');
-                    if (spinBtn) {
-                        spinBtn.disabled = true;
-                        const status = document.getElementById('spin-status');
-                        if (status) status.textContent = "The Anniversary Drop has ended.";
-                    }
-                    return;
-                }
-
-                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-                setCountdownValue(daysEl, days);
-                setCountdownValue(hoursEl, hours);
-                setCountdownValue(minutesEl, minutes);
-                setCountdownValue(secondsEl, seconds);
-            };
-
-            const setCountdownValue = (el, val) => {
-                const padded = String(val).padStart(2, '0');
-                if (el.textContent !== padded) {
-                    el.textContent = padded;
-                    el.classList.add('tick');
-                    setTimeout(() => el.classList.remove('tick'), 300);
-                }
-            };
-
-            update();
-            setInterval(update, 1000);
+        function shareWin() {
+            const msg = `I just unlocked a Typixel Anniversary reward 🎁🔥\n\n${ANNIVERSARY_CONFIG.websiteUrl}`;
+            window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
         }
 
-        // ============================================================
-        //  FADE-UP ON SCROLL (IntersectionObserver — lightweight)
-        // ============================================================
-        function setupFadeUpObserver() {
-            const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-            const els = document.querySelectorAll('.fade-up');
-            if (prefersReduced) {
-                els.forEach(el => el.classList.add('visible'));
-                return;
-            }
-            const io = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('visible');
-                        io.unobserve(entry.target);
-                    }
-                });
-            }, { threshold: 0.15, rootMargin: '0px 0px -50px 0px' });
-            els.forEach(el => io.observe(el));
+        // Debug Reset
+        if (ANNIVERSARY_CONFIG.debug) {
+            const btn = document.createElement('button');
+            btn.innerText = 'RESET';
+            btn.style.cssText = 'position:fixed;bottom:10px;left:10px;z-index:9999;background:red;color:white;padding:5px;';
+            btn.onclick = () => { localStorage.removeItem(ANNIVERSARY_CONFIG.storagePrefix + 'state'); location.reload(); };
+            document.body.appendChild(btn);
         }
 
-        // ============================================================
-        //  INIT — runs after main content is shown
-        // ============================================================
-        function initAnniversaryCampaign() {
-            buildWheelSVG();
-            checkExistingSpin();
-            startCountdown();
-            setupFadeUpObserver();
-            showAnniversaryPopupIfNeeded();
-
-            // Close modals on backdrop click
-            document.querySelectorAll('.modal-backdrop').forEach(modal => {
-                modal.addEventListener('click', (e) => {
-                    if (e.target === modal) modal.classList.remove('open');
-                });
-            });
-
-            // ESC key closes modals
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape') {
-                    document.querySelectorAll('.modal-backdrop.open').forEach(m => m.classList.remove('open'));
-                }
-            });
-        }
         </script>
 
-        <!-- ========== LOGIC (NAV HIGHLIGHT & FORMS) — existing, untouched ========== -->
+        <!-- ========== EXISTING LOGIC (NAV HIGHLIGHT & FORMS) ========== -->
         <script>
-            // --- 1. LOADER & UI LOGIC ---
             window.addEventListener('load', () => {
                 const loader = document.getElementById('app-loader');
                 const content = document.getElementById('main-content');
@@ -1882,13 +1195,8 @@ Please share the next steps.`;
                     setTimeout(() => {
                         loader.style.display = 'none';
                         content.style.display = 'block';
-                        content.querySelectorAll('.fade-in').forEach(el => {
-                            el.style.animationName = 'fadeIn';
-                        });
-                        // === INITIALIZE ANNIVERSARY CAMPAIGN AFTER CONTENT IS VISIBLE ===
-                        if (typeof initAnniversaryCampaign === 'function') {
-                            initAnniversaryCampaign();
-                        }
+                        content.querySelectorAll('.fade-in').forEach(el => el.style.animationName = 'fadeIn');
+                        initAnniversaryDrop(); // Init Drop after load
                     }, 500);
                 }, 800);
             });
@@ -1899,48 +1207,10 @@ Please share the next steps.`;
                 menu.classList.toggle('flex');
             }
 
-            function showToast(message, type = 'success') {
-                const toast = document.getElementById('toast');
-                const msg = document.getElementById('toast-msg');
-                const icon = toast.querySelector('iconify-icon');
-
-                msg.innerText = message;
-
-                if (type === 'success') {
-                    toast.classList.add('success');
-                    toast.classList.remove('error');
-                    icon.setAttribute('icon', 'lucide:check-circle');
-                    icon.classList.replace('text-red-500', 'text-green-500');
-                } else if (type === 'error') {
-                    toast.classList.add('error');
-                    toast.classList.remove('success');
-                    icon.setAttribute('icon', 'lucide:x-circle');
-                    icon.classList.replace('text-green-500', 'text-red-500');
-                } else {
-                    // info style — keep success border but use info icon
-                    toast.classList.add('success');
-                    toast.classList.remove('error');
-                    icon.setAttribute('icon', 'lucide:info');
-                    icon.classList.remove('text-red-500');
-                    icon.classList.add('text-green-500');
-                }
-
-                toast.classList.add('active');
-                setTimeout(() => { toast.classList.remove('active'); }, 3000);
-            }
-
-            // --- 2. SCROLL SPY LOGIC (NAV HIGHLIGHTING) ---
+            // --- SCROLL SPY LOGIC ---
             document.addEventListener("DOMContentLoaded", () => {
                 const sections = document.querySelectorAll("section");
                 const navLinks = document.querySelectorAll(".nav-link");
-                const mobileLinks = document.querySelectorAll(".nav-link-mobile");
-
-                const observerOptions = {
-                    root: null,
-                    rootMargin: '0px',
-                    threshold: 0.3
-                };
-
                 const observer = new IntersectionObserver((entries) => {
                     entries.forEach((entry) => {
                         if (entry.isIntersecting) {
@@ -1948,113 +1218,49 @@ Please share the next steps.`;
                                 link.classList.remove("text-brand-600");
                                 link.classList.add("text-gray-300");
                             });
-                            mobileLinks.forEach(link => {
-                                link.classList.remove("text-white", "font-black");
-                            });
-
                             const id = entry.target.getAttribute("id");
                             const activeLink = document.querySelector(`.nav-link[href="#${id}"]`);
-                            const activeMobileLink = document.querySelector(`.nav-link-mobile[href="#${id}"]`);
-
                             if (activeLink && !activeLink.classList.contains('nav-anniversary')) {
                                 activeLink.classList.remove("text-gray-300");
                                 activeLink.classList.add("text-brand-600");
                             }
-                            if (activeMobileLink) {
-                                activeMobileLink.classList.add("text-white", "font-black");
-                            }
                         }
                     });
-                }, observerOptions);
-
+                }, { threshold: 0.3 });
                 sections.forEach((section) => observer.observe(section));
             });
 
-            // --- 3. CONTACT FORM LOGIC ---
+            // --- CONTACT FORM LOGIC ---
             document.getElementById('contact-form').addEventListener('submit', async function(event) {
                 event.preventDefault();
-
                 const form = this;
                 const submitBtn = document.getElementById('contact-btn');
                 const formData = new FormData(form);
                 const originalBtnContent = submitBtn.innerHTML;
-
                 const name = document.getElementById('contact-name').value;
                 const service = document.getElementById('contact-service').value;
-                const budget = document.getElementById('contact-budget') ? document.getElementById('contact-budget').value : 'N/A';
 
                 submitBtn.innerHTML = '<iconify-icon icon="lucide:loader-2" class="text-base animate-spin"></iconify-icon> Sending...';
                 submitBtn.disabled = true;
-                submitBtn.classList.add('opacity-75', 'cursor-not-allowed');
 
                 try {
-                    const response = await fetch("https://api.web3forms.com/submit", {
-                        method: "POST",
-                        body: formData
-                    });
-
+                    const response = await fetch("https://api.web3forms.com/submit", { method: "POST", body: formData });
                     const data = await response.json();
-
                     if (response.ok) {
                         showToast("Success! Opening WhatsApp...", "success");
                         form.reset();
-
-                        const waMessage = `Hi Typixel, I am interested in collaborating.\n\nName: ${name}\nService: ${service}\nBudget: ${budget}`;
-                        const encodedMessage = encodeURIComponent(waMessage);
-
-                        setTimeout(() => {
-                            window.open(`https://wa.me/919072891142?text=${encodedMessage}`, '_blank');
-                        }, 1500);
-
+                        const waMessage = `Hi Typixel, I am interested in collaborating.\n\nName: ${name}\nService: ${service}`;
+                        setTimeout(() => window.open(`https://wa.me/919072891142?text=${encodeURIComponent(waMessage)}`, '_blank'), 1500);
                     } else {
                         showToast("Error: " + data.message, "error");
                     }
-
                 } catch (error) {
                     showToast("Something went wrong. Please try again.", "error");
                 } finally {
                     submitBtn.innerHTML = originalBtnContent;
                     submitBtn.disabled = false;
-                    submitBtn.classList.remove('opacity-75', 'cursor-not-allowed');
-                }
-            });
-
-            // --- 4. NEWSLETTER FORM LOGIC ---
-            document.getElementById('newsletter-form').addEventListener('submit', async function(event) {
-                event.preventDefault();
-
-                const form = this;
-                const btn = document.getElementById('newsletter-btn');
-                const originalBtnContent = btn.innerHTML;
-                const formData = new FormData(form);
-
-                btn.innerHTML = '<iconify-icon icon="lucide:loader-2" class="text-base animate-spin"></iconify-icon>';
-                btn.disabled = true;
-
-                try {
-                    const response = await fetch("https://api.web3forms.com/submit", {
-                        method: "POST",
-                        body: formData
-                    });
-
-                    const data = await response.json();
-
-                    if (response.ok) {
-                        showToast("Subscribed successfully!", "success");
-                        form.reset();
-                    } else {
-                        showToast("Error subscribing.", "error");
-                    }
-                } catch (error) {
-                    console.error(error);
-                    showToast("Network error, but received!", "success");
-                    form.reset();
-                } finally {
-                    btn.innerHTML = originalBtnContent;
-                    btn.disabled = false;
                 }
             });
         </script>
-
 </body>
 </html>
