@@ -5,27 +5,20 @@
     <meta name="google-site-verification" content="QV6VfNkNepI7lhYAi93Cl4QBDQSL8MACTqw-Cobq1BY">
 
     <title>Typixel | Graphic Design, Branding & Website Design Agency</title>
-    <meta name="description"
-        content="Typixel is a creative branding agency specializing in logo design, brand identity, web design, motion graphics, and digital marketing solutions.">
-
-    <meta name="keywords"
-        content="Graphic Design, Branding, Logo Design, Website Design, Brand Identity, Motion Graphics">
-
+    <meta name="description" content="Typixel is a creative branding agency specializing in logo design, brand identity, web design, motion graphics, and digital marketing solutions.">
+    <meta name="keywords" content="Graphic Design, Branding, Logo Design, Website Design, Brand Identity, Motion Graphics">
     <meta name="author" content="Typixel">
-
     <link rel="canonical" href="https://typixel.vercel.app/">
 
     <meta property="og:title" content="Typixel | Graphic Design & Branding Agency">
-    <meta property="og:description"
-        content="Creative logo design, branding, website design, and digital marketing solutions.">
+    <meta property="og:description" content="Creative logo design, branding, website design, and digital marketing solutions.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://typixel.vercel.app/">
     <meta property="og:image" content="https://typixel.vercel.app/images/cover.jpg">
 
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Typixel | Graphic Design & Branding Agency">
-    <meta name="twitter:description"
-        content="Creative logo design, branding, website design, and digital marketing solutions.">
+    <meta name="twitter:description" content="Creative logo design, branding, website design, and digital marketing solutions.">
     <meta name="twitter:image" content="https://typixel.vercel.app/images/cover.jpg">
 
     <!-- FAVICON -->
@@ -58,20 +51,12 @@
 
     <!-- 3. CRITICAL CSS -->
     <style>
-        html, body {
-            background-color: #0a0a0a;
-            color: #ffffff;
-            font-family: 'Inter', sans-serif;
-            margin: 0; padding: 0; width: 100%; overflow-x: hidden;
-        }
+        html, body { background-color: #0a0a0a; color: #ffffff; font-family: 'Inter', sans-serif; margin: 0; padding: 0; width: 100%; overflow-x: hidden; }
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #0a0a0a; }
         ::-webkit-scrollbar-thumb { background: #dc2626; border-radius: 4px; }
 
-        #app-loader {
-            position: fixed; inset: 0; z-index: 60; background: #0a0a0a; display: flex; 
-            align-items: center; justify-content: center; transition: opacity 0.5s ease;
-        }
+        #app-loader { position: fixed; inset: 0; z-index: 60; background: #0a0a0a; display: flex; align-items: center; justify-content: center; transition: opacity 0.5s ease; }
         .fade-in { animation: fadeIn 0.8s ease-out forwards; opacity: 0; transform: translateY(20px); }
         @keyframes fadeIn { to { opacity: 1; transform: translateY(0); } }
         .hover-lift { transition: transform 0.3s ease, box-shadow 0.3s ease; }
@@ -83,97 +68,54 @@
         @keyframes scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
         .glass { background: rgba(255,255,255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.05); }
         
-        /* Toast */
-        .toast {
-            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #171717; color: #fff; 
-            padding: 12px 24px; border-radius: 50px; border: 1px solid #333; box-shadow: 0 10px 40px rgba(0,0,0,0.5); 
-            z-index: 200; display: flex; align-items: center; gap: 10px; opacity: 0; pointer-events: none; 
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
+        .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #171717; color: #fff; padding: 12px 24px; border-radius: 50px; border: 1px solid #333; box-shadow: 0 10px 40px rgba(0,0,0,0.5); z-index: 200; display: flex; align-items: center; gap: 10px; opacity: 0; pointer-events: none; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .toast.active { opacity: 1; transform: translateX(-50%) translateY(0); }
         .toast.success { border-color: #dc2626; }
         .toast.error { border-color: #ef4444; }
 
         /* ========================================================
-           ANNIVERSARY DROP - PREMIUM UI STYLES
+           ANNIVERSARY DROP 2.0 - GROWTH FUNNEL UI
            ======================================================== */
-        :root {
-            --drop-bg: #050505;
-            --drop-border: rgba(255,255,255,0.08);
-            --drop-red: #dc2626;
-        }
+        :root { --drop-bg: #050505; --drop-border: rgba(255,255,255,0.08); --drop-red: #dc2626; }
 
-        /* Top Announcement Bar */
-        .announce-bar {
-            position: fixed; top: 0; left: 0; right: 0; z-index: 40; height: 32px;
-            background: #000; border-bottom: 1px solid var(--drop-red); display: flex;
-            align-items: center; justify-content: center; font-size: 11px; font-weight: 600;
-            text-transform: uppercase; letter-spacing: 0.1em; color: #fff;
-        }
+        .announce-bar { position: fixed; top: 0; left: 0; right: 0; z-index: 40; height: 32px; background: #000; border-bottom: 1px solid var(--drop-red); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: #fff; }
         .announce-bar span { color: var(--drop-red); margin: 0 8px; }
-        body { padding-top: 32px; } /* Offset for announce bar */
-        nav { top: 32px !important; } /* Offset nav */
+        body { padding-top: 32px; }
+        nav { top: 32px !important; }
 
-        /* Floating Button */
-        .anniv-fab {
-            position: fixed; bottom: 88px; right: 24px; z-index: 40;
-            display: flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 50px;
-            background: linear-gradient(135deg, #dc2626, #b91c1c); color: #fff; font-size: 0.75rem; font-weight: 700;
-            letter-spacing: 0.05em; text-transform: uppercase; box-shadow: 0 10px 30px -5px rgba(220,38,38,0.5);
-            border: 1px solid rgba(255,255,255,0.15); transition: transform 0.3s ease; cursor: pointer;
-        }
+        .anniv-fab { position: fixed; bottom: 88px; right: 24px; z-index: 40; display: flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 50px; background: linear-gradient(135deg, #dc2626, #b91c1c); color: #fff; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; box-shadow: 0 10px 30px -5px rgba(220,38,38,0.5); border: 1px solid rgba(255,255,255,0.15); transition: transform 0.3s ease; cursor: pointer; }
         .anniv-fab:hover { transform: translateY(-3px) scale(1.05); }
         @media (max-width: 640px) { .anniv-fab { bottom: 80px; right: 16px; padding: 8px 12px; font-size: 0.65rem; } }
 
-        /* Overlays */
-        .drop-overlay {
-            position: fixed; inset: 0; z-index: 100; background: var(--drop-bg);
-            display: none; align-items: center; justify-content: center; padding: 1rem;
-            backdrop-filter: blur(12px); opacity: 0; transition: opacity 0.5s ease;
-        }
+        .drop-overlay { position: fixed; inset: 0; z-index: 100; background: var(--drop-bg); display: none; align-items: center; justify-content: center; padding: 1rem; backdrop-filter: blur(12px); opacity: 0; transition: opacity 0.5s ease; overflow-y: auto; }
         .drop-overlay.open { display: flex; opacity: 1; }
-        .fine-grain {
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
-        }
+        .fine-grain { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E"); }
 
-        /* Intro Sequence */
         #anniv-intro .intro-text { opacity: 0; transform: translateY(20px); transition: all 0.8s cubic-bezier(0.16,1,0.3,1); position: absolute; }
         #anniv-intro .intro-text.visible { opacity: 1; transform: translateY(0); }
-        .confetti-piece { position: absolute; width: 8px; height 12px; background: #fff; opacity: 0; }
+        .confetti-piece { position: absolute; width: 8px; height: 12px; background: #fff; opacity: 0; }
 
-        /* Drop UI Elements */
-        .drop-card {
-            background: rgba(255,255,255,0.03); border: 1px solid var(--drop-border); border-radius: 24px;
-            backdrop-filter: blur(16px); box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-        }
+        .drop-card { background: rgba(255,255,255,0.03); border: 1px solid var(--drop-border); border-radius: 24px; backdrop-filter: blur(16px); box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
         .progress-step { transition: all 0.3s ease; }
-        .progress-step.active { color: #fff; }
         .progress-step.active .step-dot { background: var(--drop-red); box-shadow: 0 0 15px var(--drop-red); }
         .progress-step.completed .step-dot { background: #fff; }
-        .progress-step.completed .step-icon { color: #fff; }
 
-        /* Share Circles */
         .share-circle { width: 16px; height: 16px; border-radius: 50%; border: 2px solid #444; transition: all 0.4s ease; }
         .share-circle.filled { border-color: var(--drop-red); background: var(--drop-red); box-shadow: 0 0 10px var(--drop-red); transform: scale(1.2); }
 
-        /* Wheel */
-        .wheel-svg { transition: transform 5.5s cubic-bezier(0.17, 0.67, 0.12, 0.99); will-change: transform; filter: drop-shadow(0 20px 40px rgba(0,0,0,0.6)); }
+        /* Wheel Physics */
+        .wheel-svg { transition: transform 6s cubic-bezier(0.17, 0.67, 0.12, 0.99); will-change: transform; filter: drop-shadow(0 20px 40px rgba(0,0,0,0.6)); }
         .wheel-glow { position: absolute; inset: -20px; border-radius: 50%; background: radial-gradient(circle, rgba(220,38,38,0.3) 0%, transparent 70%); pointer-events: none; animation: ambientPulse 4s infinite; }
         @keyframes ambientPulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
 
-        /* Suspense */
         @keyframes scanLine { 0% { top: 0; } 100% { top: 100%; } }
         .scan-line { position: absolute; left: 0; width: 100%; height: 2px; background: rgba(220,38,38,0.5); animation: scanLine 1.5s linear infinite; }
 
-        /* Reduced Motion */
-        @media (prefers-reduced-motion: reduce) {
-            *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
-        }
+        @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; } }
     </style>
 </head>
 <body class="dark text-gray-100 antialiased selection:bg-brand-600 selection:text-white">
 
-    <!-- LOADING SPINNER -->
     <div id="app-loader">
         <div class="flex flex-col items-center animate-pulse">
             <iconify-icon icon="lucide:hexagon" class="text-6xl text-brand-600 mb-4 animate-spin"></iconify-icon>
@@ -181,7 +123,6 @@
         </div>
     </div>
 
-    <!-- TOAST NOTIFICATION -->
     <div id="toast" class="toast">
         <iconify-icon icon="lucide:check-circle" class="text-green-500"></iconify-icon>
         <span id="toast-msg" class="text-sm font-medium">Notification</span>
@@ -195,7 +136,6 @@
         <span class="hidden sm:inline">UNLOCK YOUR SURPRISE →</span>
     </div>
 
-    <!-- MAIN CONTAINER -->
     <div id="main-content" style="display:none;">
 
         <!-- ========== HEADER ========== -->
@@ -248,7 +188,6 @@
                 <div class="absolute inset-0 bg-black/80"></div>
             </div>
 
-            <!-- Huge Background Typography -->
             <div class="absolute inset-0 -z-10 flex items-center justify-center pointer-events-none overflow-hidden">
                 <span class="text-[22vw] font-black text-white/[0.02] tracking-tighter select-none whitespace-nowrap">ANNIVERSARY</span>
             </div>
@@ -281,25 +220,25 @@
             </div>
         </section>
 
-        <!-- ========== CLIENTS LOGOS (Marquee) ========== -->
+        <!-- ========== CLIENTS LOGOS ========== -->
         <div class="border-y border-white/5 bg-black/50 py-10 overflow-hidden">
             <p class="text-center text-xs font-bold uppercase tracking-widest text-gray-500 mb-8">Trusted By</p>
             <div class="marquee-wrapper w-full">
                 <div class="marquee-content">
-                    <span class="text-xl font-bold mx-12 opacity-50 hover:opacity-100 transition-opacity cursor-default"> CHAMAYAM</span>
-                    <span class="text-xl font-bold mx-12 opacity-50 hover:opacity-100 transition-opacity cursor-default">SKILLOVIA</span>
-                    <span class="text-xl font-bold mx-12 opacity-50 hover:opacity-100 transition-opacity cursor-default">AKBAR TRADES</span>
-                    <span class="text-xl font-bold mx-12 opacity-50 hover:opacity-100 transition-opacity cursor-default">ZEST-ON</span>
-                    <span class="text-xl font-bold mx-12 opacity-50 hover:opacity-100 transition-opacity cursor-default">QUICK RESUME</span>
-                    <span class="text-xl font-bold mx-12 opacity-50 hover:opacity-100 transition-opacity cursor-default">AHSAN</span>
-                    <span class="text-xl font-bold mx-12 opacity-50 hover:opacity-100 transition-opacity cursor-default">SWAHWA</span>
-                    <span class="text-xl font-bold mx-12 opacity-50 hover:opacity-100 transition-opacity cursor-default">CHAMAYAM</span>
-                    <span class="text-xl font-bold mx-12 opacity-50 hover:opacity-100 transition-opacity cursor-default">SKILLOVIA</span>
-                    <span class="text-xl font-bold mx-12 opacity-50 hover:opacity-100 transition-opacity cursor-default">AKBAR TRADES</span>
-                    <span class="text-xl font-bold mx-12 opacity-50 hover:opacity-100 transition-opacity cursor-default">ZEST-ON</span>
-                    <span class="text-xl font-bold mx-12 opacity-50 hover:opacity-100 transition-opacity cursor-default">QUICK RESUME</span>
-                    <span class="text-xl font-bold mx-12 opacity-50 hover:opacity-100 transition-opacity cursor-default">AHSAN</span>
-                    <span class="text-xl font-bold mx-12 opacity-50 hover:opacity-100 transition-opacity cursor-default">SWAHWA</span>
+                    <span class="text-xl font-bold mx-12 opacity-50">CHAMAYAM</span>
+                    <span class="text-xl font-bold mx-12 opacity-50">SKILLOVIA</span>
+                    <span class="text-xl font-bold mx-12 opacity-50">AKBAR TRADES</span>
+                    <span class="text-xl font-bold mx-12 opacity-50">ZEST-ON</span>
+                    <span class="text-xl font-bold mx-12 opacity-50">QUICK RESUME</span>
+                    <span class="text-xl font-bold mx-12 opacity-50">AHSAN</span>
+                    <span class="text-xl font-bold mx-12 opacity-50">SWAHWA</span>
+                    <span class="text-xl font-bold mx-12 opacity-50">CHAMAYAM</span>
+                    <span class="text-xl font-bold mx-12 opacity-50">SKILLOVIA</span>
+                    <span class="text-xl font-bold mx-12 opacity-50">AKBAR TRADES</span>
+                    <span class="text-xl font-bold mx-12 opacity-50">ZEST-ON</span>
+                    <span class="text-xl font-bold mx-12 opacity-50">QUICK RESUME</span>
+                    <span class="text-xl font-bold mx-12 opacity-50">AHSAN</span>
+                    <span class="text-xl font-bold mx-12 opacity-50">SWAHWA</span>
                 </div>
             </div>
         </div>
@@ -350,14 +289,14 @@
                     </div>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <a href="#contact" class="group block overflow-hidden rounded-2xl relative aspect-[4/3] cursor-pointer hover-lift"><img src="https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/poster.jpg" alt="Project" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"><div class="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6"><h3 class="text-xl font-bold text-white">Posters</h3></div></a>
-                    <a href="#contact" class="group block overflow-hidden rounded-2xl relative aspect-[4/3] cursor-pointer hover-lift"><img src="https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/Brouchere.jpg" alt="Project" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"><div class="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6"><h3 class="text-xl font-bold text-white">Brochure</h3></div></a>
-                    <a href="#contact" class="group block overflow-hidden rounded-2xl relative aspect-[4/3] cursor-pointer hover-lift"><img src="https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/website.png" alt="Project" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"><div class="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6"><h3 class="text-xl font-bold text-white">Websites</h3></div></a>
+                    <a href="https://www.instagram.com/typixelofficial/" target="_blank" class="group block overflow-hidden rounded-2xl relative aspect-[4/3] cursor-pointer hover-lift"><img src="https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/poster.jpg" alt="Project" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"><div class="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6"><h3 class="text-xl font-bold text-white">Posters</h3></div></a>
+                    <a href="https://www.instagram.com/typixelofficial/" target="_blank" class="group block overflow-hidden rounded-2xl relative aspect-[4/3] cursor-pointer hover-lift"><img src="https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/Brouchere.jpg" alt="Project" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"><div class="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6"><h3 class="text-xl font-bold text-white">Brochure</h3></div></a>
+                    <a href="https://www.instagram.com/typixelofficial/" target="_blank" class="group block overflow-hidden rounded-2xl relative aspect-[4/3] cursor-pointer hover-lift"><img src="https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/website.png" alt="Project" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"><div class="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6"><h3 class="text-xl font-bold text-white">Websites</h3></div></a>
                 </div>
             </div>
         </section>
 
-        <!-- ========== REVIEWS SECTION ========== -->
+        <!-- ========== REVIEWS ========== -->
         <section id="reviews" class="py-24 relative">
             <div class="max-w-7xl mx-auto px-5">
                 <div class="text-center mb-16">
@@ -381,7 +320,7 @@
             </div>
         </section>
 
-        <!-- ========== TEAM SECTION ========== -->
+        <!-- ========== TEAM ========== -->
         <section id="team" class="py-24 bg-black/30">
             <div class="max-w-7xl mx-auto px-5 sm:px-8 text-center">
                 <span class="text-brand-600 font-bold uppercase tracking-widest text-xs">The Crew</span>
@@ -426,7 +365,7 @@
             </div>
         </section>
 
-        <!-- ========== CONTACT (Web3Forms) ========== -->
+        <!-- ========== CONTACT ========== -->
         <section id="contact" class="py-24 bg-gradient-to-t from-dark-900 to-black">
             <div class="max-w-7xl mx-auto px-5">
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
@@ -540,7 +479,7 @@
         </button>
 
         <!-- ========================================================
-             ANNIVERSARY DROP OVERLAYS & UI
+             ANNIVERSARY DROP 2.0 OVERLAYS & UI
              ======================================================== -->
 
         <!-- 1. INTRO SEQUENCE OVERLAY -->
@@ -569,7 +508,7 @@
             <div id="confetti-container" class="absolute inset-0 pointer-events-none overflow-hidden"></div>
         </div>
 
-        <!-- 2. MAIN DROP EXPERIENCE OVERLAY -->
+        <!-- 2. MAIN DROP EXPERIENCE OVERLAY (5 LEVELS) -->
         <div id="anniv-drop" class="drop-overlay" style="z-index: 140;">
             <div class="absolute inset-0 bg-black/90"></div>
             <div class="absolute inset-0 fine-grain opacity-[0.03] mix-blend-overlay pointer-events-none"></div>
@@ -583,28 +522,18 @@
                 </div>
                 <div class="flex items-center gap-6">
                     <div class="hidden md:flex items-center gap-4">
-                        <div class="progress-step flex flex-col items-center" data-step="1">
-                            <div class="step-dot w-3 h-3 rounded-full bg-gray-700 transition-all"></div>
-                            <span class="text-[9px] mt-1 text-gray-600">01</span>
-                        </div>
+                        <div class="progress-step flex flex-col items-center" data-step="1"><div class="step-dot w-3 h-3 rounded-full bg-gray-700 transition-all"></div><span class="text-[9px] mt-1 text-gray-600">01</span></div>
                         <div class="h-px w-8 bg-gray-800"></div>
-                        <div class="progress-step flex flex-col items-center" data-step="2">
-                            <div class="step-dot w-3 h-3 rounded-full bg-gray-700 transition-all"></div>
-                            <span class="text-[9px] mt-1 text-gray-600">02</span>
-                        </div>
+                        <div class="progress-step flex flex-col items-center" data-step="2"><div class="step-dot w-3 h-3 rounded-full bg-gray-700 transition-all"></div><span class="text-[9px] mt-1 text-gray-600">02</span></div>
                         <div class="h-px w-8 bg-gray-800"></div>
-                        <div class="progress-step flex flex-col items-center" data-step="3">
-                            <div class="step-dot w-3 h-3 rounded-full bg-gray-700 transition-all"></div>
-                            <span class="text-[9px] mt-1 text-gray-600">03</span>
-                        </div>
+                        <div class="progress-step flex flex-col items-center" data-step="3"><div class="step-dot w-3 h-3 rounded-full bg-gray-700 transition-all"></div><span class="text-[9px] mt-1 text-gray-600">03</span></div>
                         <div class="h-px w-8 bg-gray-800"></div>
-                        <div class="progress-step flex flex-col items-center" data-step="4">
-                            <div class="step-dot w-3 h-3 rounded-full bg-gray-700 transition-all"></div>
-                            <span class="text-[9px] mt-1 text-gray-600">04</span>
-                        </div>
+                        <div class="progress-step flex flex-col items-center" data-step="4"><div class="step-dot w-3 h-3 rounded-full bg-gray-700 transition-all"></div><span class="text-[9px] mt-1 text-gray-600">04</span></div>
+                        <div class="h-px w-8 bg-gray-800"></div>
+                        <div class="progress-step flex flex-col items-center" data-step="5"><div class="step-dot w-3 h-3 rounded-full bg-gray-700 transition-all"></div><span class="text-[9px] mt-1 text-gray-600">05</span></div>
                     </div>
                     <div class="text-right">
-                        <p id="drop-level-text" class="text-xs font-black tracking-widest text-white">LEVEL 01 / 04</p>
+                        <p id="drop-level-text" class="text-xs font-black tracking-widest text-white">LEVEL 01 / 05</p>
                         <div class="w-24 h-1 bg-gray-800 rounded-full mt-1 overflow-hidden">
                             <div id="drop-progress-bar" class="h-full bg-brand-600 transition-all duration-500" style="width: 0%"></div>
                         </div>
@@ -621,7 +550,7 @@
                 <!-- LEVEL 01: DISCOVER -->
                 <div id="level-01-content" class="drop-content hidden">
                     <p class="text-xs font-bold tracking-widest text-brand-600 mb-2">LEVEL 01</p>
-                    <h2 class="text-4xl md:text-5xl font-black mb-4">DISCOVER THE DROP</h2>
+                    <h2 class="text-4xl md:text-5xl font-black mb-4">DISCOVER</h2>
                     <p class="text-gray-400 mb-10">Every anniversary starts with a first surprise.</p>
                     <div id="discover-card" class="drop-card p-10 cursor-pointer transition-all duration-500 hover:border-brand-600/50" onclick="revealLevel1()">
                         <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-brand-600/10 flex items-center justify-center">
@@ -642,7 +571,7 @@
                 <!-- LEVEL 02: SHARE -->
                 <div id="level-02-content" class="drop-content hidden">
                     <p class="text-xs font-bold tracking-widest text-brand-600 mb-2">LEVEL 02</p>
-                    <h2 class="text-4xl md:text-5xl font-black mb-4">UNLOCK THE NEXT LEVEL</h2>
+                    <h2 class="text-4xl md:text-5xl font-black mb-4">SHARE</h2>
                     <p class="text-gray-400 mb-10">Share the Typixel Anniversary Drop with 5 people to continue.</p>
                     
                     <div class="text-8xl font-black text-white mb-6 transition-all" id="share-counter">0 / 5</div>
@@ -652,14 +581,32 @@
                     <p id="share-status" class="text-sm font-bold text-brand-600 mb-8">5 SHARES LEFT</p>
 
                     <button onclick="openShareModal()" class="px-10 py-4 bg-white text-black font-bold uppercase tracking-wider rounded-full hover:scale-105 transition-all">Share & Unlock</button>
-                    <p class="text-[10px] text-gray-600 mt-4 max-w-xs mx-auto">Note: Represents share actions initiated on this device.</p>
+                    <p class="text-[10px] text-gray-600 mt-4 max-w-xs mx-auto">Represents share actions initiated on this device.</p>
                 </div>
 
-                <!-- LEVEL 03: SPIN -->
+                <!-- LEVEL 03: FOLLOW (INSTAGRAM) -->
                 <div id="level-03-content" class="drop-content hidden">
                     <p class="text-xs font-bold tracking-widest text-brand-600 mb-2">LEVEL 03</p>
-                    <h2 class="text-4xl md:text-5xl font-black mb-4">YOUR SURPRISE AWAITS.</h2>
-                    <p class="text-gray-400 mb-10">Spin the Typixel Anniversary Wheel.</p>
+                    <h2 class="text-4xl md:text-5xl font-black mb-4">FOLLOW THE JOURNEY</h2>
+                    <p class="text-gray-400 mb-10">You've shared the Drop. Now follow Typixel for the next unlock.</p>
+                    
+                    <a href="https://www.instagram.com/typixelofficial/" target="_blank" class="inline-flex items-center gap-2 mb-8 text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-brand-500 to-brand-700">
+                        <iconify-icon icon="mdi:instagram" class="text-3xl"></iconify-icon> @typixelofficial
+                    </a>
+                    <br>
+                    <a href="https://www.instagram.com/typixelofficial/" target="_blank" class="px-10 py-4 bg-white text-black font-bold uppercase tracking-wider rounded-full hover:scale-105 transition-all inline-block mb-4">
+                        Follow on Instagram
+                    </a>
+                    <br>
+                    <button onclick="completeLevel3()" class="px-8 py-3 bg-brand-600 hover:bg-brand-700 text-white font-bold uppercase tracking-wider rounded-full text-sm">I've Followed →</button>
+                    <p class="text-[10px] text-gray-600 mt-4 max-w-xs mx-auto">Follow action initiated. Website cannot verify Instagram follows.</p>
+                </div>
+
+                <!-- LEVEL 04: SPIN -->
+                <div id="level-04-content" class="drop-content hidden">
+                    <p class="text-xs font-bold tracking-widest text-brand-600 mb-2">LEVEL 04</p>
+                    <h2 class="text-4xl md:text-5xl font-black mb-4">SPIN</h2>
+                    <p class="text-gray-400 mb-10">Your surprise awaits. Spin the Typixel Anniversary Wheel.</p>
                     
                     <div class="relative w-64 h-64 mx-auto mb-10">
                         <div class="wheel-glow"></div>
@@ -669,17 +616,23 @@
                     </div>
                 </div>
 
-                <!-- LEVEL 04: FINAL DROP -->
-                <div id="level-04-content" class="drop-content hidden">
-                    <p class="text-xs font-bold tracking-widest text-brand-600 mb-2">LEVEL 04 / 04</p>
-                    <h2 class="text-4xl md:text-5xl font-black mb-4">ONE LAST SURPRISE.</h2>
-                    <p class="text-gray-400 mb-10">YOU'VE COME THIS FAR.</p>
+                <!-- LEVEL 05: ULTIMATE DROP -->
+                <div id="level-05-content" class="drop-content hidden">
+                    <p class="text-xs font-bold tracking-widest text-brand-600 mb-2">LEVEL 05 / 05</p>
+                    <h2 class="text-4xl md:text-5xl font-black mb-4">ULTIMATE DROP</h2>
+                    <p class="text-gray-400 mb-10">You've unlocked the secret drop.</p>
                     
-                    <div id="final-vault" class="drop-card p-12 cursor-pointer hover:border-brand-600/50 transition-all" onclick="triggerFinalDrop()">
-                        <div class="w-20 h-20 mx-auto mb-4 rounded-full bg-brand-600/10 flex items-center justify-center animate-pulse">
-                            <iconify-icon icon="lucide:lock" class="text-3xl text-brand-600"></iconify-icon>
-                        </div>
-                        <p class="font-bold text-white text-lg">OPEN THE FINAL DROP →</p>
+                    <div class="drop-card p-8 border-brand-600/40 max-w-md mx-auto">
+                        <p class="text-xs font-bold tracking-widest text-gray-500 mb-4">THE TYPOPIXEL ANNIVERSARY</p>
+                        <h3 class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-brand-700 mb-6">CREATOR PACK</h3>
+                        <ul class="text-left text-sm text-gray-400 space-y-2 mb-8">
+                            <li class="flex items-center gap-2"><iconify-icon icon="lucide:check" class="text-brand-600"></iconify-icon> 10 Premium Social Templates</li>
+                            <li class="flex items-center gap-2"><iconify-icon icon="lucide:check" class="text-brand-600"></iconify-icon> 5 Animated Backgrounds</li>
+                            <li class="flex items-center gap-2"><iconify-icon icon="lucide:check" class="text-brand-600"></iconify-icon> Typography Pairing Guide</li>
+                            <li class="flex items-center gap-2"><iconify-icon icon="lucide:check" class="text-brand-600"></iconify-icon> Anniversary-only Assets</li>
+                        </ul>
+                        <button onclick="downloadCreatorPack()" class="w-full py-3 bg-brand-600 hover:bg-brand-700 text-white font-bold uppercase tracking-wider rounded-full text-xs mb-3">Download Creator Pack</button>
+                        <button onclick="closeAnniversaryOverlay('anniv-drop')" class="w-full py-3 text-gray-400 hover:text-white text-xs font-bold uppercase transition-colors">Close Drop</button>
                     </div>
                 </div>
 
@@ -714,6 +667,7 @@
                         <span class="text-xs font-bold uppercase">Facebook</span>
                     </button>
                 </div>
+                <p class="text-[10px] text-gray-600 mt-4 text-center">Your unique referral link is automatically included.</p>
             </div>
         </div>
 
@@ -733,36 +687,18 @@
                         <p class="text-[10px] text-gray-600 mb-1">CODE</p>
                         <p id="reward-code" class="text-xl font-mono font-black text-white tracking-wider">TYPE25-X8KQ</p>
                     </div>
-                    <div class="flex gap-3">
-                        <button onclick="copyCode(document.getElementById('reward-code').innerText)" class="flex-1 py-3 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold uppercase tracking-wider rounded-full text-xs">Copy Code</button>
-                        <button onclick="claimRewardWhatsApp()" class="flex-1 py-3 bg-brand-600 hover:bg-brand-700 text-white font-bold uppercase tracking-wider rounded-full text-xs">Claim Reward</button>
+                    <div class="flex flex-col gap-3">
+                        <button onclick="downloadRewardCard()" class="py-3 bg-white text-black font-bold uppercase tracking-wider rounded-full text-xs flex items-center justify-center gap-2"><iconify-icon icon="lucide:download"></iconify-icon> Download Reward Card</button>
+                        <button onclick="copyCode(document.getElementById('reward-code').innerText)" class="py-3 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold uppercase tracking-wider rounded-full text-xs">Copy Code</button>
+                        <button onclick="claimRewardWhatsApp()" class="py-3 bg-brand-600 hover:bg-brand-700 text-white font-bold uppercase tracking-wider rounded-full text-xs">Claim Reward</button>
                     </div>
-                    <button onclick="closeAnniversaryOverlay('anniv-suspense'); goToLevel(4);" class="mt-6 text-sm text-gray-400 hover:text-white transition-colors">Continue to Final Drop →</button>
+                    <button onclick="closeAnniversaryOverlay('anniv-suspense'); goToLevel(5);" class="mt-6 text-sm text-gray-400 hover:text-white transition-colors">Continue to Final Drop →</button>
                 </div>
             </div>
         </div>
 
-        <!-- 5. FINAL REWARD MODAL -->
-        <div id="anniv-final-reward" class="drop-overlay" style="z-index: 160;">
-            <div class="text-center relative w-full max-w-md">
-                <div id="final-reveal" class="drop-card p-8 opacity-0 transition-opacity duration-700 border-brand-600/40">
-                    <p class="text-xs font-bold tracking-widest text-gray-500 mb-2">TYPOPIXEL</p>
-                    <p class="text-[10px] font-bold tracking-widest text-brand-600 mb-6">ANNIVERSARY DROP</p>
-                    <p class="text-xs font-bold tracking-widest text-gray-500 mb-4">FINAL REWARD</p>
-                    <h3 id="final-reward-title" class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-brand-700 mb-2">FREE THUMBNAIL</h3>
-                    <div class="bg-black/50 border border-dashed border-brand-600/40 rounded-xl p-4 my-6">
-                        <p class="text-[10px] text-gray-600 mb-1">CODE</p>
-                        <p id="final-reward-code" class="text-xl font-mono font-black text-white tracking-wider">TYPEGIFT-92LX</p>
-                    </div>
-                    <p class="text-[10px] text-gray-600 mb-6">VALID UNTIL 2026-12-31</p>
-                    <div class="flex flex-col gap-3">
-                        <button onclick="copyCode(document.getElementById('final-reward-code').innerText)" class="py-3 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold uppercase tracking-wider rounded-full text-xs">Copy Code</button>
-                        <button onclick="claimFinalRewardWhatsApp()" class="py-3 bg-brand-600 hover:bg-brand-700 text-white font-bold uppercase tracking-wider rounded-full text-xs">Claim on WhatsApp</button>
-                        <button onclick="shareWin()" class="py-3 text-gray-400 hover:text-white text-xs font-bold uppercase transition-colors">Share Your Win</button>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <!-- Hidden Canvas for Reward Card Generation -->
+        <canvas id="reward-canvas" width="1080" height="1350" style="display: none;"></canvas>
 
         <!-- ========================================================
              JAVASCRIPT LOGIC
@@ -775,6 +711,7 @@
             requiredShares: 5,
             whatsappNumber: "919072891142",
             websiteUrl: window.location.origin,
+            instagramUrl: "https://www.instagram.com/typixelofficial/",
             storagePrefix: "typixel_anniversary_",
             rewards: [
                 { label: "10% OFF", value: "10", type: "discount", probability: 25, code: "TYPE10" },
@@ -785,12 +722,6 @@
                 { label: "FREE POST", value: "Post", type: "free", probability: 10, code: "TYPEGIFT" },
                 { label: "FREE CONSULT", value: "Consult", type: "free", probability: 5, code: "TYPEGIFT" },
                 { label: "SURPRISE GIFT", value: "Surprise", type: "surprise", probability: 5, code: "TYPEGIFT" }
-            ],
-            finalRewards: [
-                { label: "BONUS DISCOUNT", value: "Bonus" },
-                { label: "FREE DESIGN ADD-ON", value: "AddOn" },
-                { label: "FREE THUMBNAIL", value: "Thumb" },
-                { label: "PRIORITY BOOKING", value: "Priority" }
             ]
         };
 
@@ -799,8 +730,9 @@
             shares: 0,
             reward: null,
             coupon: null,
-            finalReward: null,
-            entrySeen: false
+            entrySeen: false,
+            refId: null,
+            referredBy: null
         };
 
         // --- localStorage Helpers ---
@@ -812,18 +744,37 @@
                 const saved = localStorage.getItem(ANNIVERSARY_CONFIG.storagePrefix + 'state');
                 if (saved) {
                     annivState = JSON.parse(saved);
-                    annivState.entrySeen = ANNIVERSARY_CONFIG.debug ? false : annivState.entrySeen; // Override for debug
+                    annivState.entrySeen = ANNIVERSARY_CONFIG.debug ? false : annivState.entrySeen;
                 }
             } catch(e) {}
+        }
+
+        // --- Referral System ---
+        function generateRefId() {
+            return 'TY-' + Math.random().toString(36).substring(2, 7).toUpperCase();
+        }
+
+        function checkReferral() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const ref = urlParams.get('ref');
+            if (ref) {
+                annivState.referredBy = ref;
+                saveAnnivState();
+                // Clean URL
+                window.history.replaceState({}, document.title, window.location.pathname);
+                showToast(`REFERRED BY ${ref}'S ANNIVERSARY DROP`, "success");
+            }
+            
+            if (!annivState.refId) {
+                annivState.refId = generateRefId();
+                saveAnnivState();
+            }
         }
 
         // --- Overlay Helpers ---
         function openOverlay(id) { document.getElementById(id).classList.add('open'); }
         function closeOverlay(id) { document.getElementById(id).classList.remove('open'); }
-
-        function closeAnniversaryOverlay(id) {
-            closeOverlay(id);
-        }
+        function closeAnniversaryOverlay(id) { closeOverlay(id); }
 
         // --- Toast ---
         function showToast(msg, type = 'success') {
@@ -836,13 +787,13 @@
         // --- Init ---
         function initAnniversaryDrop() {
             loadAnnivState();
+            checkReferral();
             buildWheelSVG();
             
             if (!annivState.entrySeen) {
                 setTimeout(() => triggerIntroSequence(), 1000);
             }
 
-            // ESC key listener
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape') {
                     document.querySelectorAll('.drop-overlay.open').forEach(o => o.classList.remove('open'));
@@ -892,7 +843,6 @@
 
                 container.appendChild(piece);
 
-                // Animate
                 const duration = 2000 + Math.random() * 1000;
                 const xMove = (Math.random() - 0.5) * 400;
                 const yMove = 800 + Math.random() * 400;
@@ -916,14 +866,9 @@
         }
 
         function restoreProgress() {
-            // If returning, jump to current level
             goToLevel(annivState.level);
-            
             if (annivState.level === 2 && annivState.shares > 0) {
                 updateShareUI();
-            }
-            if (annivState.level === 3 && annivState.reward) {
-                showToast("WELCOME BACK. LEVEL 03 READY.", "success");
             }
         }
 
@@ -934,11 +879,9 @@
             document.querySelectorAll('.drop-content').forEach(el => el.classList.add('hidden'));
             document.getElementById(`level-0${level}-content`).classList.remove('hidden');
 
-            // Update top bar
-            document.getElementById('drop-level-text').innerText = `LEVEL 0${level} / 04`;
-            document.getElementById('drop-progress-bar').style.width = ((level-1)/3 * 100) + '%';
+            document.getElementById('drop-level-text').innerText = `LEVEL 0${level} / 05`;
+            document.getElementById('drop-progress-bar').style.width = ((level-1)/4 * 100) + '%';
 
-            // Update steps
             document.querySelectorAll('.progress-step').forEach(step => {
                 const stepNum = parseInt(step.dataset.step);
                 step.classList.remove('active', 'completed');
@@ -961,26 +904,24 @@
         }
 
         function performShare(platform) {
-            const msg = `🔥 I just found the Typixel Anniversary Drop.\n\nComplete the journey and unlock a surprise reward.\n\n${ANNIVERSARY_CONFIG.websiteUrl}`;
+            const refUrl = `${ANNIVERSARY_CONFIG.websiteUrl}?ref=${annivState.refId}`;
+            const msg = `🔥 I just found the Typixel Anniversary Drop.\n\nComplete the journey and unlock a surprise reward.\n\n${refUrl}`;
             const encMsg = encodeURIComponent(msg);
-            const url = encodeURIComponent(ANNIVERSARY_CONFIG.websiteUrl);
+            const encUrl = encodeURIComponent(refUrl);
 
             if (platform === 'whatsapp') window.open(`https://wa.me/?text=${encMsg}`, '_blank');
-            else if (platform === 'telegram') window.open(`https://t.me/share/url?url=${url}&text=${encMsg}`, '_blank');
-            else if (platform === 'facebook') window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
+            else if (platform === 'telegram') window.open(`https://t.me/share/url?url=${encUrl}&text=${encMsg}`, '_blank');
+            else if (platform === 'facebook') window.open(`https://www.facebook.com/sharer/sharer.php?u=${encUrl}`, '_blank');
             else if (platform === 'copy') {
-                const text = `${ANNIVERSARY_CONFIG.websiteUrl} - ${msg}`;
-                navigator.clipboard.writeText(text).then(() => showToast("✓ LINK COPIED", "success")).catch(() => fallbackCopy(text));
+                navigator.clipboard.writeText(refUrl).then(() => showToast("✓ LINK COPIED", "success")).catch(() => fallbackCopy(refUrl));
             }
             else if (platform === 'instagram') {
-                const text = msg;
-                navigator.clipboard.writeText(text).then(() => {
-                    showToast("LINK + MESSAGE COPIED. OPEN INSTAGRAM.", "success");
-                    setTimeout(() => window.open('https://instagram.com', '_blank'), 1000);
-                }).catch(() => fallbackCopy(text));
+                navigator.clipboard.writeText(msg).then(() => {
+                    showToast("LINK + MSG COPIED. OPEN INSTAGRAM.", "success");
+                    setTimeout(() => window.open(ANNIVERSARY_CONFIG.instagramUrl, '_blank'), 1000);
+                }).catch(() => fallbackCopy(msg));
             }
 
-            // Increment share action
             if (annivState.shares < 5) {
                 annivState.shares++;
                 saveAnnivState();
@@ -1026,7 +967,13 @@
             }, 1500);
         }
 
-        // --- Level 3 (Spin) ---
+        // --- Level 3 (Instagram Follow) ---
+        function completeLevel3() {
+            showToast("FOLLOW ACTION INITIATED ✓", "success");
+            setTimeout(() => goToLevel(4), 1000);
+        }
+
+        // --- Level 4 (Spin - Correct Physics) ---
         let currentRotation = 0;
         function buildWheelSVG() {
             const wheelEl = document.getElementById('wheel-svg');
@@ -1081,23 +1028,35 @@
             spinBtn.disabled = true;
             spinBtn.innerText = '...';
 
+            // Mathematically correct spin
             const winningIndex = pickWinningRewardIndex();
             const reward = ANNIVERSARY_CONFIG.rewards[winningIndex];
-            const segAngle = 360 / ANNIVERSARY_CONFIG.rewards.length;
+            const segCount = ANNIVERSARY_CONFIG.rewards.length;
+            const segAngle = 360 / segCount;
 
-            const targetEffective = (360 - winningIndex * segAngle) % 360;
+            // The pointer is at the top (0 degrees).
+            // To bring segment `winningIndex` to the top, we need to rotate it by `-winningIndex * segAngle` (or `360 - winningIndex * segAngle`).
+            const targetAngle = 360 - (winningIndex * segAngle);
+            
+            // Add 6 full rotations for effect
+            const totalRotations = 360 * 6;
+            
+            // Calculate the final rotation. We want to end up at `targetAngle` + `totalRotations`.
+            // But we need to ensure we always move forward from `currentRotation`.
             const currentEffective = currentRotation % 360;
-            let delta = targetEffective - currentEffective;
+            let delta = targetAngle - currentEffective;
             if (delta < 0) delta += 360;
             
-            currentRotation += 360 * 5 + delta;
+            currentRotation += totalRotations + delta;
+            
             document.getElementById('wheel-svg').style.transform = `rotate(${currentRotation}deg)`;
 
             setTimeout(() => {
                 triggerSuspense(reward);
-                spinBtn.disabled = false;
-                spinBtn.innerText = 'SPIN';
-            }, 5500);
+                spinBtn.disabled = false; // Re-enable for UI consistency, though state prevents respin
+                spinBtn.innerText = 'DONE';
+                spinBtn.onclick = () => { return false; }; // Prevent double spin
+            }, 6000); // Match CSS transition duration
         }
 
         function triggerSuspense(reward) {
@@ -1130,7 +1089,70 @@
             }, 5000);
         }
 
-        // --- Sharing & WhatsApp ---
+        // --- Shareable Reward Card ---
+        function downloadRewardCard() {
+            const canvas = document.getElementById('reward-canvas');
+            const ctx = canvas.getContext('2d');
+            const reward = annivState.reward || 'SURPRISE';
+            const code = annivState.coupon || 'TYPE-X8KQ';
+
+            // Background
+            ctx.fillStyle = '#050505';
+            ctx.fillRect(0, 0, 1080, 1350);
+
+            // Border
+            ctx.strokeStyle = '#dc2626';
+            ctx.lineWidth = 8;
+            ctx.strokeRect(40, 40, 1000, 1270);
+
+            // Inner Glass area
+            ctx.fillStyle = 'rgba(255,255,255,0.03)';
+            ctx.fillRect(80, 80, 920, 1190);
+
+            // Text
+            ctx.textAlign = 'center';
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 60px Inter, sans-serif';
+            ctx.fillText('TYPOPIXEL', 540, 200);
+            
+            ctx.fillStyle = '#dc2626';
+            ctx.font = 'bold 30px Inter, sans-serif';
+            ctx.fillText('ANNIVERSARY DROP', 540, 250);
+
+            ctx.fillStyle = '#888888';
+            ctx.font = 'bold 40px Inter, sans-serif';
+            ctx.fillText('I JUST UNLOCKED', 540, 500);
+
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 120px Inter, sans-serif';
+            ctx.fillText(reward, 540, 650);
+
+            ctx.fillStyle = '#dc2626';
+            ctx.font = 'bold 50px monospace';
+            ctx.fillText(code, 540, 800);
+
+            ctx.fillStyle = '#888888';
+            ctx.font = 'bold 40px Inter, sans-serif';
+            ctx.fillText('UNLOCKED FROM', 540, 1000);
+            
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 50px Inter, sans-serif';
+            ctx.fillText('@typixelofficial', 540, 1070);
+
+            ctx.fillStyle = '#dc2626';
+            ctx.font = 'bold 30px Inter, sans-serif';
+            ctx.fillText('#TypixelAnniversary', 540, 1200);
+
+            // Download
+            const link = document.createElement('a');
+            link.download = `Typixel-Reward-${code}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+            
+            showToast("REWARD CARD DOWNLOADED", "success");
+        }
+
+        // --- Copy & WhatsApp ---
         function copyCode(code) {
             navigator.clipboard.writeText(code).then(() => showToast("✓ CODE COPIED", "success")).catch(() => fallbackCopy(code));
         }
@@ -1140,38 +1162,12 @@
             window.open(`https://wa.me/${ANNIVERSARY_CONFIG.whatsappNumber}?text=${encodeURIComponent(msg)}`, '_blank');
         }
 
-        // --- Level 4 (Final) ---
-        function triggerFinalDrop() {
-            // Simulate cinematic transition
-            document.getElementById('level-04-content').style.opacity = '0';
-            setTimeout(() => {
-                openOverlay('anniv-final-reward');
-                document.getElementById('level-04-content').style.opacity = '1';
-                
-                const finalReward = ANNIVERSARY_CONFIG.finalRewards[Math.floor(Math.random() * ANNIVERSARY_CONFIG.finalRewards.length)];
-                const finalCode = generateCode('TYPEGIFT');
-                
-                annivState.finalReward = finalReward.label;
-                saveAnnivState();
-
-                document.getElementById('final-reward-title').innerText = finalReward.label;
-                document.getElementById('final-reward-code').innerText = finalCode;
-                
-                // Animate reveal
-                setTimeout(() => {
-                    document.getElementById('final-reveal').style.opacity = '1';
-                }, 500);
-            }, 1000);
-        }
-
-        function claimFinalRewardWhatsApp() {
-            const msg = `Hi Typixel 👋\n\nI completed the Typixel Anniversary Drop.\n\nMy reward:\n${annivState.reward}\nMy coupon:\n${annivState.coupon}\n\nFinal Reward:\n${annivState.finalReward}\n\nI'd like to claim my anniversary reward.`;
+        // --- Level 5 (Ultimate Drop) ---
+        function downloadCreatorPack() {
+            // In a real scenario, this would link to a Google Drive folder or a secure download endpoint.
+            // For now, it opens the WhatsApp message to claim it, or a placeholder.
+            const msg = `Hi Typixel 👋\n\nI completed the Anniversary Drop and unlocked the Creator Pack.\n\nMy reward was: ${annivState.reward} (${annivState.coupon})\n\nPlease send me the download link!`;
             window.open(`https://wa.me/${ANNIVERSARY_CONFIG.whatsappNumber}?text=${encodeURIComponent(msg)}`, '_blank');
-        }
-
-        function shareWin() {
-            const msg = `I just unlocked a Typixel Anniversary reward 🎁🔥\n\n${ANNIVERSARY_CONFIG.websiteUrl}`;
-            window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
         }
 
         // Debug Reset
@@ -1185,7 +1181,7 @@
 
         </script>
 
-        <!-- ========== EXISTING LOGIC (NAV HIGHLIGHT & FORMS) ========== -->
+        <!-- ========== EXISTING LOGIC ========== -->
         <script>
             window.addEventListener('load', () => {
                 const loader = document.getElementById('app-loader');
@@ -1196,7 +1192,7 @@
                         loader.style.display = 'none';
                         content.style.display = 'block';
                         content.querySelectorAll('.fade-in').forEach(el => el.style.animationName = 'fadeIn');
-                        initAnniversaryDrop(); // Init Drop after load
+                        initAnniversaryDrop();
                     }, 500);
                 }, 800);
             });
