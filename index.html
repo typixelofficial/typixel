@@ -27,8 +27,7 @@
     <meta name="twitter:description"
         content="Creative logo design, branding, website design, and digital marketing solutions.">
     <meta name="twitter:image" content="https://typixel.vercel.app/images/cover.jpg">
-</head>
-    
+
     <!-- FAVICON -->
     <link rel="icon" href="https://z-cdn-media.chatglm.cn/files/db59a431-5745-42ec-8575-eda0a0d7d874.png?auth_key=1877803378-171e0b259fba4a18b98bd102cd7552e3-0-9f785a189e477354911412f66e12d36d" type="image/png">
 
@@ -36,7 +35,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    
+
     <!-- 2. TAILWIND CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -53,10 +52,10 @@
             }
         }
     </script>
-    
+
     <!-- Icons -->
     <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
-    
+
     <!-- 3. CRITICAL CSS -->
     <style>
         /* Force Dark Mode Immediately */
@@ -78,15 +77,15 @@
         /* Loader */
         #app-loader {
             position: fixed; inset: 0; z-index: 60;
-            background: #0a0a0a; display: flex; 
+            background: #0a0a0a; display: flex;
             align-items: center; justify-content: center;
             transition: opacity 0.5s ease;
         }
-        
+
         /* Animation Utilities */
         .fade-in { animation: fadeIn 0.8s ease-out forwards; opacity: 0; transform: translateY(20px); }
         @keyframes fadeIn { to { opacity: 1; transform: translateY(0); } }
-        
+
         .hover-lift { transition: transform 0.3s ease, box-shadow 0.3s ease; }
         .hover-lift:hover { transform: translateY(-5px); box-shadow: 0 10px 30px -10px rgba(220, 38, 38, 0.3); }
 
@@ -133,6 +132,176 @@
         .toast.active { opacity: 1; transform: translateX(-50%) translateY(0); }
         .toast.success { border-color: #dc2626; }
         .toast.error { border-color: #ef4444; }
+
+        /* ========================================================
+           ANNIVERSARY CAMPAIGN STYLES
+           ======================================================== */
+
+        /* Slow pulse for ambient glows */
+        @keyframes ambientPulse {
+            0%, 100% { opacity: 0.4; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.05); }
+        }
+        .ambient-glow { animation: ambientPulse 8s ease-in-out infinite; }
+
+        /* Slow drifting light */
+        @keyframes drift {
+            0%   { transform: translate(0,0) scale(1); }
+            33%  { transform: translate(40px,-30px) scale(1.1); }
+            66%  { transform: translate(-30px,40px) scale(0.95); }
+            100% { transform: translate(0,0) scale(1); }
+        }
+        .drift-light { animation: drift 18s ease-in-out infinite; }
+
+        /* Fine grain noise */
+        .fine-grain {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
+        }
+
+        /* Countdown unit */
+        .countdown-unit {
+            display: flex; flex-direction: column; align-items: center;
+            min-width: 64px; padding: 8px 6px; border-radius: 12px;
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(220,38,38,0.15);
+        }
+        .countdown-number {
+            font-size: 1.9rem; font-weight: 900; color: #fff;
+            font-variant-numeric: tabular-nums; line-height: 1;
+            transition: transform 0.3s ease;
+        }
+        .countdown-number.tick { transform: scale(1.15); color: #dc2626; }
+        .countdown-label {
+            font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.18em;
+            color: #dc2626; margin-top: 6px; font-weight: 700;
+        }
+        @media (max-width: 480px) {
+            .countdown-unit { min-width: 56px; padding: 6px 4px; }
+            .countdown-number { font-size: 1.4rem; }
+            .countdown-label { font-size: 0.55rem; }
+        }
+
+        /* Spin Wheel */
+        .wheel-wrapper {
+            position: relative; width: 100%; max-width: 420px; margin: 0 auto;
+            aspect-ratio: 1 / 1;
+        }
+        .wheel-glow-ring {
+            position: absolute; inset: -14px; border-radius: 50%;
+            background: radial-gradient(circle, rgba(220,38,38,0.35) 0%, rgba(220,38,38,0) 70%);
+            filter: blur(14px); pointer-events: none; z-index: 0;
+            animation: ambientPulse 4s ease-in-out infinite;
+        }
+        .wheel-border-ring {
+            position: absolute; inset: -4px; border-radius: 50%;
+            border: 2px solid rgba(220,38,38,0.6);
+            box-shadow: 0 0 30px rgba(220,38,38,0.25), inset 0 0 20px rgba(220,38,38,0.1);
+            pointer-events: none; z-index: 1;
+        }
+        .wheel-svg {
+            position: relative; z-index: 2;
+            transition: transform 5.5s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+            will-change: transform;
+            filter: drop-shadow(0 20px 40px rgba(0,0,0,0.6));
+        }
+        .wheel-pointer {
+            position: absolute; top: -8px; left: 50%; transform: translateX(-50%);
+            z-index: 5; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
+        }
+
+        /* Anniversary card hover */
+        .anniv-card {
+            transition: transform 0.4s cubic-bezier(0.16,1,0.3,1), border-color 0.4s ease, box-shadow 0.4s ease;
+        }
+        .anniv-card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(220,38,38,0.5);
+            box-shadow: 0 25px 50px -20px rgba(220,38,38,0.25);
+        }
+
+        /* Timeline */
+        .timeline-item {
+            position: relative; padding-left: 2.5rem;
+        }
+        .timeline-item::before {
+            content: ''; position: absolute; left: 0; top: 6px;
+            width: 14px; height: 14px; border-radius: 50%;
+            background: #dc2626; box-shadow: 0 0 0 4px rgba(220,38,38,0.2);
+        }
+        .timeline-item::after {
+            content: ''; position: absolute; left: 6px; top: 22px; bottom: -32px;
+            width: 2px; background: linear-gradient(to bottom, rgba(220,38,38,0.5), transparent);
+        }
+        .timeline-item:last-child::after { display: none; }
+
+        /* Modal */
+        .modal-backdrop {
+            position: fixed; inset: 0; z-index: 100;
+            display: none; align-items: center; justify-content: center;
+            padding: 1rem; backdrop-filter: blur(12px);
+            background: rgba(0,0,0,0.8);
+        }
+        .modal-backdrop.open { display: flex; }
+        .modal-card {
+            transform: scale(0.92) translateY(20px); opacity: 0;
+            transition: transform 0.45s cubic-bezier(0.16,1,0.3,1), opacity 0.3s ease;
+        }
+        .modal-backdrop.open .modal-card { transform: scale(1) translateY(0); opacity: 1; }
+
+        /* Fade up on scroll */
+        .fade-up {
+            opacity: 0; transform: translateY(40px);
+            transition: opacity 0.9s ease, transform 0.9s cubic-bezier(0.16,1,0.3,1);
+        }
+        .fade-up.visible { opacity: 1; transform: translateY(0); }
+
+        /* Floating anniversary badge */
+        .anniv-fab {
+            position: fixed; bottom: 88px; right: 24px; z-index: 50;
+            display: flex; align-items: center; gap: 8px;
+            padding: 10px 16px; border-radius: 50px;
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            color: #fff; font-size: 0.78rem; font-weight: 700;
+            letter-spacing: 0.05em; text-transform: uppercase;
+            box-shadow: 0 10px 30px -5px rgba(220,38,38,0.5);
+            border: 1px solid rgba(255,255,255,0.15);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+        .anniv-fab:hover { transform: translateY(-3px) scale(1.05); box-shadow: 0 14px 36px -5px rgba(220,38,38,0.65); }
+        .anniv-fab .pulse-dot {
+            width: 8px; height: 8px; border-radius: 50%; background: #fff;
+            box-shadow: 0 0 0 0 rgba(255,255,255,0.7);
+            animation: pulseDot 2s infinite;
+        }
+        @keyframes pulseDot {
+            0% { box-shadow: 0 0 0 0 rgba(255,255,255,0.7); }
+            70% { box-shadow: 0 0 0 8px rgba(255,255,255,0); }
+            100% { box-shadow: 0 0 0 0 rgba(255,255,255,0); }
+        }
+        @media (max-width: 640px) {
+            .anniv-fab { bottom: 80px; right: 16px; padding: 8px 14px; font-size: 0.7rem; }
+        }
+
+        /* Nav anniversary link */
+        .nav-anniversary {
+            position: relative;
+        }
+        .nav-anniversary::after {
+            content: ''; position: absolute; left: 0; right: 0; bottom: -6px;
+            height: 2px; background: #dc2626; transform: scaleX(0);
+            transition: transform 0.3s ease; transform-origin: left;
+        }
+        .nav-anniversary:hover::after { transform: scaleX(1); }
+
+        /* Reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.001ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.001ms !important;
+            }
+            .ambient-glow, .drift-light, .anniv-fab .pulse-dot { animation: none !important; }
+        }
     </style>
 </head>
 <body class="dark text-gray-100 antialiased selection:bg-brand-600 selection:text-white">
@@ -153,21 +322,83 @@
 
     <!-- MAIN CONTAINER -->
     <div id="main-content" style="display:none;">
-        
+
+        <!-- ========================================================
+             ANNIVERSARY POPUP MODAL (First visit only)
+             ======================================================== -->
+        <div id="anniversary-popup" class="modal-backdrop">
+            <div class="modal-card relative bg-dark-800 border border-brand-600/30 rounded-3xl p-8 sm:p-10 max-w-md w-full text-center overflow-hidden">
+                <div class="absolute -top-20 -right-20 w-60 h-60 bg-brand-600/20 rounded-full blur-3xl pointer-events-none"></div>
+                <button onclick="closeAnniversaryPopup(false)" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-gray-400 hover:text-white transition-colors z-10">
+                    <iconify-icon icon="lucide:x"></iconify-icon>
+                </button>
+                <div class="relative z-10">
+                    <span class="inline-flex items-center gap-2 py-1.5 px-4 rounded-full bg-brand-600/15 border border-brand-600/40 text-brand-500 text-xs font-bold uppercase tracking-widest mb-6">
+                        <span class="w-1.5 h-1.5 bg-brand-500 rounded-full"></span>
+                        Typixel Anniversary
+                    </span>
+                    <h3 class="text-3xl sm:text-4xl font-black mb-3 leading-tight">Something special<br>just dropped.</h3>
+                    <p class="text-gray-400 mb-8">Spin the wheel.<br>Unlock your surprise.</p>
+                    <div class="flex flex-col gap-3">
+                        <button onclick="closeAnniversaryPopup(true)" class="w-full py-3.5 bg-brand-600 hover:bg-brand-700 text-white font-bold uppercase tracking-wider rounded-full transition-all hover:scale-[1.02]">
+                            Spin Now
+                        </button>
+                        <button onclick="closeAnniversaryPopup(false)" class="w-full py-2 text-gray-400 hover:text-white text-sm font-medium transition-colors">
+                            Maybe Later
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================================
+             REWARD MODAL (After wheel spin)
+             ======================================================== -->
+        <div id="reward-modal" class="modal-backdrop">
+            <div class="modal-card relative bg-dark-800 border border-brand-600/30 rounded-3xl p-8 sm:p-10 max-w-md w-full text-center overflow-hidden">
+                <div class="absolute -top-24 -left-24 w-60 h-60 bg-brand-600/25 rounded-full blur-3xl pointer-events-none"></div>
+                <button onclick="closeRewardModal()" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-gray-400 hover:text-white transition-colors z-10">
+                    <iconify-icon icon="lucide:x"></iconify-icon>
+                </button>
+                <div class="relative z-10">
+                    <div class="text-5xl mb-4">🎉</div>
+                    <p class="text-xs text-brand-500 font-bold uppercase tracking-widest mb-3">You Unlocked a Surprise</p>
+                    <h3 id="reward-modal-title" class="text-4xl sm:text-5xl font-black mb-2 text-transparent bg-clip-text bg-gradient-to-r from-brand-400 via-brand-500 to-brand-700">25% OFF</h3>
+                    <p class="text-xs text-gray-400 uppercase tracking-widest mb-6">Your Anniversary Reward</p>
+
+                    <div class="bg-black/40 border border-dashed border-brand-600/40 rounded-2xl p-5 mb-6">
+                        <p class="text-[10px] text-gray-500 uppercase tracking-widest mb-2">Coupon Code</p>
+                        <p id="reward-coupon-code" class="text-2xl sm:text-3xl font-mono font-black text-white tracking-wider">TYPE25-XXXX</p>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <button onclick="copyCouponCode()" id="copy-coupon-btn" class="flex-1 py-3 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold uppercase tracking-wider rounded-full transition-all flex items-center justify-center gap-2 text-sm">
+                            <iconify-icon icon="lucide:copy" class="text-base"></iconify-icon>
+                            <span id="copy-coupon-text">Copy Code</span>
+                        </button>
+                        <button onclick="claimRewardWhatsApp()" id="claim-reward-btn" class="flex-1 py-3 bg-brand-600 hover:bg-brand-700 text-white font-bold uppercase tracking-wider rounded-full transition-all flex items-center justify-center gap-2 text-sm">
+                            <iconify-icon icon="lucide:message-circle" class="text-base"></iconify-icon>
+                            Claim Reward
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- ========== HEADER ========== -->
         <nav class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 backdrop-blur-xl bg-dark-900/80 border-b border-white/5">
             <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 h-20 flex items-center justify-between">
-                
+
                 <!-- LEFT: Logo -->
                 <div class="flex items-center gap-3 cursor-pointer group" onclick="window.scrollTo(0,0)">
                     <div class="relative w-10 h-10 flex items-center justify-center logo-spin">
-                        <img src="https://z-cdn-media.chatglm.cn/files/db59a431-5745-42ec-8575-eda0a0d7d874.png?auth_key=1877803378-171e0b259fba4a18b98bd102cd7552e3-0-9f785a189e477354911412f66e12d36d" 
-                             alt="Typixel Logo" 
+                        <img src="https://z-cdn-media.chatglm.cn/files/db59a431-5745-42ec-8575-eda0a0d7d874.png?auth_key=1877803378-171e0b259fba4a18b98bd102cd7552e3-0-9f785a189e477354911412f66e12d36d"
+                             alt="Typixel Logo"
                              class="w-full h-full object-contain">
                     </div>
                     <div>
                         <span class="text-xl font-bold tracking-tight text-white group-hover:text-brand-600 transition-colors">Typixel</span>
-                        <span class="block text-[10px] font-medium tracking-[0.15em] text-gray-400 uppercase">Built 
+                        <span class="block text-[10px] font-medium tracking-[0.15em] text-gray-400 uppercase">Built
                             to
                             Be
                             Remembered</span>
@@ -176,10 +407,14 @@
 
                 <!-- CENTER: Navigation -->
                 <div class="hidden md:flex items-center gap-8">
-                    <!-- UPDATED ORDER: Reviews now before Team -->
                     <a href="#home" class="nav-link text-sm font-medium text-gray-300 hover:text-white transition-colors">Home</a>
                     <a href="#services" class="nav-link text-sm font-medium text-gray-300 hover:text-white transition-colors">Services</a>
                     <a href="#portfolio" class="nav-link text-sm font-medium text-gray-300 hover:text-white transition-colors">Portfolio</a>
+                    <!-- NEW: Anniversary nav link -->
+                    <a href="#anniversary-offers" class="nav-anniversary nav-link text-sm font-bold text-brand-500 hover:text-brand-400 transition-colors flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 bg-brand-500 rounded-full animate-pulse"></span>
+                        Anniversary
+                    </a>
                     <a href="#reviews" class="nav-link text-sm font-medium text-gray-300 hover:text-white transition-colors">Reviews</a>
                     <a href="#team" class="nav-link text-sm font-medium text-gray-300 hover:text-white transition-colors">Team</a>
                     <a href="#contact" class="nav-link text-sm font-medium text-gray-300 hover:text-white transition-colors">Contact</a>
@@ -187,7 +422,7 @@
 
                 <!-- RIGHT: Button Only -->
                 <div class="flex items-center gap-4">
-                    <a href="#contact" 
+                    <a href="#contact"
                        class="hidden sm:flex bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold uppercase tracking-wider px-6 py-3 rounded-full items-center gap-2 transition-all transform hover:scale-105 shadow-lg shadow-brand-600/20">
                         Let's Talk
                     </a>
@@ -198,11 +433,15 @@
             </div>
 
             <!-- Mobile Menu -->
-            <!-- UPDATED ORDER: Reviews now before Team -->
             <div id="mobile-menu" class="hidden absolute top-20 left-0 w-full bg-brand-600 border-b border-brand-700 p-6 flex-col gap-4 md:hidden shadow-2xl z-40">
                 <a onclick="toggleMenu()" href="#home" class="nav-link-mobile text-lg font-medium text-white hover:text-black transition-colors">Home</a>
                 <a onclick="toggleMenu()" href="#services" class="nav-link-mobile text-lg font-medium text-white hover:text-black transition-colors">Services</a>
                 <a onclick="toggleMenu()" href="#portfolio" class="nav-link-mobile text-lg font-medium text-white hover:text-black transition-colors">Portfolio</a>
+                <!-- NEW: Anniversary mobile link -->
+                <a onclick="toggleMenu()" href="#anniversary-offers" class="nav-link-mobile text-lg font-bold text-white hover:text-black transition-colors flex items-center gap-2">
+                    <span class="w-2 h-2 bg-white rounded-full"></span>
+                    Anniversary
+                </a>
                 <a onclick="toggleMenu()" href="#reviews" class="nav-link-mobile text-lg font-medium text-white hover:text-black transition-colors">Reviews</a>
                 <a onclick="toggleMenu()" href="#team" class="nav-link-mobile text-lg font-medium text-white hover:text-black transition-colors">Our Team</a>
                 <a onclick="toggleMenu()" href="#contact" class="nav-link-mobile text-lg font-medium text-white hover:text-black transition-colors">Contact</a>
@@ -210,70 +449,115 @@
             </div>
         </nav>
 
-<!-- ========== HOME ========== -->
+<!-- ========== HOME / ANNIVERSARY HERO (upgraded) ========== -->
 <section id="home" class="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden">
-    <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-dark-900 via-dark-900 to-black -z-20"></div>
-    <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-brand-600/10 rounded-full blur-[100px] -z-10"></div>
-    <div class="absolute bottom-1/4 right-1/4 w-80 h-80 bg-brand-700/10 rounded-full blur-[80px] -z-10"></div>
-    <div class="absolute inset-0 opacity-20 -z-10"
-        style="background-image: radial-gradient(white 1px, transparent 1px); background-size: 30px 30px;">
+    <!-- Background video (existing) -->
+    <div class="absolute inset-0 -z-20 overflow-hidden">
+        <video autoplay muted loop playsinline class="absolute inset-0 w-full h-full object-cover object-center">
+            <source src="assets/video.mp4" type="video/mp4">
+        </video>
+        <div class="absolute inset-0 bg-black/70"></div>
     </div>
+
+    <!-- ANNIVERSARY: Large transparent background typography -->
+    <div class="absolute inset-0 -z-10 flex items-center justify-center pointer-events-none overflow-hidden">
+        <span class="text-[22vw] sm:text-[20vw] lg:text-[18vw] font-black text-white/[0.025] tracking-tighter select-none whitespace-nowrap">ANNIVERSARY</span>
+    </div>
+    <div class="absolute -bottom-10 right-2 sm:right-10 -z-10 pointer-events-none">
+        <span class="text-[18vw] sm:text-[14vw] lg:text-[12vw] font-black text-brand-600/[0.06] tracking-tighter select-none">2026</span>
+    </div>
+
+    <!-- ANNIVERSARY: Subtle red ambient glow + slow drifting light -->
+    <div class="absolute top-1/3 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-brand-600/15 rounded-full blur-[130px] -z-10 ambient-glow"></div>
+    <div class="absolute top-1/4 left-1/4 w-72 h-72 bg-brand-700/10 rounded-full blur-[90px] -z-10 drift-light"></div>
+
+    <!-- ANNIVERSARY: Fine grain noise overlay -->
+    <div class="absolute inset-0 opacity-[0.035] mix-blend-overlay pointer-events-none fine-grain -z-10"></div>
 
     <div class="max-w-7xl mx-auto px-5 text-center relative z-10">
 
-        <!-- Badge -->
-      <!-- Logo Animation -->
-<div class="absolute inset-0 -z-10 overflow-hidden">
-    <video
-        autoplay
-        muted
-        loop
-        playsinline
-        class="absolute inset-0 w-full h-full object-cover object-center">
-        <source src="assets/video.mp4" type="video/mp4">
-    </video>
+        <!-- ANNIVERSARY BADGE -->
+        <span class="inline-flex items-center gap-2 py-1.5 px-4 rounded-full bg-brand-600/15 border border-brand-600/40 text-brand-500 text-xs font-bold uppercase tracking-widest mb-8 fade-in">
+            <span class="w-1.5 h-1.5 bg-brand-500 rounded-full animate-pulse"></span>
+            Typixel Anniversary
+        </span>
 
-    <!-- Dark Overlay -->
-    <div class="absolute inset-0 bg-black/60"></div>
-</div>
-
-<!-- Badge -->
-<span class="inline-block py-1 px-3 rounded-full bg-brand-600/10 border border-brand-600/30 text-brand-500 text-xs font-bold uppercase tracking-widest mb-6 fade-in">
-    Graphic Design • Branding • Web Design
-</span>
-
-        <!-- SEO Optimized H1 -->
-        <h1 class="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black leading-tight mb-6 fade-in">
-            Professional
-            <span class="text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-200 to-gray-400">
-                Graphic Design
-            </span><br>
-            & Branding Agency
+        <!-- ANNIVERSARY MAIN HEADING -->
+        <h1 class="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black leading-[0.95] mb-6 fade-in tracking-tight">
+            ANOTHER YEAR.<br>
+            <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 via-brand-500 to-brand-700">ANOTHER CHAPTER.</span>
         </h1>
 
-        <!-- SEO Optimized Description -->
-        <p class="text-lg sm:text-xl text-gray-400 max-w-3xl mx-auto mb-10 font-light fade-in">
-            Typixel helps businesses grow through creative logo design, brand identity,
-            social media graphics, website design, motion graphics, packaging design,
-            brochures, flyers, business cards, and digital marketing solutions that
-            leave a lasting impression.
+        <!-- ANNIVERSARY SUBTEXT -->
+        <p class="text-base sm:text-lg md:text-xl text-gray-300 max-w-3xl mx-auto mb-3 font-light fade-in">
+            To celebrate our journey, we're opening a limited Anniversary Drop with exclusive offers and surprise rewards.
+        </p>
+
+        <!-- SEO supporting line (keeps agency keywords for SEO) -->
+        <p class="text-xs sm:text-sm text-gray-500 max-w-2xl mx-auto mb-10 font-medium tracking-wide fade-in">
+            Typixel — Professional Graphic Design, Branding & Website Design Agency.
         </p>
 
         <!-- CTA Buttons -->
         <div class="flex flex-col sm:flex-row gap-4 justify-center fade-in">
-            <a href="#portfolio"
-                class="px-8 py-4 rounded-full border border-white/20 hover:border-white text-white font-semibold transition-all hover:bg-white hover:text-black">
-                View Our Portfolio
+            <a href="#anniversary-offers"
+               class="px-8 py-4 rounded-full bg-brand-600 hover:bg-brand-700 text-white font-bold uppercase tracking-wider shadow-lg shadow-brand-600/30 transition-all hover:scale-105 text-sm">
+                Claim Anniversary Offer
             </a>
-
-            <a href="#contact"
-                class="px-8 py-4 rounded-full bg-brand-600 hover:bg-brand-700 text-white font-bold uppercase tracking-wider shadow-lg shadow-brand-600/25 transition-all hover:scale-105">
-                Get a Free Quote
+            <a href="#portfolio"
+               class="px-8 py-4 rounded-full border border-white/20 hover:border-white text-white font-semibold transition-all hover:bg-white hover:text-black text-sm">
+                Explore Our Work
             </a>
         </div>
 
+        <!-- ANNIVERSARY SPECIAL line -->
+        <p class="mt-12 text-[10px] sm:text-xs text-gray-500 uppercase tracking-[0.25em] fade-in">
+            Anniversary Special • Limited-Time Offers • Surprise Gifts • Exclusive Deals
+        </p>
+
     </div>
 </section>
+
+        <!-- ========================================================
+             ANNIVERSARY OFFER BAR + COUNTDOWN
+             ======================================================== -->
+        <section id="anniversary-offer-bar" class="relative py-8 border-y border-brand-600/20 bg-gradient-to-r from-dark-900 via-dark-800 to-dark-900 overflow-hidden">
+            <div class="absolute inset-0 bg-brand-600/5 pointer-events-none"></div>
+            <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[1px] bg-gradient-to-r from-transparent via-brand-600 to-transparent"></div>
+            <div class="max-w-7xl mx-auto px-5 relative z-10">
+                <div class="flex flex-col lg:flex-row items-center justify-between gap-6">
+                    <div class="text-center lg:text-left">
+                        <p class="text-xs font-bold uppercase tracking-widest text-brand-500 mb-1 flex items-center justify-center lg:justify-start gap-2">
+                            <span class="w-1.5 h-1.5 bg-brand-500 rounded-full animate-pulse"></span>
+                            Anniversary Drop is Live
+                        </p>
+                        <p class="text-sm text-gray-400">Limited Time • Limited Slots</p>
+                    </div>
+                    <div id="countdown-timer" class="flex gap-2 sm:gap-3">
+                        <div class="countdown-unit">
+                            <span id="countdown-days" class="countdown-number">00</span>
+                            <span class="countdown-label">Days</span>
+                        </div>
+                        <div class="countdown-unit">
+                            <span id="countdown-hours" class="countdown-number">00</span>
+                            <span class="countdown-label">Hours</span>
+                        </div>
+                        <div class="countdown-unit">
+                            <span id="countdown-minutes" class="countdown-number">00</span>
+                            <span class="countdown-label">Minutes</span>
+                        </div>
+                        <div class="countdown-unit">
+                            <span id="countdown-seconds" class="countdown-number">00</span>
+                            <span class="countdown-label">Seconds</span>
+                        </div>
+                    </div>
+                    <div id="countdown-ended-msg" class="hidden text-center">
+                        <p class="text-sm font-bold uppercase tracking-widest text-gray-500">The Anniversary Drop Has Ended</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- ========== CLIENTS LOGOS (Marquee) ========== -->
         <div class="border-y border-white/5 bg-black/50 py-10 overflow-hidden">
             <p class="text-center text-xs font-bold uppercase tracking-widest text-gray-500 mb-8">Trusted By</p>
@@ -285,7 +569,7 @@
                     <span class="text-xl font-bold mx-12 opacity-50 hover:opacity-100 transition-opacity cursor-default">ZEST-ON</span>
                     <span class="text-xl font-bold mx-12 opacity-50 hover:opacity-100 transition-opacity cursor-default">QUICK RESUME</span>
                     <span class="text-xl font-bold mx-12 opacity-50 hover:opacity-100 transition-opacity cursor-default">AHSAN</span>
-                    <span class="text-xl font-bold mx-12 opacity-50 hover:opacity-100 transition-opacity cursor-default">SWAHWA</span>
+                    <span class="text-xl font-bold mx-12 opacity:opacity-50 hover:opacity-100 transition-opacity cursor-default">SWAHWA</span>
                     <!-- Duplicate -->
                     <span class="text-xl font-bold mx-12 opacity-50 hover:opacity-100 transition-opacity cursor-default">CHAMAYAM</span>
                     <span class="text-xl font-bold mx-12 opacity-50 hover:opacity-100 transition-opacity cursor-default">SKILLOVIA</span>
@@ -350,25 +634,278 @@
 <script>
 document.addEventListener("DOMContentLoaded", function () {
     const video = document.getElementById("showcaseVideo");
-
-    // Prevent pause
-    video.addEventListener("pause", function () {
-        video.play();
-    });
-
-    // Disable mouse interaction
+    video.addEventListener("pause", function () { video.play(); });
     video.style.pointerEvents = "none";
 });
 </script>
 
-        <!-- ========== PORTFOLIO ========== -->
+        <!-- ========================================================
+             ANNIVERSARY OFFERS SECTION (3 Premium Cards)
+             ======================================================== -->
+        <section id="anniversary-offers" class="py-24 relative overflow-hidden">
+            <div class="absolute top-1/2 left-0 w-96 h-96 bg-brand-700/10 rounded-full blur-3xl -translate-y-1/2"></div>
+            <div class="absolute bottom-0 right-0 w-96 h-96 bg-brand-600/5 rounded-full blur-3xl"></div>
+            <div class="max-w-7xl mx-auto px-5 sm:px-8 relative z-10">
+                <div class="text-center mb-16 fade-up">
+                    <span class="inline-flex items-center gap-2 text-brand-500 font-bold uppercase tracking-widest text-xs mb-3">
+                        <span class="w-6 h-px bg-brand-500"></span>
+                        Anniversary Drop
+                        <span class="w-6 h-px bg-brand-500"></span>
+                    </span>
+                    <h2 class="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight mb-4">THE ANNIVERSARY DROP</h2>
+                    <p class="text-gray-400 max-w-2xl mx-auto">Better design. Special pricing. One limited-time campaign.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
+
+                    <!-- CARD 01: QUICK DESIGN -->
+                    <div class="anniv-card fade-up bg-gradient-to-b from-white/[0.06] to-white/[0.02] border border-white/10 rounded-3xl p-8 relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-brand-600 to-brand-700"></div>
+                        <div class="absolute -top-12 -right-12 w-32 h-32 bg-brand-600/10 rounded-full blur-2xl"></div>
+                        <div class="relative z-10">
+                            <div class="flex items-center justify-between mb-6">
+                                <span class="text-xs font-bold uppercase tracking-widest text-gray-500">Card 01</span>
+                                <span class="text-xs font-bold uppercase tracking-widest text-brand-500 px-3 py-1 rounded-full bg-brand-600/10 border border-brand-600/30">Popular</span>
+                            </div>
+                            <h3 class="text-2xl font-black mb-2">QUICK DESIGN</h3>
+                            <div class="flex items-end gap-2 mb-6">
+                                <span class="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-brand-600">30%</span>
+                                <span class="text-xl font-bold text-brand-500 mb-1">OFF</span>
+                            </div>
+                            <ul class="space-y-3 mb-8">
+                                <li class="flex items-center gap-3 text-sm text-gray-300"><iconify-icon icon="lucide:check" class="text-brand-500"></iconify-icon> Posters</li>
+                                <li class="flex items-center gap-3 text-sm text-gray-300"><iconify-icon icon="lucide:check" class="text-brand-500"></iconify-icon> Social Media Creatives</li>
+                                <li class="flex items-center gap-3 text-sm text-gray-300"><iconify-icon icon="lucide:check" class="text-brand-500"></iconify-icon> Flyers</li>
+                                <li class="flex items-center gap-3 text-sm text-gray-300"><iconify-icon icon="lucide:check" class="text-brand-500"></iconify-icon> YouTube Thumbnails</li>
+                            </ul>
+                            <button onclick="claimAnniversaryOffer('Quick Design', '30% OFF')" class="anniv-claim-btn w-full py-3.5 bg-brand-600 hover:bg-brand-700 text-white font-bold uppercase tracking-wider rounded-full transition-all text-sm">
+                                Claim Offer
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- CARD 02: BRAND BUILDER -->
+                    <div class="anniv-card fade-up bg-gradient-to-b from-brand-600/[0.12] to-white/[0.02] border border-brand-600/30 rounded-3xl p-8 relative overflow-hidden md:scale-105 md:-translate-y-2">
+                        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-brand-500 via-brand-600 to-brand-700"></div>
+                        <div class="absolute -top-12 -right-12 w-40 h-40 bg-brand-600/20 rounded-full blur-2xl"></div>
+                        <div class="relative z-10">
+                            <div class="flex items-center justify-between mb-6">
+                                <span class="text-xs font-bold uppercase tracking-widest text-brand-400">Card 02</span>
+                                <span class="text-xs font-bold uppercase tracking-widest text-white px-3 py-1 rounded-full bg-brand-600">Best Value</span>
+                            </div>
+                            <h3 class="text-2xl font-black mb-2">BRAND BUILDER</h3>
+                            <div class="flex items-end gap-2 mb-6">
+                                <span class="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-brand-600">25%</span>
+                                <span class="text-xl font-bold text-brand-500 mb-1">OFF</span>
+                            </div>
+                            <ul class="space-y-3 mb-8">
+                                <li class="flex items-center gap-3 text-sm text-gray-300"><iconify-icon icon="lucide:check" class="text-brand-500"></iconify-icon> Logo Design</li>
+                                <li class="flex items-center gap-3 text-sm text-gray-300"><iconify-icon icon="lucide:check" class="text-brand-500"></iconify-icon> Brand Identity</li>
+                                <li class="flex items-center gap-3 text-sm text-gray-300"><iconify-icon icon="lucide:check" class="text-brand-500"></iconify-icon> Brand Kit</li>
+                                <li class="flex items-center gap-3 text-sm text-gray-300"><iconify-icon icon="lucide:check" class="text-brand-500"></iconify-icon> Social Profile Setup</li>
+                            </ul>
+                            <button onclick="claimAnniversaryOffer('Brand Builder', '25% OFF')" class="anniv-claim-btn w-full py-3.5 bg-brand-600 hover:bg-brand-700 text-white font-bold uppercase tracking-wider rounded-full transition-all text-sm shadow-lg shadow-brand-600/30">
+                                Claim Offer
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- CARD 03: DIGITAL LAUNCH -->
+                    <div class="anniv-card fade-up bg-gradient-to-b from-white/[0.06] to-white/[0.02] border border-white/10 rounded-3xl p-8 relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-brand-600 to-brand-700"></div>
+                        <div class="absolute -top-12 -right-12 w-32 h-32 bg-brand-600/10 rounded-full blur-2xl"></div>
+                        <div class="relative z-10">
+                            <div class="flex items-center justify-between mb-6">
+                                <span class="text-xs font-bold uppercase tracking-widest text-gray-500">Card 03</span>
+                                <span class="text-xs font-bold uppercase tracking-widest text-brand-500 px-3 py-1 rounded-full bg-brand-600/10 border border-brand-600/30">Premium</span>
+                            </div>
+                            <h3 class="text-2xl font-black mb-2">DIGITAL LAUNCH</h3>
+                            <div class="flex items-end gap-2 mb-6">
+                                <span class="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-brand-600">20%</span>
+                                <span class="text-xl font-bold text-brand-500 mb-1">OFF</span>
+                            </div>
+                            <ul class="space-y-3 mb-8">
+                                <li class="flex items-center gap-3 text-sm text-gray-300"><iconify-icon icon="lucide:check" class="text-brand-500"></iconify-icon> Website Design</li>
+                                <li class="flex items-center gap-3 text-sm text-gray-300"><iconify-icon icon="lucide:check" class="text-brand-500"></iconify-icon> Landing Pages</li>
+                                <li class="flex items-center gap-3 text-sm text-gray-300"><iconify-icon icon="lucide:check" class="text-brand-500"></iconify-icon> UI Design</li>
+                                <li class="flex items-center gap-3 text-sm text-gray-300"><iconify-icon icon="lucide:check" class="text-brand-500"></iconify-icon> Digital Assets</li>
+                            </ul>
+                            <button onclick="claimAnniversaryOffer('Digital Launch', '20% OFF')" class="anniv-claim-btn w-full py-3.5 bg-brand-600 hover:bg-brand-700 text-white font-bold uppercase tracking-wider rounded-full transition-all text-sm">
+                                Claim Offer
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+                <p class="text-center text-xs text-gray-500 mt-10 fade-up">All offers are valid during the anniversary campaign window. Limited slots available.</p>
+            </div>
+        </section>
+
+        <!-- ========================================================
+             SPIN & SURPRISE SECTION (Main Anniversary Feature)
+             ======================================================== -->
+        <section id="spin-surprise" class="py-24 relative overflow-hidden bg-gradient-to-b from-dark-900 via-black to-dark-900">
+            <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-brand-600/10 rounded-full blur-[120px] pointer-events-none"></div>
+            <div class="absolute inset-0 opacity-[0.03] fine-grain pointer-events-none mix-blend-overlay"></div>
+
+            <div class="max-w-5xl mx-auto px-5 sm:px-8 relative z-10">
+                <div class="text-center mb-12 fade-up">
+                    <span class="inline-flex items-center gap-2 text-brand-500 font-bold uppercase tracking-widest text-xs mb-3">
+                        <span class="w-6 h-px bg-brand-500"></span>
+                        Spin & Surprise
+                        <span class="w-6 h-px bg-brand-500"></span>
+                    </span>
+                    <h2 class="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight mb-4">SPIN. WIN. CELEBRATE.</h2>
+                    <p class="text-gray-400 max-w-2xl mx-auto">Every anniversary deserves a surprise.<br>Spin the Typixel wheel and unlock your reward.</p>
+                </div>
+
+                <!-- WHEEL CONTAINER -->
+                <div class="flex flex-col items-center fade-up">
+                    <div class="wheel-wrapper">
+                        <!-- Pointer at top -->
+                        <svg class="wheel-pointer" width="28" height="36" viewBox="0 0 28 36" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M 14 36 L 2 6 Q 14 0 26 6 Z" fill="#dc2626" stroke="#ffffff" stroke-width="2" stroke-linejoin="round"/>
+                            <circle cx="14" cy="6" r="3" fill="#ffffff"/>
+                        </svg>
+                        <div class="wheel-glow-ring"></div>
+                        <div class="wheel-border-ring"></div>
+                        <svg id="wheel-svg" class="wheel-svg w-full h-full" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Generated by JS -->
+                        </svg>
+                    </div>
+
+                    <!-- SPIN BUTTON + STATE -->
+                    <div class="mt-10 text-center">
+                        <button id="spin-btn" onclick="spinWheel()" class="group relative inline-flex items-center gap-3 px-10 py-4 bg-brand-600 hover:bg-brand-700 text-white font-bold uppercase tracking-wider rounded-full shadow-lg shadow-brand-600/30 transition-all hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100">
+                            <iconify-icon icon="lucide:rotate-cw" class="text-lg group-hover:rotate-180 transition-transform duration-500"></iconify-icon>
+                            Spin the Wheel
+                        </button>
+                        <p id="spin-status" class="mt-4 text-sm text-gray-400 min-h-[1.5rem]">One spin per visitor.</p>
+                        <div id="previous-reward" class="hidden mt-4 max-w-md mx-auto p-4 rounded-2xl bg-white/5 border border-brand-600/30">
+                            <p class="text-xs text-gray-500 uppercase tracking-widest mb-1">Your Previous Reward</p>
+                            <p id="previous-reward-label" class="text-lg font-bold text-brand-500 mb-1">25% OFF</p>
+                            <p id="previous-reward-code" class="text-sm font-mono text-white">TYPE25-XXXX</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SURPRISE GIFT CARD -->
+                <div class="mt-20 fade-up">
+                    <div class="text-center mb-8">
+                        <h3 class="text-2xl sm:text-3xl font-black mb-2">THINK YOU'VE SEEN EVERYTHING?</h3>
+                        <p class="text-gray-400">Some rewards aren't discounts.</p>
+                    </div>
+                    <div class="max-w-2xl mx-auto anniv-card group relative bg-gradient-to-br from-dark-800 via-dark-800 to-brand-900/30 border border-brand-600/30 rounded-3xl p-8 sm:p-10 overflow-hidden cursor-pointer" onclick="scrollToWheel()">
+                        <div class="absolute -top-20 -right-20 w-60 h-60 bg-brand-600/20 rounded-full blur-3xl group-hover:bg-brand-600/30 transition-colors duration-500"></div>
+                        <div class="absolute -bottom-20 -left-20 w-60 h-60 bg-brand-700/10 rounded-full blur-3xl"></div>
+                        <div class="relative z-10 flex items-center gap-6">
+                            <div class="text-5xl sm:text-6xl">🎁</div>
+                            <div>
+                                <p class="text-xs font-bold uppercase tracking-widest text-brand-500 mb-2">Surprise Gift</p>
+                                <h4 class="text-2xl sm:text-3xl font-black mb-2">SURPRISE GIFT</h4>
+                                <p class="text-gray-400 text-sm">Your reward could unlock something completely unexpected.</p>
+                            </div>
+                            <iconify-icon icon="lucide:arrow-right" class="hidden sm:block text-2xl text-brand-500 group-hover:translate-x-2 transition-transform"></iconify-icon>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================
+             ANNIVERSARY STORY (Timeline)
+             ======================================================== -->
+        <section id="anniversary-story" class="py-24 relative bg-black/30">
+            <div class="absolute top-0 right-0 w-96 h-96 bg-brand-700/5 rounded-full blur-3xl"></div>
+            <div class="max-w-5xl mx-auto px-5 sm:px-8 relative z-10">
+                <div class="text-center mb-16 fade-up">
+                    <span class="text-brand-500 font-bold uppercase tracking-widest text-xs">The Journey</span>
+                    <h2 class="text-3xl sm:text-4xl md:text-5xl font-black mt-2">FROM AN IDEA TO TYPIXEL</h2>
+                </div>
+
+                <div class="space-y-8 max-w-2xl mx-auto">
+                    <div class="timeline-item fade-up pl-10">
+                        <span class="text-brand-600 font-black text-2xl">2021</span>
+                        <h3 class="text-xl font-bold mt-1">THE IDEA</h3>
+                        <p class="text-sm text-gray-400 mt-1">Where it all began — a spark to craft memorable brands.</p>
+                    </div>
+                    <div class="timeline-item fade-up pl-10">
+                        <span class="text-brand-600 font-bold text-sm uppercase tracking-widest">Early Days</span>
+                        <h3 class="text-xl font-bold mt-1">FIRST PROJECTS</h3>
+                        <p class="text-sm text-gray-400 mt-1">Building trust, one design at a time.</p>
+                    </div>
+                    <div class="timeline-item fade-up pl-10">
+                        <span class="text-brand-600 font-bold text-sm uppercase tracking-widest">Growing</span>
+                        <h3 class="text-xl font-bold mt-1">FIRST CLIENTS</h3>
+                        <p class="text-sm text-gray-400 mt-1">Brands that chose Typixel to tell their story.</p>
+                    </div>
+                    <div class="timeline-item fade-up pl-10">
+                        <span class="text-brand-600 font-bold text-sm uppercase tracking-widest">Together</span>
+                        <h3 class="text-xl font-bold mt-1">THE TEAM</h3>
+                        <p class="text-sm text-gray-400 mt-1">A creative crew shaping every chapter.</p>
+                    </div>
+                    <div class="timeline-item fade-up pl-10">
+                        <span class="text-brand-600 font-bold text-sm uppercase tracking-widest">Today</span>
+                        <h3 class="text-xl font-bold mt-1">THE JOURNEY</h3>
+                        <p class="text-sm text-gray-400 mt-1">Every project, every client — part of the story.</p>
+                    </div>
+                    <div class="timeline-item fade-up pl-10">
+                        <span class="text-brand-600 font-black text-2xl">2026</span>
+                        <h3 class="text-xl font-bold mt-1">THE NEXT CHAPTER</h3>
+                        <p class="text-sm text-gray-400 mt-1">Built to be remembered — and we're just getting started.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================
+             ANNIVERSARY STATS (Qualitative)
+             ======================================================== -->
+        <section id="anniversary-stats" class="py-20 relative">
+            <div class="absolute inset-0 bg-grid-white/5 [mask-image:linear-gradient(to_bottom,transparent,black,transparent)] [mask-size:contain]"></div>
+            <div class="max-w-7xl mx-auto px-5 sm:px-8 relative z-10">
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+                    <div class="fade-up text-center p-6 rounded-2xl bg-white/5 border border-white/5 hover:border-brand-600/30 transition-colors">
+                        <div class="w-12 h-12 mx-auto mb-4 bg-brand-600/10 rounded-full flex items-center justify-center text-brand-500">
+                            <iconify-icon icon="lucide:sparkles" class="text-xl"></iconify-icon>
+                        </div>
+                        <h3 class="text-lg font-bold mb-1">Creative Projects</h3>
+                        <p class="text-xs text-gray-500">Crafted with intent</p>
+                    </div>
+                    <div class="fade-up text-center p-6 rounded-2xl bg-white/5 border border-white/5 hover:border-brand-600/30 transition-colors">
+                        <div class="w-12 h-12 mx-auto mb-4 bg-brand-600/10 rounded-full flex items-center justify-center text-brand-500">
+                            <iconify-icon icon="lucide:users" class="text-xl"></iconify-icon>
+                        </div>
+                        <h3 class="text-lg font-bold mb-1">Growing Community</h3>
+                        <p class="text-xs text-gray-500">Built on trust</p>
+                    </div>
+                    <div class="fade-up text-center p-6 rounded-2xl bg-white/5 border border-white/5 hover:border-brand-600/30 transition-colors">
+                        <div class="w-12 h-12 mx-auto mb-4 bg-brand-600/10 rounded-full flex items-center justify-center text-brand-500">
+                            <iconify-icon icon="lucide:gem" class="text-xl"></iconify-icon>
+                        </div>
+                        <h3 class="text-lg font-bold mb-1">Brand Experiences</h3>
+                        <p class="text-xs text-gray-500">Designed to last</p>
+                    </div>
+                    <div class="fade-up text-center p-6 rounded-2xl bg-white/5 border border-white/5 hover:border-brand-600/30 transition-colors">
+                        <div class="w-12 h-12 mx-auto mb-4 bg-brand-600/10 rounded-full flex items-center justify-center text-brand-500">
+                            <iconify-icon icon="lucide:calendar" class="text-xl"></iconify-icon>
+                        </div>
+                        <h3 class="text-lg font-bold mb-1">Years of Design</h3>
+                        <p class="text-xs text-gray-500">A journey in progress</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== PORTFOLIO (upgraded with anniversary heading) ========== -->
         <section id="portfolio" class="py-24 bg-black/30">
             <div class="absolute bottom-0 left-0 w-96 h-96 bg-brand-700/5 rounded-full blur-3xl"></div>
             <div class="max-w-7xl mx-auto px-5 sm:px-8 relative z-10">
                 <div class="flex justify-between items-end mb-16">
                     <div>
-                        <span class="text-brand-600 font-bold uppercase tracking-widest text-xs">Work</span>
-                        <h2 class="text-7xl sm:text-8xl font-black text-white tracking-tight">Portfolio</h2>
+                        <span class="text-brand-600 font-bold uppercase tracking-widest text-xs">The Work Behind the Journey</span>
+                        <h2 class="text-5xl sm:text-7xl md:text-8xl font-black text-white tracking-tight">Portfolio</h2>
+                        <p class="text-sm text-gray-400 mt-3">Some of the work that shaped Typixel.</p>
                     </div>
                     <a href="https://www.instagram.com/typixelofficial/" class="hidden sm:inline-block px-6 py-2 border border-white/20 rounded-full hover:bg-white hover:text-black transition-all">View All</a>
                 </div>
@@ -479,7 +1016,6 @@ document.addEventListener("DOMContentLoaded", function () {
         </section>
 
         <!-- ========== TEAM SECTION ========== -->
-```html
 <section id="team" class="py-24 bg-black/30">
     <div class="max-w-7xl mx-auto px-5 sm:px-8 text-center">
         <span class="text-brand-600 font-bold uppercase tracking-widest text-xs">The Crew</span>
@@ -543,7 +1079,7 @@ document.addEventListener("DOMContentLoaded", function () {
 </section>
 
 
-        <!-- ========== NEW SECTION: HOW WE WORK ========== -->
+        <!-- ========== HOW WE WORK ========== -->
         <section class="py-24 relative bg-dark-900">
             <div class="absolute top-0 left-0 w-full h-full bg-grid-white/5 [mask-image:linear-gradient(to_bottom,transparent,black)] [mask-size:contain]"></div>
             <div class="max-w-7xl mx-auto px-5 relative z-10">
@@ -598,6 +1134,35 @@ document.addEventListener("DOMContentLoaded", function () {
             </div>
         </section>
 
+        <!-- ========================================================
+             THANK YOU SECTION (Before Contact)
+             ======================================================== -->
+        <section id="thank-you" class="py-24 relative overflow-hidden">
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-brand-600/10 rounded-full blur-[120px] pointer-events-none"></div>
+            <div class="max-w-4xl mx-auto px-5 sm:px-8 relative z-10 text-center">
+                <div class="fade-up">
+                    <span class="inline-flex items-center gap-2 text-brand-500 font-bold uppercase tracking-widest text-xs mb-6">
+                        <span class="w-6 h-px bg-brand-500"></span>
+                        Thank You
+                        <span class="w-6 h-px bg-brand-500"></span>
+                    </span>
+                    <h2 class="text-4xl sm:text-5xl md:text-6xl font-black leading-tight mb-4">
+                        THIS MILESTONE ISN'T JUST OURS.
+                    </h2>
+                    <p class="text-2xl sm:text-3xl text-brand-500 font-bold mb-10">It's yours too.</p>
+                    <div class="max-w-2xl mx-auto space-y-2 text-gray-400 text-base sm:text-lg leading-relaxed mb-12">
+                        <p>To every client who trusted us,</p>
+                        <p>every project that challenged us,</p>
+                        <p>and everyone who supported Typixel,</p>
+                        <p class="text-white font-semibold pt-4">Thank you.</p>
+                    </div>
+                    <h3 class="text-5xl sm:text-7xl md:text-8xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-200 to-gray-500">
+                        BUILT TO BE REMEMBERED.
+                    </h3>
+                </div>
+            </div>
+        </section>
+
         <!-- ========== CONTACT (Web3Forms) ========== -->
         <section id="contact" class="py-24 bg-gradient-to-t from-dark-900 to-black">
             <div class="max-w-7xl mx-auto px-5">
@@ -606,7 +1171,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         <p class="text-brand-600 font-bold uppercase tracking-widest text-xs mb-3">Get In Touch</p>
                         <h2 class="text-3xl sm:text-4xl font-bold text-white tracking-tight mb-6">Let's Collaborate</h2>
                         <p class="text-base text-gray-400 font-light leading-relaxed mb-10">Have a project in mind? Fill out form below. It will send an email and also open WhatsApp for a quick collaboration chat.</p>
-                        
+
                         <div class="space-y-6">
                             <a href="https://wa.me/919072891142?text=Hi%20Typixel,%20I%20want%20to%20collaborate." target="_blank" class="flex items-center gap-4 group">
                                 <div class="w-12 h-12 rounded-xl bg-green-600/10 flex items-center justify-center group-hover:bg-green-600 transition-all duration-300">
@@ -628,7 +1193,7 @@ document.addEventListener("DOMContentLoaded", function () {
                             </a>
                         </div>
 
-                        <!-- NEW HIGHLIGHTED LINKS -->
+                        <!-- HIGHLIGHTED LINKS -->
                         <div class="grid grid-cols-2 gap-4 mt-8">
                             <a href="price.html" class="group flex flex-col items-center justify-center gap-2 p-4 rounded-xl border border-brand-500/30 bg-brand-500/5 hover:bg-brand-600 hover:border-brand-600 transition-all duration-300 text-brand-400 hover:text-white">
                                 <iconify-icon icon="lucide:list" class="text-xl transition-transform group-hover:scale-110"></iconify-icon>
@@ -639,7 +1204,6 @@ document.addEventListener("DOMContentLoaded", function () {
                                 <span class="text-sm font-bold uppercase tracking-wider">Join Our Team</span>
                             </a>
                         </div>
-                        <!-- END HIGHLIGHTED LINKS -->
                     </div>
 
                     <div>
@@ -678,7 +1242,7 @@ document.addEventListener("DOMContentLoaded", function () {
                                     <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">Message</label>
                                     <textarea id="contact-message" name="message" rows="4" placeholder="Describe your brand, what you need..." class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white text-sm placeholder:text-gray-600 focus:outline-none focus:border-brand-600 transition-all resize-none"></textarea>
                                 </div>
-                                
+
                                 <button type="submit" id="contact-btn" class="w-full bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold uppercase tracking-widest py-4 rounded-xl flex items-center justify-center gap-2 transition-all">
                                     <iconify-icon icon="lucide:send" class="text-base"></iconify-icon>
                                     Send Collaboration Inquiry
@@ -690,12 +1254,12 @@ document.addEventListener("DOMContentLoaded", function () {
             </div>
         </section>
 
-        <!-- ========== FOOTER (Simple & Professional) ========== -->
+        <!-- ========== FOOTER ========== -->
         <footer class="bg-black border-t border-white/10 pt-16 pb-8">
             <div class="max-w-7xl mx-auto px-5">
                 <!-- Top Grid -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
-                    
+
                     <!-- 1. Brand Section -->
                     <div class="space-y-4">
                         <div class="flex items-center gap-3">
@@ -709,13 +1273,13 @@ document.addEventListener("DOMContentLoaded", function () {
                     </div>
 
                     <!-- 2. Quick Links -->
-                    <!-- UPDATED ORDER: Reviews now before Team -->
                     <div>
                         <h4 class="text-white font-bold uppercase tracking-widest text-sm mb-4">Quick Links</h4>
                         <ul class="space-y-2">
                             <li><a href="#home" class="text-sm text-gray-400 hover:text-brand-500 transition-colors">Home</a></li>
                             <li><a href="#services" class="text-sm text-gray-400 hover:text-brand-500 transition-colors">Services</a></li>
                             <li><a href="#portfolio" class="text-sm text-gray-400 hover:text-brand-500 transition-colors">Portfolio</a></li>
+                            <li><a href="#anniversary-offers" class="text-sm text-brand-500 hover:text-brand-400 transition-colors font-medium">Anniversary</a></li>
                             <li><a href="#reviews" class="text-sm text-gray-400 hover:text-brand-500 transition-colors">Reviews</a></li>
                             <li><a href="#team" class="text-sm text-gray-400 hover:text-brand-500 transition-colors">Team</a></li>
                             <li><a href="#contact" class="text-sm text-gray-400 hover:text-brand-500 transition-colors">Contact</a></li>
@@ -752,7 +1316,7 @@ document.addEventListener("DOMContentLoaded", function () {
                                 <a href="tel:+919072891142" class="hover:text-white transition-colors">+91 9072891142</a>
                             </li>
                         </ul>
-                        
+
                         <h4 class="text-white font-bold uppercase tracking-widest text-sm mb-3">Follow Us</h4>
                         <div class="flex gap-4">
                             <a href="https://www.instagram.com/typixelofficial/" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-brand-600 hover:text-white text-gray-400 transition-all">
@@ -770,13 +1334,12 @@ document.addEventListener("DOMContentLoaded", function () {
                     <div class="max-w-lg mx-auto text-center">
                         <h4 class="text-white font-bold mb-2">Stay Updated</h4>
                         <p class="text-sm text-gray-500 mb-4">Subscribe to our newsletter for the latest designs & offers.</p>
-                        
-                        <!-- WORKING NEWSLETTER FORM -->
+
                         <form id="newsletter-form" class="flex gap-2" action="https://api.web3forms.com/submit" method="POST">
                             <input type="hidden" name="access_key" value="d350e23d-beb1-4d69-a2d2-6e83681ecb14">
                             <input type="hidden" name="subject" value="New Newsletter Subscription from Typixel">
                             <input type="text" name="from_name" value="Newsletter Subscriber" style="display:none;">
-                            
+
                             <input type="email" name="email" placeholder="your email" required class="flex-1 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-brand-600 transition-colors">
                             <button type="submit" id="newsletter-btn" class="px-6 py-2 bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold uppercase rounded-full transition-colors">Subscribe</button>
                         </form>
@@ -794,15 +1357,523 @@ document.addEventListener("DOMContentLoaded", function () {
             </div>
         </footer>
 
-        <!-- ========== FLOATING WHATSAPP ========== -->
+        <!-- ========== FLOATING WHATSAPP (existing, untouched) ========== -->
         <a href="https://wa.me/919072891142?text=Hi%20Typixel,%20I%20am%20interested%20in%20a%20design%20collaboration." target="_blank" class="fixed bottom-6 right-6 z-50 w-14 h-14 bg-green-500 hover:bg-green-600 rounded-full flex items-center justify-center shadow-2xl shadow-green-500/30 hover:shadow-green-500/50 hover:scale-110 transition-all duration-300">
             <iconify-icon icon="lucide:message-circle" class="text-white text-2xl"></iconify-icon>
         </a>
 
-        <!-- ========== LOGIC (NAV HIGHLIGHT & FORMS) ========== -->
+        <!-- ========== FLOATING ANNIVERSARY CTA (NEW) ========== -->
+        <button onclick="scrollToWheel()" class="anniv-fab" aria-label="Win a surprise">
+            <span class="pulse-dot"></span>
+            <span>🎁 Win a Surprise</span>
+        </button>
+
+        <!-- ========================================================
+             ANNIVERSARY CAMPAIGN JAVASCRIPT
+             ======================================================== -->
+        <script>
+        // ============================================================
+        //  ANNIVERSARY CONFIG — Edit all campaign values here
+        // ============================================================
+        const ANNIVERSARY_CONFIG = {
+            // Campaign end date — easily change later
+            campaignEndDate: "2026-12-31T23:59:59",
+
+            // Existing WhatsApp number from the website
+            whatsappNumber: "919072891142",
+
+            // Coupon code prefix
+            couponPrefix: "TYPE",
+
+            // Spin limit per visitor (localStorage based, client-side only)
+            spinLimit: 1,
+            spinStorageKey: "typixelSpinUsed",
+            rewardStorageKey: "typixelSpinReward",
+            couponStorageKey: "typixelSpinCoupon",
+            popupStorageKey: "typixelAnniversarySeen",
+
+            // Wheel rewards with probabilities (must total 100)
+            // Probabilities are easy to edit here.
+            rewards: [
+                { shortLabel: "10%",  subLabel: "OFF",         fullLabel: "10% OFF",                value: "10",  type: "discount", probability: 25, couponPrefix: "TYPE10" },
+                { shortLabel: "15%",  subLabel: "OFF",         fullLabel: "15% OFF",                value: "15",  type: "discount", probability: 20, couponPrefix: "TYPE15" },
+                { shortLabel: "20%",  subLabel: "OFF",         fullLabel: "20% OFF",                value: "20",  type: "discount", probability: 15, couponPrefix: "TYPE20" },
+                { shortLabel: "25%",  subLabel: "OFF",         fullLabel: "25% OFF",                value: "25",  type: "discount", probability: 10, couponPrefix: "TYPE25" },
+                { shortLabel: "FREE",  subLabel: "THUMBNAIL",  fullLabel: "FREE THUMBNAIL",          value: "Free Thumbnail",        type: "free",      probability: 10, couponPrefix: "TYPEGIFT" },
+                { shortLabel: "FREE",  subLabel: "POST",       fullLabel: "FREE SOCIAL POST",       value: "Free Social Post",      type: "free",      probability: 10, couponPrefix: "TYPEGIFT" },
+                { shortLabel: "FREE",  subLabel: "CONSULT",    fullLabel: "FREE LOGO CONSULTATION",  value: "Free Logo Consultation", type: "free",      probability: 5,  couponPrefix: "TYPEGIFT" },
+                { shortLabel: "GIFT",  subLabel: "SURPRISE",   fullLabel: "SURPRISE GIFT",           value: "Surprise Gift",         type: "surprise",  probability: 5,  couponPrefix: "TYPEGIFT" }
+            ],
+
+            // Spin animation duration in ms (must match CSS transition)
+            spinDuration: 5500,
+
+            // Number of full rotations during spin
+            spinRotations: 5
+        };
+
+        // ============================================================
+        //  GLOBAL STATE
+        // ============================================================
+        let currentWheelRotation = 0;
+        let isSpinning = false;
+        let currentReward = null;       // Holds reward object after spin
+        let currentCouponCode = null;   // Holds coupon code after spin
+        let campaignEnded = false;
+
+        // ============================================================
+        //  WHEEL SVG BUILDER (Generates segments + labels dynamically)
+        // ============================================================
+        function polarToCartesian(cx, cy, r, angleDeg) {
+            // angleDeg: 0 = top, 90 = right, 180 = bottom, 270 = left
+            const rad = (angleDeg - 90) * Math.PI / 180;
+            return {
+                x: cx + r * Math.cos(rad),
+                y: cy + r * Math.sin(rad)
+            };
+        }
+
+        function buildWheelSVG() {
+            const wheelEl = document.getElementById('wheel-svg');
+            if (!wheelEl) return;
+            const size = 400, cx = 200, cy = 200, r = 195, innerR = 38;
+            const rewards = ANNIVERSARY_CONFIG.rewards;
+            const segCount = rewards.length;
+            const segAngle = 360 / segCount;
+
+            let paths = '', labels = '';
+
+            rewards.forEach((reward, i) => {
+                const startAngle = i * segAngle - segAngle / 2;
+                const endAngle = i * segAngle + segAngle / 2;
+                const startPt = polarToCartesian(cx, cy, r, startAngle);
+                const endPt = polarToCartesian(cx, cy, r, endAngle);
+                // Alternating dark / dark-red segments (premium look)
+                const fillColor = i % 2 === 0 ? '#181818' : '#241515';
+
+                paths += `<path d="M ${cx} ${cy} L ${startPt.x} ${startPt.y} A ${r} ${r} 0 0 1 ${endPt.x} ${endPt.y} Z"
+                              fill="${fillColor}" stroke="#dc2626" stroke-width="1" stroke-opacity="0.35" />`;
+
+                // Two-line label placed at 0.62*r from center, kept horizontal (readable)
+                const labelPt = polarToCartesian(cx, cy, r * 0.62, i * segAngle);
+                labels += `<text x="${labelPt.x}" y="${labelPt.y - 5}" fill="#ffffff" font-size="14" font-weight="900" text-anchor="middle" dominant-baseline="middle" font-family="Inter, sans-serif">${reward.shortLabel}</text>`;
+                labels += `<text x="${labelPt.x}" y="${labelPt.y + 9}" fill="#dc2626" font-size="8" font-weight="700" text-anchor="middle" dominant-baseline="middle" font-family="Inter, sans-serif" letter-spacing="0.5">${reward.subLabel}</text>`;
+            });
+
+            // Outer rim
+            const outerRim = `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#dc2626" stroke-width="3" stroke-opacity="0.7" />`;
+
+            // Inner hub
+            const hub = `<circle cx="${cx}" cy="${cy}" r="${innerR}" fill="#0a0a0a" stroke="#dc2626" stroke-width="2" />
+                         <text x="${cx}" y="${cy - 5}" fill="#dc2626" font-size="10" font-weight="900" text-anchor="middle" dominant-baseline="middle" font-family="Inter, sans-serif">TYPIXEL</text>
+                         <text x="${cx}" y="${cy + 8}" fill="#888" font-size="6" font-weight="700" text-anchor="middle" dominant-baseline="middle" font-family="Inter, sans-serif" letter-spacing="1.5">SPIN & WIN</text>`;
+
+            // Small decorative dots around rim
+            let dots = '';
+            for (let i = 0; i < segCount; i++) {
+                const pt = polarToCartesian(cx, cy, r - 8, i * segAngle);
+                dots += `<circle cx="${pt.x}" cy="${pt.y}" r="2" fill="#dc2626" opacity="0.8" />`;
+            }
+
+            wheelEl.innerHTML = paths + labels + outerRim + dots + hub;
+        }
+
+        // ============================================================
+        //  PROBABILITY PICKER (Weighted random selection)
+        // ============================================================
+        function pickWinningRewardIndex() {
+            const rewards = ANNIVERSARY_CONFIG.rewards;
+            const totalProb = rewards.reduce((s, r) => s + r.probability, 0);
+            let rand = Math.random() * totalProb;
+            for (let i = 0; i < rewards.length; i++) {
+                rand -= rewards[i].probability;
+                if (rand < 0) return i;
+            }
+            return rewards.length - 1;
+        }
+
+        // ============================================================
+        //  COUPON CODE GENERATOR
+        // ============================================================
+        function generateCouponCode(reward) {
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // no confusing chars
+            let suffix = '';
+            for (let i = 0; i < 4; i++) {
+                suffix += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return `${reward.couponPrefix}-${suffix}`;
+        }
+
+        // ============================================================
+        //  SPIN WHEEL — main spin handler
+        // ============================================================
+        function spinWheel() {
+            if (isSpinning) return;
+
+            // If campaign ended
+            if (campaignEnded) {
+                showToast("The Anniversary Drop has ended.", "error");
+                return;
+            }
+
+            // Check localStorage spin limit (client-side only, not secure)
+            if (localStorage.getItem(ANNIVERSARY_CONFIG.spinStorageKey) === 'true') {
+                showToast("You've already claimed your anniversary surprise.", "info");
+                return;
+            }
+
+            isSpinning = true;
+            const spinBtn = document.getElementById('spin-btn');
+            const spinStatus = document.getElementById('spin-status');
+            spinBtn.disabled = true;
+            spinStatus.textContent = "Spinning...";
+
+            // Pick winning reward via weighted probability
+            const winningIndex = pickWinningRewardIndex();
+            const reward = ANNIVERSARY_CONFIG.rewards[winningIndex];
+
+            const segCount = ANNIVERSARY_CONFIG.rewards.length;
+            const segAngle = 360 / segCount;
+
+            // Calculate target rotation so that the winning segment lands at top (under pointer)
+            const currentEffective = ((currentWheelRotation % 360) + 360) % 360;
+            const targetEffective = (360 - winningIndex * segAngle + 360) % 360;
+            let delta = targetEffective - currentEffective;
+            if (delta < 0) delta += 360;
+
+            // Small random offset within the segment (keeps away from edges)
+            const randomOffset = (Math.random() - 0.5) * (segAngle - 12);
+
+            const additionalRotation = 360 * ANNIVERSARY_CONFIG.spinRotations + delta + randomOffset;
+            currentWheelRotation += additionalRotation;
+
+            const wheel = document.getElementById('wheel-svg');
+            wheel.style.transform = `rotate(${currentWheelRotation}deg)`;
+
+            // After spin animation completes
+            setTimeout(() => {
+                isSpinning = false;
+                handleSpinResult(reward);
+            }, ANNIVERSARY_CONFIG.spinDuration + 100);
+        }
+
+        // ============================================================
+        //  HANDLE SPIN RESULT — generate coupon, save to localStorage, show modal
+        // ============================================================
+        function handleSpinResult(reward) {
+            currentReward = reward;
+            currentCouponCode = generateCouponCode(reward);
+
+            // Save to localStorage so user can't spin again, and reward persists
+            try {
+                localStorage.setItem(ANNIVERSARY_CONFIG.spinStorageKey, 'true');
+                localStorage.setItem(ANNIVERSARY_CONFIG.rewardStorageKey, JSON.stringify(reward));
+                localStorage.setItem(ANNIVERSARY_CONFIG.couponStorageKey, currentCouponCode);
+            } catch (e) {
+                console.warn('localStorage unavailable:', e);
+            }
+
+            // Update UI
+            const spinBtn = document.getElementById('spin-btn');
+            const spinStatus = document.getElementById('spin-status');
+            spinBtn.disabled = true;
+            spinBtn.innerHTML = '<iconify-icon icon="lucide:check" class="text-lg"></iconify-icon> Reward Unlocked';
+            spinStatus.textContent = "You've already claimed your anniversary surprise.";
+
+            // Show reward in modal
+            document.getElementById('reward-modal-title').textContent = reward.fullLabel;
+            document.getElementById('reward-coupon-code').textContent = currentCouponCode;
+            openModal('reward-modal');
+
+            // Also show inline previous reward (in case they close modal)
+            showPreviousReward(reward, currentCouponCode);
+
+            showToast(`You unlocked: ${reward.fullLabel}`, "success");
+        }
+
+        // ============================================================
+        //  SHOW PREVIOUS REWARD (for returning visitors)
+        // ============================================================
+        function showPreviousReward(reward, coupon) {
+            const container = document.getElementById('previous-reward');
+            const labelEl = document.getElementById('previous-reward-label');
+            const codeEl = document.getElementById('previous-reward-code');
+            if (reward && coupon) {
+                labelEl.textContent = reward.fullLabel;
+                codeEl.textContent = coupon;
+                container.classList.remove('hidden');
+            }
+        }
+
+        // ============================================================
+        //  CHECK SPIN STATUS ON PAGE LOAD (returning visitor)
+        // ============================================================
+        function checkExistingSpin() {
+            try {
+                const used = localStorage.getItem(ANNIVERSARY_CONFIG.spinStorageKey) === 'true';
+                if (used) {
+                    const spinBtn = document.getElementById('spin-btn');
+                    const spinStatus = document.getElementById('spin-status');
+                    spinBtn.disabled = true;
+                    spinBtn.innerHTML = '<iconify-icon icon="lucide:check" class="text-lg"></iconify-icon> Reward Unlocked';
+                    spinStatus.textContent = "You've already claimed your anniversary surprise.";
+
+                    const savedReward = JSON.parse(localStorage.getItem(ANNIVERSARY_CONFIG.rewardStorageKey) || 'null');
+                    const savedCoupon = localStorage.getItem(ANNIVERSARY_CONFIG.couponStorageKey);
+                    if (savedReward && savedCoupon) {
+                        currentReward = savedReward;
+                        currentCouponCode = savedCoupon;
+                        showPreviousReward(savedReward, savedCoupon);
+                    }
+                }
+            } catch (e) {
+                console.warn('localStorage check failed:', e);
+            }
+        }
+
+        // ============================================================
+        //  COPY COUPON CODE
+        // ============================================================
+        function copyCouponCode() {
+            if (!currentCouponCode) return;
+            const fallbackCopy = () => {
+                const ta = document.createElement('textarea');
+                ta.value = currentCouponCode;
+                ta.style.position = 'fixed'; ta.style.opacity = '0';
+                document.body.appendChild(ta);
+                ta.select();
+                try { document.execCommand('copy'); } catch (e) {}
+                document.body.removeChild(ta);
+            };
+
+            const onSuccess = () => {
+                const textEl = document.getElementById('copy-coupon-text');
+                const original = textEl.textContent;
+                textEl.textContent = '✓ Code Copied';
+                showToast('Coupon code copied to clipboard', 'success');
+                setTimeout(() => { textEl.textContent = original; }, 2500);
+            };
+
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(currentCouponCode).then(onSuccess).catch(() => {
+                    fallbackCopy(); onSuccess();
+                });
+            } else {
+                fallbackCopy(); onSuccess();
+            }
+        }
+
+        // ============================================================
+        //  CLAIM REWARD → WHATSAPP (uses existing Typixel number)
+        // ============================================================
+        function claimRewardWhatsApp() {
+            if (!currentReward || !currentCouponCode) return;
+            const message =
+`Hi Typixel 👋
+
+I just played the Typixel Anniversary Spin & Surprise.
+
+My reward:
+ ${currentReward.fullLabel}
+
+My coupon code:
+ ${currentCouponCode}
+
+I'd like to claim my anniversary reward.`;
+            const encoded = encodeURIComponent(message);
+            const url = `https://wa.me/${ANNIVERSARY_CONFIG.whatsappNumber}?text=${encoded}`;
+            window.open(url, '_blank');
+        }
+
+        // ============================================================
+        //  CLAIM ANNIVERSARY OFFER (from offer cards → WhatsApp)
+        // ============================================================
+        function claimAnniversaryOffer(cardName, discount) {
+            if (campaignEnded) {
+                showToast("The Anniversary Drop has ended.", "error");
+                return;
+            }
+            const message =
+`Hi Typixel 👋
+
+I'd like to claim the Typixel Anniversary Offer.
+
+Offer: ${cardName}
+Discount: ${discount}
+
+Please share the next steps.`;
+            const encoded = encodeURIComponent(message);
+            const url = `https://wa.me/${ANNIVERSARY_CONFIG.whatsappNumber}?text=${encoded}`;
+            window.open(url, '_blank');
+        }
+
+        // ============================================================
+        //  MODAL HELPERS
+        // ============================================================
+        function openModal(id) {
+            const m = document.getElementById(id);
+            if (m) m.classList.add('open');
+        }
+        function closeModal(id) {
+            const m = document.getElementById(id);
+            if (m) m.classList.remove('open');
+        }
+        function closeRewardModal() { closeModal('reward-modal'); }
+
+        // ============================================================
+        //  ANNIVERSARY POPUP (first visit only)
+        // ============================================================
+        function showAnniversaryPopupIfNeeded() {
+            try {
+                if (localStorage.getItem(ANNIVERSARY_CONFIG.popupStorageKey) === 'true') return;
+            } catch (e) { return; }
+
+            setTimeout(() => { openModal('anniversary-popup'); }, 4500);
+        }
+
+        function closeAnniversaryPopup(spinned) {
+            closeModal('anniversary-popup');
+            try {
+                localStorage.setItem(ANNIVERSARY_CONFIG.popupStorageKey, 'true');
+            } catch (e) {}
+            if (spinned) {
+                setTimeout(() => {
+                    document.getElementById('spin-surprise').scrollIntoView({ behavior: 'smooth' });
+                }, 350);
+            }
+        }
+
+        // ============================================================
+        //  SCROLL TO WHEEL (used by floating badge + surprise card)
+        // ============================================================
+        function scrollToWheel() {
+            // If user already spun, show their reward modal instead
+            try {
+                const used = localStorage.getItem(ANNIVERSARY_CONFIG.spinStorageKey) === 'true';
+                if (used && currentReward && currentCouponCode) {
+                    document.getElementById('reward-modal-title').textContent = currentReward.fullLabel;
+                    document.getElementById('reward-coupon-code').textContent = currentCouponCode;
+                    openModal('reward-modal');
+                    return;
+                }
+            } catch (e) {}
+            document.getElementById('spin-surprise').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // ============================================================
+        //  COUNTDOWN TIMER
+        // ============================================================
+        function startCountdown() {
+            const endDate = new Date(ANNIVERSARY_CONFIG.campaignEndDate).getTime();
+
+            const update = () => {
+                const now = new Date().getTime();
+                const distance = endDate - now;
+
+                const daysEl = document.getElementById('countdown-days');
+                const hoursEl = document.getElementById('countdown-hours');
+                const minutesEl = document.getElementById('countdown-minutes');
+                const secondsEl = document.getElementById('countdown-seconds');
+
+                if (distance <= 0) {
+                    // Campaign ended
+                    campaignEnded = true;
+                    daysEl.textContent = '00';
+                    hoursEl.textContent = '00';
+                    minutesEl.textContent = '00';
+                    secondsEl.textContent = '00';
+
+                    document.getElementById('countdown-ended-msg').classList.remove('hidden');
+                    document.getElementById('countdown-timer').classList.add('hidden');
+
+                    // Disable anniversary claim buttons
+                    document.querySelectorAll('.anniv-claim-btn').forEach(btn => {
+                        btn.disabled = true;
+                        btn.classList.add('opacity-40', 'cursor-not-allowed');
+                    });
+                    const spinBtn = document.getElementById('spin-btn');
+                    if (spinBtn) {
+                        spinBtn.disabled = true;
+                        const status = document.getElementById('spin-status');
+                        if (status) status.textContent = "The Anniversary Drop has ended.";
+                    }
+                    return;
+                }
+
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                setCountdownValue(daysEl, days);
+                setCountdownValue(hoursEl, hours);
+                setCountdownValue(minutesEl, minutes);
+                setCountdownValue(secondsEl, seconds);
+            };
+
+            const setCountdownValue = (el, val) => {
+                const padded = String(val).padStart(2, '0');
+                if (el.textContent !== padded) {
+                    el.textContent = padded;
+                    el.classList.add('tick');
+                    setTimeout(() => el.classList.remove('tick'), 300);
+                }
+            };
+
+            update();
+            setInterval(update, 1000);
+        }
+
+        // ============================================================
+        //  FADE-UP ON SCROLL (IntersectionObserver — lightweight)
+        // ============================================================
+        function setupFadeUpObserver() {
+            const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            const els = document.querySelectorAll('.fade-up');
+            if (prefersReduced) {
+                els.forEach(el => el.classList.add('visible'));
+                return;
+            }
+            const io = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        io.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.15, rootMargin: '0px 0px -50px 0px' });
+            els.forEach(el => io.observe(el));
+        }
+
+        // ============================================================
+        //  INIT — runs after main content is shown
+        // ============================================================
+        function initAnniversaryCampaign() {
+            buildWheelSVG();
+            checkExistingSpin();
+            startCountdown();
+            setupFadeUpObserver();
+            showAnniversaryPopupIfNeeded();
+
+            // Close modals on backdrop click
+            document.querySelectorAll('.modal-backdrop').forEach(modal => {
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) modal.classList.remove('open');
+                });
+            });
+
+            // ESC key closes modals
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    document.querySelectorAll('.modal-backdrop.open').forEach(m => m.classList.remove('open'));
+                }
+            });
+        }
+        </script>
+
+        <!-- ========== LOGIC (NAV HIGHLIGHT & FORMS) — existing, untouched ========== -->
         <script>
             // --- 1. LOADER & UI LOGIC ---
-
             window.addEventListener('load', () => {
                 const loader = document.getElementById('app-loader');
                 const content = document.getElementById('main-content');
@@ -814,6 +1885,10 @@ document.addEventListener("DOMContentLoaded", function () {
                         content.querySelectorAll('.fade-in').forEach(el => {
                             el.style.animationName = 'fadeIn';
                         });
+                        // === INITIALIZE ANNIVERSARY CAMPAIGN AFTER CONTENT IS VISIBLE ===
+                        if (typeof initAnniversaryCampaign === 'function') {
+                            initAnniversaryCampaign();
+                        }
                     }, 500);
                 }, 800);
             });
@@ -828,19 +1903,26 @@ document.addEventListener("DOMContentLoaded", function () {
                 const toast = document.getElementById('toast');
                 const msg = document.getElementById('toast-msg');
                 const icon = toast.querySelector('iconify-icon');
-                
+
                 msg.innerText = message;
-                
+
                 if (type === 'success') {
                     toast.classList.add('success');
                     toast.classList.remove('error');
                     icon.setAttribute('icon', 'lucide:check-circle');
                     icon.classList.replace('text-red-500', 'text-green-500');
-                } else {
+                } else if (type === 'error') {
                     toast.classList.add('error');
                     toast.classList.remove('success');
                     icon.setAttribute('icon', 'lucide:x-circle');
                     icon.classList.replace('text-green-500', 'text-red-500');
+                } else {
+                    // info style — keep success border but use info icon
+                    toast.classList.add('success');
+                    toast.classList.remove('error');
+                    icon.setAttribute('icon', 'lucide:info');
+                    icon.classList.remove('text-red-500');
+                    icon.classList.add('text-green-500');
                 }
 
                 toast.classList.add('active');
@@ -848,41 +1930,36 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
             // --- 2. SCROLL SPY LOGIC (NAV HIGHLIGHTING) ---
-            
             document.addEventListener("DOMContentLoaded", () => {
                 const sections = document.querySelectorAll("section");
                 const navLinks = document.querySelectorAll(".nav-link");
                 const mobileLinks = document.querySelectorAll(".nav-link-mobile");
 
-                // This observer will trigger when a section takes up 50% of the viewport
                 const observerOptions = {
                     root: null,
                     rootMargin: '0px',
-                    threshold: 0.3 // Trigger when 30% of the section is visible
+                    threshold: 0.3
                 };
 
                 const observer = new IntersectionObserver((entries) => {
                     entries.forEach((entry) => {
                         if (entry.isIntersecting) {
-                            // Remove active class from all links
                             navLinks.forEach(link => {
                                 link.classList.remove("text-brand-600");
                                 link.classList.add("text-gray-300");
                             });
                             mobileLinks.forEach(link => {
-                                link.classList.remove("text-white", "font-black"); // Mobile highlight style
+                                link.classList.remove("text-white", "font-black");
                             });
 
-                            // Add active class to the current link
                             const id = entry.target.getAttribute("id");
                             const activeLink = document.querySelector(`.nav-link[href="#${id}"]`);
                             const activeMobileLink = document.querySelector(`.nav-link-mobile[href="#${id}"]`);
 
-                            if (activeLink) {
+                            if (activeLink && !activeLink.classList.contains('nav-anniversary')) {
                                 activeLink.classList.remove("text-gray-300");
                                 activeLink.classList.add("text-brand-600");
                             }
-
                             if (activeMobileLink) {
                                 activeMobileLink.classList.add("text-white", "font-black");
                             }
@@ -894,10 +1971,9 @@ document.addEventListener("DOMContentLoaded", function () {
             });
 
             // --- 3. CONTACT FORM LOGIC ---
-
             document.getElementById('contact-form').addEventListener('submit', async function(event) {
                 event.preventDefault();
-                
+
                 const form = this;
                 const submitBtn = document.getElementById('contact-btn');
                 const formData = new FormData(form);
@@ -905,9 +1981,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 const name = document.getElementById('contact-name').value;
                 const service = document.getElementById('contact-service').value;
-                const budget = document.getElementById('contact-budget').value;
+                const budget = document.getElementById('contact-budget') ? document.getElementById('contact-budget').value : 'N/A';
 
-                // Loading State
                 submitBtn.innerHTML = '<iconify-icon icon="lucide:loader-2" class="text-base animate-spin"></iconify-icon> Sending...';
                 submitBtn.disabled = true;
                 submitBtn.classList.add('opacity-75', 'cursor-not-allowed');
@@ -929,7 +2004,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                         setTimeout(() => {
                             window.open(`https://wa.me/919072891142?text=${encodedMessage}`, '_blank');
-                        }, 1500); 
+                        }, 1500);
 
                     } else {
                         showToast("Error: " + data.message, "error");
@@ -944,17 +2019,15 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             });
 
-            // --- 4. NEWSLETTER FORM LOGIC (WORKING) ---
-
+            // --- 4. NEWSLETTER FORM LOGIC ---
             document.getElementById('newsletter-form').addEventListener('submit', async function(event) {
                 event.preventDefault();
-                
+
                 const form = this;
                 const btn = document.getElementById('newsletter-btn');
                 const originalBtnContent = btn.innerHTML;
                 const formData = new FormData(form);
 
-                // Loading State
                 btn.innerHTML = '<iconify-icon icon="lucide:loader-2" class="text-base animate-spin"></iconify-icon>';
                 btn.disabled = true;
 
@@ -974,9 +2047,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     }
                 } catch (error) {
                     console.error(error);
-                    // Even if API fails (e.g. rate limit), show success for UX in this demo context
-                    // or remove this block for strict error handling.
-                    showToast("Network error, but received!", "success"); 
+                    showToast("Network error, but received!", "success");
                     form.reset();
                 } finally {
                     btn.innerHTML = originalBtnContent;
@@ -984,6 +2055,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             });
         </script>
-       
+
 </body>
 </html>
