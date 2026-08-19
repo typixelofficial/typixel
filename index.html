@@ -4,40 +4,35 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta name="google-site-verification" content="QV6VfNkNepI7lhYAi93Cl4QBDQSL8MACTqw-Cobq1BY">
-
-    <title>Typixel | Graphic Design, Branding & Website Design Agency</title>
-    <meta name="description"
-        content="Typixel is a creative branding agency specializing in logo design, brand identity, web design, motion graphics, and digital marketing solutions.">
-
-    <meta name="keywords"
-        content="Graphic Design, Branding, Logo Design, Website Design, Brand Identity, Motion Graphics">
-
-    <meta name="author" content="Typixel">
+    <title>Typixel | Graphic Design & Branding Agency in Kerala</title>
+    <meta name="description" content="Typixel is a creative design agency in Kerala offering branding, graphic design, web design, social media creatives and visual identity solutions.">
+    
     <link rel="canonical" href="https://typixel.vercel.app/">
+    
+    <!-- Security Headers (Meta equivalent, though Vercel.json is recommended) -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
 
-    <meta property="og:title" content="Typixel | Graphic Design & Branding Agency">
-    <meta property="og:description"
-        content="Creative logo design, branding, website design, and digital marketing solutions.">
+    <!-- Open Graph / Social Media -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://typixel.vercel.app/">
+    <meta property="og:title" content="Typixel | Creative Design & Branding Agency">
+    <meta property="og:description" content="Typixel is a creative design agency in Kerala offering branding, graphic design, web design, social media creatives and visual identity solutions.">
     <meta property="og:image" content="https://typixel.vercel.app/images/cover.jpg">
-
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Typixel | Graphic Design & Branding Agency">
-    <meta name="twitter:description"
-        content="Creative logo design, branding, website design, and digital marketing solutions.">
+    <meta name="twitter:title" content="Typixel | Creative Design & Branding Agency">
+    <meta name="twitter:description" content="Creative design agency in Kerala offering branding, web design, and visual identity solutions.">
     <meta name="twitter:image" content="https://typixel.vercel.app/images/cover.jpg">
 
-    <!-- FAVICON -->
+    <!-- Favicon -->
     <link rel="icon" href="/images/favicon.png" type="image/png">
 
-    <!-- FONTS -->
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-    <!-- TAILWIND -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -46,7 +41,7 @@
                 extend: {
                     fontFamily: { sans: ['Inter', 'sans-serif'] },
                     colors: {
-                        brand: { 50: '#fef2f2', 100: '#fee2e2', 500: '#ef4444', 600: '#dc2626', 700: '#b91c1c', 900: '#7f1d1d' },
+                        brand: { 500: '#ef4444', 600: '#dc2626', 700: '#b91c1c' },
                         ink: { 950: '#080808', 900: '#0a0a0a', 800: '#121212', 700: '#1a1a1a' }
                     }
                 }
@@ -54,8 +49,65 @@
         }
     </script>
 
-    <!-- ICONS -->
+    <!-- Icons -->
     <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+
+    <!-- Structured Data: Organization & Local Business -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "ProfessionalService",
+      "name": "Typixel",
+      "image": "https://typixel.vercel.app/images/cover.jpg",
+      "description": "Creative design agency in Kerala offering branding, graphic design, web design, and visual identity solutions.",
+      "@id": "https://typixel.vercel.app",
+      "url": "https://typixel.vercel.app",
+      "telephone": "+91-90728-91142",
+      "priceRange": "₹499+",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Kottakkal",
+        "addressLocality": "Malappuram",
+        "addressRegion": "Kerala",
+        "postalCode": "676503",
+        "addressCountry": "IN"
+      },
+      "sameAs": [
+        "https://www.instagram.com/typixelofficial/",
+        "https://www.behance.net/hashimmhd"
+      ]
+    }
+    </script>
+
+    <!-- Structured Data: FAQ -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What graphic design services does Typixel offer?",
+          "acceptedAnswer": { "@type": "Answer", "text": "We offer branding, logo design, social media creatives, web design, packaging, print design, and YouTube thumbnail design." }
+        },
+        {
+          "@type": "Question",
+          "name": "Do you work with businesses outside Kerala?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes, while we are based in Malappuram, Kerala, we work with clients globally over email, WhatsApp, and Zoom." }
+        },
+        {
+          "@type": "Question",
+          "name": "How many revisions are included?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Revisions are included within the agreed project scope. Starter includes 2, Business includes 5, and Premium includes unlimited revisions within scope." }
+        },
+        {
+          "@type": "Question",
+          "name": "Do you provide source files?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes, Business and Premium packages include editable source files (AI, PSD, Figma, or SVG depending on the project)." }
+        }
+      ]
+    }
+    </script>
 
     <style>
         html, body {
@@ -74,11 +126,29 @@
         ::-webkit-scrollbar-thumb { background: #1f1f1f; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #dc2626; }
 
+        /* Loader is an overlay only. Content is always in DOM for SEO and JS-failure safety. */
         #app-loader {
-            position: fixed; inset: 0; z-index: 60;
+            position: fixed; inset: 0; z-index: 9999;
             background: #080808; display: flex;
             align-items: center; justify-content: center;
             transition: opacity 0.5s ease;
+        }
+
+        /* Accessibility: Focus states */
+        a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+            outline: 2px solid #dc2626;
+            outline-offset: 2px;
+            border-radius: 4px;
+        }
+
+        /* Accessibility: Reduced Motion */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
         }
 
         .fade-up { opacity: 0; transform: translateY(24px); transition: opacity .8s ease, transform .8s ease; }
@@ -87,9 +157,8 @@
         .hover-lift { transition: transform 0.4s cubic-bezier(.2,.7,.2,1), box-shadow 0.4s ease, border-color 0.4s ease; }
         .hover-lift:hover { transform: translateY(-4px); border-color: rgba(220,38,38,.35); }
 
-        /* Subtle logo interaction (no more spinning) */
-        .logo-mark { transition: transform .4s ease, opacity .4s ease; }
-        .logo-mark:hover { transform: scale(1.06); opacity: .92; }
+        .logo-mark { transition: transform .4s ease; }
+        .logo-mark:hover { transform: scale(1.06); }
 
         .glass {
             background: rgba(255,255,255, 0.025);
@@ -109,28 +178,27 @@
         .toast.success { border-color: #1f7a3a; }
         .toast.error { border-color: #b91c1c; }
 
-        /* Editorial hero typography */
         .display { letter-spacing: -0.04em; line-height: 0.95; }
 
-        /* Modal */
         .modal-backdrop { background: rgba(8,8,8,.85); backdrop-filter: blur(8px); }
         .modal-enter { animation: modalIn .35s cubic-bezier(.2,.7,.2,1); }
         @keyframes modalIn { from { opacity: 0; transform: translateY(20px) scale(.98); } to { opacity: 1; transform: none; } }
 
-        /* FAQ */
         details > summary { list-style: none; cursor: pointer; }
         details > summary::-webkit-details-marker { display: none; }
         details[open] .faq-icon { transform: rotate(45deg); }
         .faq-icon { transition: transform .3s ease; }
 
-        /* Honeypot (hidden from humans, visible to bots) */
         .hp-field { position: absolute; left: -9999px; top: -9999px; }
     </style>
 </head>
 <body class="dark text-gray-100 antialiased selection:bg-brand-600 selection:text-white">
 
+    <!-- If JS is disabled, hide loader immediately -->
+    <noscript><style>#app-loader { display: none !important; }</style></noscript>
+
     <!-- LOADER -->
-    <div id="app-loader">
+    <div id="app-loader" aria-hidden="true">
         <div class="flex flex-col items-center">
             <iconify-icon icon="lucide:hexagon" class="text-5xl text-brand-600 mb-4 animate-pulse"></iconify-icon>
             <span class="text-gray-500 font-medium tracking-[0.25em] text-xs">TYPIXEL</span>
@@ -138,19 +206,19 @@
     </div>
 
     <!-- TOAST -->
-    <div id="toast" class="toast">
+    <div id="toast" class="toast" role="status" aria-live="polite">
         <iconify-icon icon="lucide:check-circle" class="text-green-500"></iconify-icon>
         <span id="toast-msg" class="text-sm font-medium">Notification</span>
     </div>
 
     <!-- PROJECT MODAL -->
-    <div id="project-modal" class="fixed inset-0 z-[80] hidden modal-backdrop">
+    <div id="project-modal" class="fixed inset-0 z-[80] hidden modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="pm-title">
         <div class="absolute inset-0" onclick="closeProjectModal()"></div>
         <div class="relative z-10 max-w-4xl w-full mx-auto my-8 modal-enter">
             <div class="bg-ink-900 border border-white/10 rounded-3xl overflow-hidden">
                 <div class="relative aspect-[16/9] bg-black">
                     <img id="pm-image" src="" alt="" class="w-full h-full object-cover">
-                    <button onclick="closeProjectModal()" class="absolute top-4 right-4 w-10 h-10 rounded-full bg-black/60 border border-white/10 flex items-center justify-center text-white hover:bg-black">
+                    <button onclick="closeProjectModal()" class="absolute top-4 right-4 w-10 h-10 rounded-full bg-black/60 border border-white/10 flex items-center justify-center text-white hover:bg-black" aria-label="Close project details">
                         <iconify-icon icon="lucide:x"></iconify-icon>
                     </button>
                 </div>
@@ -172,11 +240,11 @@
                             <p class="text-xs uppercase tracking-widest text-gray-500 mb-2">Before / After</p>
                             <div class="grid grid-cols-2 gap-3">
                                 <div>
-                                    <img id="pm-before" src="" alt="Before" class="w-full aspect-[4/3] object-cover rounded-lg border border-white/10">
+                                    <img id="pm-before" src="" alt="Before redesign" class="w-full aspect-[4/3] object-cover rounded-lg border border-white/10">
                                     <p class="text-[10px] text-gray-500 mt-1 text-center">Before</p>
                                 </div>
                                 <div>
-                                    <img id="pm-after" src="" alt="After" class="w-full aspect-[4/3] object-cover rounded-lg border border-white/10">
+                                    <img id="pm-after" src="" alt="After redesign" class="w-full aspect-[4/3] object-cover rounded-lg border border-white/10">
                                     <p class="text-[10px] text-gray-500 mt-1 text-center">After</p>
                                 </div>
                             </div>
@@ -193,31 +261,30 @@
         </div>
     </div>
 
-    <!-- MAIN -->
-    <div id="main-content" style="display:none;">
+    <!-- MAIN CONTENT -->
+    <main id="main-content">
 
         <!-- HEADER -->
-        <nav class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 backdrop-blur-xl bg-ink-950/80 border-b border-white/5">
+        <nav class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 backdrop-blur-xl bg-ink-950/80 border-b border-white/5" aria-label="Main navigation">
             <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 h-20 flex items-center justify-between">
 
-                <!-- Logo (subtle scale, no spin) -->
                 <a href="#home" class="flex items-center gap-3 group">
                     <div class="w-9 h-9 flex items-center justify-center logo-mark">
                         <img src="/images/favicon.png" alt="Typixel Logo" class="w-full h-full object-contain">
                     </div>
                     <div class="leading-tight">
                         <span class="text-lg font-bold tracking-tight text-white">Typixel</span>
-                        <span class="block text-[10px] font-medium tracking-[0.18em] text-gray-500 uppercase">Built to be remembered</span>
+                        <span class="block text-[10px] font-medium tracking-[0.18em] text-gray-500 uppercase">Creative Design Studio</span>
                     </div>
                 </a>
 
-                <!-- New nav order -->
                 <div class="hidden md:flex items-center gap-8">
                     <a href="#work" class="nav-link text-sm font-medium text-gray-400 hover:text-white transition-colors">Work</a>
                     <a href="#services" class="nav-link text-sm font-medium text-gray-400 hover:text-white transition-colors">Services</a>
                     <a href="#process" class="nav-link text-sm font-medium text-gray-400 hover:text-white transition-colors">Process</a>
                     <a href="#about" class="nav-link text-sm font-medium text-gray-400 hover:text-white transition-colors">About</a>
                     <a href="#reviews" class="nav-link text-sm font-medium text-gray-400 hover:text-white transition-colors">Reviews</a>
+                    <a href="#faq" class="nav-link text-sm font-medium text-gray-400 hover:text-white transition-colors">FAQ</a>
                     <a href="#contact" class="nav-link text-sm font-medium text-gray-400 hover:text-white transition-colors">Contact</a>
                 </div>
 
@@ -226,7 +293,7 @@
                        class="hidden sm:inline-flex bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold uppercase tracking-wider px-5 py-3 rounded-full items-center gap-2 transition-all hover:scale-[1.02]">
                         Start a Project
                     </a>
-                    <button onclick="toggleMenu()" class="md:hidden w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white">
+                    <button onclick="toggleMenu()" id="menu-toggle" class="md:hidden w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white" aria-label="Toggle menu" aria-expanded="false" aria-controls="mobile-menu">
                         <iconify-icon icon="lucide:menu" class="text-xl"></iconify-icon>
                     </button>
                 </div>
@@ -239,59 +306,56 @@
                 <a onclick="toggleMenu()" href="#process" class="nav-link-mobile text-lg font-medium text-white hover:text-brand-500 transition-colors">Process</a>
                 <a onclick="toggleMenu()" href="#about" class="nav-link-mobile text-lg font-medium text-white hover:text-brand-500 transition-colors">About</a>
                 <a onclick="toggleMenu()" href="#reviews" class="nav-link-mobile text-lg font-medium text-white hover:text-brand-500 transition-colors">Reviews</a>
+                <a onclick="toggleMenu()" href="#faq" class="nav-link-mobile text-lg font-medium text-white hover:text-brand-500 transition-colors">FAQ</a>
                 <a onclick="toggleMenu()" href="#contact" class="nav-link-mobile text-lg font-medium text-white hover:text-brand-500 transition-colors">Contact</a>
                 <a href="#contact" onclick="toggleMenu()" class="w-full py-3 bg-brand-600 text-white text-center rounded-full font-bold uppercase tracking-wider mt-4">Start a Project</a>
             </div>
         </nav>
 
-        <!-- HERO (editorial, minimal effects) -->
+        <!-- HERO -->
         <section id="home" class="relative min-h-screen flex items-center pt-32 pb-20 overflow-hidden">
-            <!-- Single, subtle ambient glow only -->
             <div class="absolute top-1/3 -left-32 w-[480px] h-[480px] bg-brand-600/5 rounded-full blur-[120px] pointer-events-none"></div>
 
             <div class="max-w-7xl mx-auto px-5 sm:px-8 relative z-10 w-full">
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
 
-                    <!-- Left: editorial copy -->
                     <div class="lg:col-span-7">
                         <span class="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-gray-500 mb-6 fade-up">
                             <span class="w-8 h-px bg-brand-600"></span>
-                            Design Studio · Kerala, India
+                            Creative Design Studio · Kerala, India
                         </span>
 
                         <h1 class="display text-5xl sm:text-6xl lg:text-7xl font-black text-white mb-6 fade-up">
-                            Brands that get
-                            <span class="text-brand-500">remembered</span>,
-                            not scrolled past.
+                            Design that makes your brand impossible to ignore.
                         </h1>
 
                         <p class="text-lg text-gray-400 max-w-xl mb-10 leading-relaxed fade-up">
-                            We design logos, identities, websites, and social media systems for ambitious businesses — built to look premium, perform consistently, and scale across every platform.
+                            Typixel creates strategic branding, graphic design and digital experiences for businesses in Kerala and beyond. We help you build a memorable visual identity that drives growth.
                         </p>
 
                         <div class="flex flex-col sm:flex-row gap-4 fade-up">
-                            <a href="#contact"
+                            <a href="#work"
                                 class="inline-flex items-center justify-center gap-2 px-7 py-4 rounded-full bg-brand-600 hover:bg-brand-700 text-white font-semibold transition-all hover:scale-[1.02]">
-                                Start a Project
+                                View Our Work
                                 <iconify-icon icon="lucide:arrow-right"></iconify-icon>
                             </a>
-                            <a href="#work"
+                            <a href="#contact"
                                 class="inline-flex items-center justify-center gap-2 px-7 py-4 rounded-full border border-white/15 hover:border-white/40 text-white font-medium transition-colors">
-                                View Selected Work
+                                Start a Project
                             </a>
                         </div>
                     </div>
 
-                    <!-- Right: selected work preview -->
                     <div class="lg:col-span-5 fade-up">
-                        <a href="#work" class="block group relative">
+                        <a href="#work" class="block group relative" aria-label="View featured branding project">
                             <div class="aspect-[4/5] rounded-3xl overflow-hidden border border-white/10 bg-ink-800">
                                 <img src="https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/Branding.jpg"
-                                     alt="Selected Typixel work"
+                                     alt="Brand identity design created for a textile business" 
+                                     width="400" height="500"
                                      class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
                             </div>
                             <div class="absolute -bottom-4 -left-4 sm:-left-6 glass rounded-2xl p-4 max-w-[220px]">
-                                <p class="text-[10px] uppercase tracking-widest text-gray-500 mb-1">Featured</p>
+                                <p class="text-[10px] uppercase tracking-widest text-gray-500 mb-1">Featured Project</p>
                                 <p class="text-sm font-semibold text-white">Brand Identity System</p>
                                 <p class="text-xs text-gray-400 mt-1">Logo, palette, type, guidelines</p>
                             </div>
@@ -301,67 +365,11 @@
             </div>
         </section>
 
-        <!-- FEATURED WORK (new — 3 exceptional projects) -->
-        <section id="featured" class="py-20 border-t border-white/5">
-            <div class="max-w-7xl mx-auto px-5 sm:px-8">
-                <div class="flex items-end justify-between mb-12">
-                    <div>
-                        <span class="text-xs font-semibold uppercase tracking-[0.2em] text-gray-500">Featured</span>
-                        <h2 class="text-3xl sm:text-4xl font-bold mt-2">Recent Work</h2>
-                    </div>
-                    <a href="#work" class="hidden sm:inline-flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors">
-                        All projects <iconify-icon icon="lucide:arrow-right"></iconify-icon>
-                    </a>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <button onclick="openProject('branding-chamayam')" class="text-left group">
-                        <div class="aspect-[4/3] rounded-2xl overflow-hidden border border-white/10 bg-ink-800 hover-lift">
-                            <img src="https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/Branding.jpg" alt="" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
-                        </div>
-                        <div class="mt-4 flex items-center justify-between">
-                            <div>
-                                <p class="text-sm font-semibold text-white">Chamayam — Brand Identity</p>
-                                <p class="text-xs text-gray-500">Branding · Logo · Guidelines</p>
-                            </div>
-                            <iconify-icon icon="lucide:arrow-up-right" class="text-gray-500 group-hover:text-brand-500 transition-colors"></iconify-icon>
-                        </div>
-                    </button>
-
-                    <button onclick="openProject('website-skillovia')" class="text-left group">
-                        <div class="aspect-[4/3] rounded-2xl overflow-hidden border border-white/10 bg-ink-800 hover-lift">
-                            <img src="https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/website.png" alt="" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
-                        </div>
-                        <div class="mt-4 flex items-center justify-between">
-                            <div>
-                                <p class="text-sm font-semibold text-white">Skillovia — Website Design</p>
-                                <p class="text-xs text-gray-500">UI · Web · Development</p>
-                            </div>
-                            <iconify-icon icon="lucide:arrow-up-right" class="text-gray-500 group-hover:text-brand-500 transition-colors"></iconify-icon>
-                        </div>
-                    </button>
-
-                    <button onclick="openProject('poster-cinema')" class="text-left group">
-                        <div class="aspect-[4/3] rounded-2xl overflow-hidden border border-white/10 bg-ink-800 hover-lift">
-                            <img src="https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/Cinema.jpg" alt="" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
-                        </div>
-                        <div class="mt-4 flex items-center justify-between">
-                            <div>
-                                <p class="text-sm font-semibold text-white">Cinematic Poster Series</p>
-                                <p class="text-xs text-gray-500">Print · Poster · Promo</p>
-                            </div>
-                            <iconify-icon icon="lucide:arrow-up-right" class="text-gray-500 group-hover:text-brand-500 transition-colors"></iconify-icon>
-                        </div>
-                    </button>
-                </div>
-            </div>
-        </section>
-
-        <!-- SELECTED CLIENTS (renamed, no fake "Trusted By") -->
+        <!-- SELECTED CLIENTS -->
         <section class="border-y border-white/5 py-14">
             <div class="max-w-7xl mx-auto px-5 sm:px-8">
                 <p class="text-center text-xs font-semibold uppercase tracking-[0.25em] text-gray-500 mb-10">
-                    Brands We've Worked With
+                    Projects We've Worked On
                 </p>
                 <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6 items-center">
                     <div class="text-center text-gray-400 font-semibold tracking-wide hover:text-white transition-colors text-sm">CHAMAYAM</div>
@@ -383,16 +391,16 @@
                     <p class="text-gray-400">Every project starts at ₹499. Final pricing depends on scope, deliverables, and turnaround.</p>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <div class="bg-ink-800/60 border border-white/8 rounded-2xl p-8 hover-lift">
                         <div class="w-11 h-11 bg-brand-600/15 rounded-lg flex items-center justify-center text-brand-500 mb-6">
                             <iconify-icon icon="lucide:pen-tool"></iconify-icon>
                         </div>
-                        <h3 class="text-lg font-bold mb-2">Branding & Identity</h3>
-                        <p class="text-sm text-gray-400 mb-5">Logos, color systems, typography, and brand guidelines.</p>
+                        <h3 class="text-lg font-bold mb-2">Branding & Visual Identity</h3>
+                        <p class="text-sm text-gray-400 mb-5">Logos, color systems, typography, and brand guidelines for businesses.</p>
                         <div class="flex items-center justify-between">
                             <span class="text-brand-500 font-semibold text-sm">Starting ₹2,999</span>
-                            <a href="#pricing" class="text-xs text-gray-400 hover:text-white">View Pricing →</a>
+                            <a href="/services/branding.html" class="text-xs text-gray-400 hover:text-white">Learn More →</a>
                         </div>
                     </div>
 
@@ -400,11 +408,11 @@
                         <div class="w-11 h-11 bg-brand-600/15 rounded-lg flex items-center justify-center text-brand-500 mb-6">
                             <iconify-icon icon="lucide:layout"></iconify-icon>
                         </div>
-                        <h3 class="text-lg font-bold mb-2">YouTube Thumbnails</h3>
-                        <p class="text-sm text-gray-400 mb-5">Click-worthy thumbnails crafted to lift CTR.</p>
+                        <h3 class="text-lg font-bold mb-2">Web Design & UI/UX</h3>
+                        <p class="text-sm text-gray-400 mb-5">Modern, responsive website designs that convert visitors into clients.</p>
                         <div class="flex items-center justify-between">
-                            <span class="text-brand-500 font-semibold text-sm">Starting ₹499</span>
-                            <a href="#pricing" class="text-xs text-gray-400 hover:text-white">View Pricing →</a>
+                            <span class="text-brand-500 font-semibold text-sm">Custom Quote</span>
+                            <a href="/services/web-design.html" class="text-xs text-gray-400 hover:text-white">Learn More →</a>
                         </div>
                     </div>
 
@@ -412,30 +420,54 @@
                         <div class="w-11 h-11 bg-brand-600/15 rounded-lg flex items-center justify-center text-brand-500 mb-6">
                             <iconify-icon icon="lucide:instagram"></iconify-icon>
                         </div>
-                        <h3 class="text-lg font-bold mb-2">Social Media</h3>
-                        <p class="text-sm text-gray-400 mb-5">Posts, stories, and banner systems that stay consistent.</p>
+                        <h3 class="text-lg font-bold mb-2">Social Media Creatives</h3>
+                        <p class="text-sm text-gray-400 mb-5">Posts, stories, and banner systems that stay consistent and scroll-stopping.</p>
                         <div class="flex items-center justify-between">
                             <span class="text-brand-500 font-semibold text-sm">Starting ₹399</span>
-                            <a href="#pricing" class="text-xs text-gray-400 hover:text-white">View Pricing →</a>
+                            <a href="/services/social-media-design.html" class="text-xs text-gray-400 hover:text-white">Learn More →</a>
                         </div>
                     </div>
 
                     <div class="bg-ink-800/60 border border-white/8 rounded-2xl p-8 hover-lift">
                         <div class="w-11 h-11 bg-brand-600/15 rounded-lg flex items-center justify-center text-brand-500 mb-6">
-                            <iconify-icon icon="lucide:megaphone"></iconify-icon>
+                            <iconify-icon icon="lucide:youtube"></iconify-icon>
                         </div>
-                        <h3 class="text-lg font-bold mb-2">Ads & Promo</h3>
-                        <p class="text-sm text-gray-400 mb-5">Flyers, posters, and ad creatives that convert.</p>
+                        <h3 class="text-lg font-bold mb-2">YouTube Thumbnail Design</h3>
+                        <p class="text-sm text-gray-400 mb-5">Click-worthy thumbnails crafted to lift CTR and video visibility.</p>
                         <div class="flex items-center justify-between">
                             <span class="text-brand-500 font-semibold text-sm">Starting ₹499</span>
-                            <a href="#pricing" class="text-xs text-gray-400 hover:text-white">View Pricing →</a>
+                            <a href="/services/graphic-design.html" class="text-xs text-gray-400 hover:text-white">Learn More →</a>
+                        </div>
+                    </div>
+
+                    <div class="bg-ink-800/60 border border-white/8 rounded-2xl p-8 hover-lift">
+                        <div class="w-11 h-11 bg-brand-600/15 rounded-lg flex items-center justify-center text-brand-500 mb-6">
+                            <iconify-icon icon="lucide:package"></iconify-icon>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2">Packaging Design</h3>
+                        <p class="text-sm text-gray-400 mb-5">Product packaging that stands out on shelves and e-commerce listings.</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-brand-500 font-semibold text-sm">Custom Quote</span>
+                            <a href="/services/packaging-design.html" class="text-xs text-gray-400 hover:text-white">Learn More →</a>
+                        </div>
+                    </div>
+
+                    <div class="bg-ink-800/60 border border-white/8 rounded-2xl p-8 hover-lift">
+                        <div class="w-11 h-11 bg-brand-600/15 rounded-lg flex items-center justify-center text-brand-500 mb-6">
+                            <iconify-icon icon="lucide:printer"></iconify-icon>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2">Print & Poster Design</h3>
+                        <p class="text-sm text-gray-400 mb-5">Flyers, posters, brochures, and promotional materials ready for print.</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-brand-500 font-semibold text-sm">Starting ₹499</span>
+                            <a href="/services/graphic-design.html" class="text-xs text-gray-400 hover:text-white">Learn More →</a>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- PRICING / PACKAGES (new) -->
+        <!-- PRICING -->
         <section id="pricing" class="py-24 border-t border-white/5 bg-ink-900/40">
             <div class="max-w-7xl mx-auto px-5 sm:px-8">
                 <div class="max-w-2xl mb-14">
@@ -445,21 +477,19 @@
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <!-- Starter -->
                     <div class="bg-ink-800/60 border border-white/8 rounded-2xl p-8 hover-lift flex flex-col">
                         <p class="text-xs uppercase tracking-widest text-gray-500 mb-2">Starter</p>
                         <p class="text-3xl font-bold mb-1">₹499<span class="text-sm font-normal text-gray-500"> / starting</span></p>
                         <p class="text-xs text-gray-500 mb-6">Single deliverable</p>
                         <ul class="text-sm text-gray-300 space-y-2 mb-8 flex-1">
                             <li class="flex gap-2"><iconify-icon icon="lucide:check" class="text-brand-500 mt-0.5"></iconify-icon> 1 design concept</li>
-                            <li class="flex gap-2"><iconify-icon icon="lucide:check" class="text-brand-500 mt-0.5"></iconify-icon> 2 revisions</li>
+                            <li class="flex gap-2"><iconify-icon icon="lucide:check" class="text-brand-500 mt-0.5"></iconify-icon> 2 revisions within scope</li>
                             <li class="flex gap-2"><iconify-icon icon="lucide:check" class="text-brand-500 mt-0.5"></iconify-icon> 48h delivery</li>
                             <li class="flex gap-2"><iconify-icon icon="lucide:check" class="text-brand-500 mt-0.5"></iconify-icon> JPG + PNG files</li>
                         </ul>
                         <a href="#contact" class="text-center py-3 rounded-full border border-white/15 hover:border-white/40 text-sm font-medium transition-colors">Get Quote</a>
                     </div>
 
-                    <!-- Business -->
                     <div class="bg-ink-800/60 border border-brand-600/40 rounded-2xl p-8 hover-lift flex flex-col relative">
                         <span class="absolute -top-3 left-8 bg-brand-600 text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full">Popular</span>
                         <p class="text-xs uppercase tracking-widest text-gray-500 mb-2">Business</p>
@@ -469,13 +499,12 @@
                             <li class="flex gap-2"><iconify-icon icon="lucide:check" class="text-brand-500 mt-0.5"></iconify-icon> Logo + 2 variations</li>
                             <li class="flex gap-2"><iconify-icon icon="lucide:check" class="text-brand-500 mt-0.5"></iconify-icon> Color palette + typography</li>
                             <li class="flex gap-2"><iconify-icon icon="lucide:check" class="text-brand-500 mt-0.5"></iconify-icon> 5 social media templates</li>
-                            <li class="flex gap-2"><iconify-icon icon="lucide:check" class="text-brand-500 mt-0.5"></iconify-icon> 5 revisions</li>
+                            <li class="flex gap-2"><iconify-icon icon="lucide:check" class="text-brand-500 mt-0.5"></iconify-icon> 5 revisions within scope</li>
                             <li class="flex gap-2"><iconify-icon icon="lucide:check" class="text-brand-500 mt-0.5"></iconify-icon> Source files included</li>
                         </ul>
                         <a href="#contact" class="text-center py-3 rounded-full bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold transition-colors">Get Quote</a>
                     </div>
 
-                    <!-- Premium -->
                     <div class="bg-ink-800/60 border border-white/8 rounded-2xl p-8 hover-lift flex flex-col">
                         <p class="text-xs uppercase tracking-widest text-gray-500 mb-2">Premium</p>
                         <p class="text-3xl font-bold mb-1">₹9,999<span class="text-sm font-normal text-gray-500"> / starting</span></p>
@@ -484,13 +513,12 @@
                             <li class="flex gap-2"><iconify-icon icon="lucide:check" class="text-brand-500 mt-0.5"></iconify-icon> Complete brand identity</li>
                             <li class="flex gap-2"><iconify-icon icon="lucide:check" class="text-brand-500 mt-0.5"></iconify-icon> Brand guidelines PDF</li>
                             <li class="flex gap-2"><iconify-icon icon="lucide:check" class="text-brand-500 mt-0.5"></iconify-icon> 10 social templates</li>
-                            <li class="flex gap-2"><iconify-icon icon="lucide:check" class="text-brand-500 mt-0.5"></iconify-icon> Unlimited revisions</li>
+                            <li class="flex gap-2"><iconify-icon icon="lucide:check" class="text-brand-500 mt-0.5"></iconify-icon> Revisions within project scope</li>
                             <li class="flex gap-2"><iconify-icon icon="lucide:check" class="text-brand-500 mt-0.5"></iconify-icon> Priority support</li>
                         </ul>
                         <a href="#contact" class="text-center py-3 rounded-full border border-white/15 hover:border-white/40 text-sm font-medium transition-colors">Get Quote</a>
                     </div>
 
-                    <!-- Custom -->
                     <div class="bg-ink-800/60 border border-white/8 rounded-2xl p-8 hover-lift flex flex-col">
                         <p class="text-xs uppercase tracking-widest text-gray-500 mb-2">Custom</p>
                         <p class="text-3xl font-bold mb-1">Let's talk</p>
@@ -507,7 +535,7 @@
             </div>
         </section>
 
-        <!-- PORTFOLIO (with modal system) -->
+        <!-- PORTFOLIO -->
         <section id="work" class="py-24">
             <div class="max-w-7xl mx-auto px-5 sm:px-8">
                 <div class="flex justify-between items-end mb-12">
@@ -515,18 +543,18 @@
                         <span class="text-xs font-semibold uppercase tracking-[0.2em] text-gray-500">Work</span>
                         <h2 class="text-3xl sm:text-4xl font-bold mt-2">Selected Projects</h2>
                     </div>
-                    <a href="https://www.instagram.com/typixelofficial/" target="_blank" rel="noopener" class="hidden sm:inline-flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors">
+                    <a href="https://www.instagram.com/typixelofficial/" target="_blank" rel="noopener noreferrer" class="hidden sm:inline-flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors">
                         View All <iconify-icon icon="lucide:arrow-right"></iconify-icon>
                     </a>
                 </div>
 
                 <div id="portfolio-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <!-- Cards injected by JS -->
+                    <!-- Injected by JS -->
                 </div>
             </div>
         </section>
 
-        <!-- PROCESS (renamed "How We Work") -->
+        <!-- PROCESS -->
         <section id="process" class="py-24 border-t border-white/5 bg-ink-900/40">
             <div class="max-w-7xl mx-auto px-5 sm:px-8">
                 <div class="max-w-2xl mb-14">
@@ -568,8 +596,104 @@
             </div>
         </section>
 
+        <!-- ABOUT / TEAM -->
+        <section id="about" class="py-24 border-t border-white/5">
+            <div class="max-w-7xl mx-auto px-5 sm:px-8">
+                <div class="max-w-2xl mb-14">
+                    <span class="text-xs font-semibold uppercase tracking-[0.2em] text-gray-500">About</span>
+                    <h2 class="text-3xl sm:text-4xl font-bold mt-2 mb-4">The team</h2>
+                    <p class="text-gray-400">A small, focused team handling strategy, design, and delivery end-to-end.</p>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="group relative rounded-2xl overflow-hidden border border-white/8 bg-ink-800/60 hover-lift">
+                        <div class="aspect-[4/5] overflow-hidden">
+                            <img src="/images/hashim-typixel-ceo-founder.jpg" alt="Hashim, CEO and Founder of Typixel" width="400" height="500" loading="lazy" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 grayscale group-hover:grayscale-0">
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-lg font-bold">Hashim</h3>
+                            <p class="text-brand-500 text-xs font-semibold uppercase tracking-wider mb-3">CEO & Founder</p>
+                            <p class="text-sm text-gray-400 mb-4">Leads overall direction, client strategy, and creative direction across every project.</p>
+                            <div class="flex gap-3">
+                                <a href="https://www.instagram.com/typixelofficial/" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:bg-brand-600 hover:text-white transition-colors" aria-label="Hashim on Instagram">
+                                    <iconify-icon icon="lucide:instagram"></iconify-icon>
+                                </a>
+                                <a href="https://www.behance.net/hashimmhd" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:bg-brand-600 hover:text-white transition-colors" aria-label="Hashim on Behance">
+                                    <iconify-icon icon="mdi:behance"></iconify-icon>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="group relative rounded-2xl overflow-hidden border border-white/8 bg-ink-800/60 hover-lift">
+                        <div class="aspect-[4/5] overflow-hidden">
+                            <img src="https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/rifad.jpg" alt="Rifad, Co-Founder of Typixel" width="400" height="500" loading="lazy" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 grayscale group-hover:grayscale-0">
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-lg font-bold">Rifad</h3>
+                            <p class="text-brand-500 text-xs font-semibold uppercase tracking-wider mb-3">Co-Founder</p>
+                            <p class="text-sm text-gray-400 mb-4">Oversees operations and partnerships, ensuring smooth delivery from brief to launch.</p>
+                            <div class="flex gap-3">
+                                <a href="https://www.instagram.com/typixelofficial/" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:bg-brand-600 hover:text-white transition-colors" aria-label="Rifad on Instagram">
+                                    <iconify-icon icon="lucide:instagram"></iconify-icon>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="group relative rounded-2xl overflow-hidden border border-white/8 bg-ink-800/60 hover-lift">
+                        <div class="aspect-[4/5] overflow-hidden">
+                            <img src="https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/nidal.jpg" alt="Nidal, Marketing Manager at Typixel" width="400" height="500" loading="lazy" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 grayscale group-hover:grayscale-0">
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-lg font-bold">Nidal</h3>
+                            <p class="text-brand-500 text-xs font-semibold uppercase tracking-wider mb-3">Marketing Manager</p>
+                            <p class="text-sm text-gray-400 mb-4">Drives outreach, content strategy, and campaign performance for client brands.</p>
+                            <div class="flex gap-3">
+                                <a href="https://www.instagram.com/typixelofficial/" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:bg-brand-600 hover:text-white transition-colors" aria-label="Nidal on Instagram">
+                                    <iconify-icon icon="lucide:instagram"></iconify-icon>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="group relative rounded-2xl overflow-hidden border border-white/8 bg-ink-800/60 hover-lift">
+                        <div class="aspect-[4/5] overflow-hidden">
+                            <img src="https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/shadin.jpg" alt="Shadin, Creative Director at Typixel" width="400" height="500" loading="lazy" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 grayscale group-hover:grayscale-0">
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-lg font-bold">Shadin</h3>
+                            <p class="text-brand-500 text-xs font-semibold uppercase tracking-wider mb-3">Creative Director</p>
+                            <p class="text-sm text-gray-400 mb-4">Owns visual direction, design quality, and creative consistency across projects.</p>
+                            <div class="flex gap-3">
+                                <a href="https://www.instagram.com/typixelofficial/" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:bg-brand-600 hover:text-white transition-colors" aria-label="Shadin on Instagram">
+                                    <iconify-icon icon="lucide:instagram"></iconify-icon>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="group relative rounded-2xl overflow-hidden border border-white/8 bg-ink-800/60 hover-lift">
+                        <div class="aspect-[4/5] overflow-hidden">
+                            <img src="https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/afsal.jpg" alt="Afsal, Brand Strategist at Typixel" width="400" height="500" loading="lazy" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 grayscale group-hover:grayscale-0">
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-lg font-bold">Afsal</h3>
+                            <p class="text-brand-500 text-xs font-semibold uppercase tracking-wider mb-3">Brand Strategist</p>
+                            <p class="text-sm text-gray-400 mb-4">Shapes positioning, naming, and brand systems that give designs strategic depth.</p>
+                            <div class="flex gap-3">
+                                <a href="https://www.instagram.com/typixelofficial/" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:bg-brand-600 hover:text-white transition-colors" aria-label="Afsal on Instagram">
+                                    <iconify-icon icon="lucide:instagram"></iconify-icon>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- REVIEWS -->
-        <section id="reviews" class="py-24">
+        <section id="reviews" class="py-24 bg-ink-900/40 border-t border-white/5">
             <div class="max-w-7xl mx-auto px-5 sm:px-8">
                 <div class="max-w-2xl mb-14">
                     <span class="text-xs font-semibold uppercase tracking-[0.2em] text-gray-500">Reviews</span>
@@ -578,7 +702,7 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <div class="bg-ink-800/60 border border-white/8 rounded-2xl p-6 hover-lift">
-                        <div class="flex items-center gap-1 mb-4">
+                        <div class="flex items-center gap-1 mb-4" aria-label="5 out of 5 stars">
                             <iconify-icon icon="lucide:star" class="text-amber-400 text-sm"></iconify-icon>
                             <iconify-icon icon="lucide:star" class="text-amber-400 text-sm"></iconify-icon>
                             <iconify-icon icon="lucide:star" class="text-amber-400 text-sm"></iconify-icon>
@@ -592,7 +716,7 @@
                         </div>
                     </div>
                     <div class="bg-ink-800/60 border border-white/8 rounded-2xl p-6 hover-lift">
-                        <div class="flex items-center gap-1 mb-4">
+                        <div class="flex items-center gap-1 mb-4" aria-label="5 out of 5 stars">
                             <iconify-icon icon="lucide:star" class="text-amber-400 text-sm"></iconify-icon>
                             <iconify-icon icon="lucide:star" class="text-amber-400 text-sm"></iconify-icon>
                             <iconify-icon icon="lucide:star" class="text-amber-400 text-sm"></iconify-icon>
@@ -606,7 +730,7 @@
                         </div>
                     </div>
                     <div class="bg-ink-800/60 border border-white/8 rounded-2xl p-6 hover-lift">
-                        <div class="flex items-center gap-1 mb-4">
+                        <div class="flex items-center gap-1 mb-4" aria-label="5 out of 5 stars">
                             <iconify-icon icon="lucide:star" class="text-amber-400 text-sm"></iconify-icon>
                             <iconify-icon icon="lucide:star" class="text-amber-400 text-sm"></iconify-icon>
                             <iconify-icon icon="lucide:star" class="text-amber-400 text-sm"></iconify-icon>
@@ -620,166 +744,10 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Why Choose Us (24/7 removed → Reliable Support) -->
-                <div class="border-t border-white/10 pt-20 mt-20">
-                    <div class="max-w-2xl mb-14">
-                        <span class="text-xs font-semibold uppercase tracking-[0.2em] text-gray-500">Why Typixel</span>
-                        <h2 class="text-3xl sm:text-4xl font-bold mt-2">Reasons clients stay</h2>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        <div class="bg-ink-800/60 border border-white/8 rounded-2xl p-8 hover-lift">
-                            <div class="w-11 h-11 mb-5 bg-brand-600/15 rounded-lg flex items-center justify-center text-brand-500">
-                                <iconify-icon icon="lucide:zap" class="text-xl"></iconify-icon>
-                            </div>
-                            <h3 class="text-lg font-bold mb-2">Fast Delivery</h3>
-                            <p class="text-sm text-gray-400">Clear timelines. We respect deadlines without compromising quality.</p>
-                        </div>
-                        <div class="bg-ink-800/60 border border-white/8 rounded-2xl p-8 hover-lift">
-                            <div class="w-11 h-11 mb-5 bg-brand-600/15 rounded-lg flex items-center justify-center text-brand-500">
-                                <iconify-icon icon="lucide:diamond" class="text-xl"></iconify-icon>
-                            </div>
-                            <h3 class="text-lg font-bold mb-2">Premium Quality</h3>
-                            <p class="text-sm text-gray-400">Pixel-perfect, high-resolution assets that work everywhere.</p>
-                        </div>
-                        <div class="bg-ink-800/60 border border-white/8 rounded-2xl p-8 hover-lift">
-                            <div class="w-11 h-11 mb-5 bg-brand-600/15 rounded-lg flex items-center justify-center text-brand-500">
-                                <iconify-icon icon="lucide:message-square" class="text-xl"></iconify-icon>
-                            </div>
-                            <h3 class="text-lg font-bold mb-2">Reliable Support</h3>
-                            <p class="text-sm text-gray-400">Direct communication with the designer. Quick replies on WhatsApp & email.</p>
-                        </div>
-                        <div class="bg-ink-800/60 border border-white/8 rounded-2xl p-8 hover-lift">
-                            <div class="w-11 h-11 mb-5 bg-brand-600/15 rounded-lg flex items-center justify-center text-brand-500">
-                                <iconify-icon icon="lucide:wallet" class="text-xl"></iconify-icon>
-                            </div>
-                            <h3 class="text-lg font-bold mb-2">Fair Pricing</h3>
-                            <p class="text-sm text-gray-400">Transparent packages for startups and growing businesses.</p>
-                        </div>
-                    </div>
-                </div>
             </div>
         </section>
 
-        <!-- ABOUT / TEAM (fixed — no literal ```html, hierarchy consistent, role descriptions + socials) -->
-        <section id="about" class="py-24 border-t border-white/5 bg-ink-900/40">
-            <div class="max-w-7xl mx-auto px-5 sm:px-8">
-                <div class="max-w-2xl mb-14">
-                    <span class="text-xs font-semibold uppercase tracking-[0.2em] text-gray-500">About</span>
-                    <h2 class="text-3xl sm:text-4xl font-bold mt-2 mb-4">The team</h2>
-                    <p class="text-gray-400">A small, focused team handling strategy, design, and delivery end-to-end.</p>
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-
-                    <!-- Hashim — CEO & Founder -->
-                    <div class="group relative rounded-2xl overflow-hidden border border-white/8 bg-ink-800/60 hover-lift">
-                        <div class="aspect-[4/5] overflow-hidden">
-                            <img src="/images/hashim-typixel-ceo-founder.jpg" alt="Hashim, CEO and Founder of Typixel" loading="lazy" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 grayscale group-hover:grayscale-0">
-                        </div>
-                        <div class="p-6">
-                            <h3 class="text-lg font-bold">Hashim</h3>
-                            <p class="text-brand-500 text-xs font-semibold uppercase tracking-wider mb-3">CEO & Founder</p>
-                            <p class="text-sm text-gray-400 mb-4">Leads overall direction, client strategy, and creative direction across every project.</p>
-                            <div class="flex gap-3">
-                                <a href="https://www.instagram.com/typixelofficial/" target="_blank" rel="noopener" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:bg-brand-600 hover:text-white transition-colors">
-                                    <iconify-icon icon="lucide:instagram"></iconify-icon>
-                                </a>
-                                <a href="https://www.behance.net/hashimmhd" target="_blank" rel="noopener" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:bg-brand-600 hover:text-white transition-colors">
-                                    <iconify-icon icon="mdi:behance"></iconify-icon>
-                                </a>
-                                <a href="https://www.linkedin.com/" target="_blank" rel="noopener" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:bg-brand-600 hover:text-white transition-colors">
-                                    <iconify-icon icon="lucide:linkedin"></iconify-icon>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Rifad — Co-Founder (fixed) -->
-                    <div class="group relative rounded-2xl overflow-hidden border border-white/8 bg-ink-800/60 hover-lift">
-                        <div class="aspect-[4/5] overflow-hidden">
-                            <img src="https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/rifad.jpg" alt="Rifad, Co-Founder of Typixel" loading="lazy" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 grayscale group-hover:grayscale-0">
-                        </div>
-                        <div class="p-6">
-                            <h3 class="text-lg font-bold">Rifad</h3>
-                            <p class="text-brand-500 text-xs font-semibold uppercase tracking-wider mb-3">Co-Founder</p>
-                            <p class="text-sm text-gray-400 mb-4">Oversees operations and partnerships, ensuring smooth delivery from brief to launch.</p>
-                            <div class="flex gap-3">
-                                <a href="https://www.instagram.com/typixelofficial/" target="_blank" rel="noopener" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:bg-brand-600 hover:text-white transition-colors">
-                                    <iconify-icon icon="lucide:instagram"></iconify-icon>
-                                </a>
-                                <a href="https://www.linkedin.com/" target="_blank" rel="noopener" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:bg-brand-600 hover:text-white transition-colors">
-                                    <iconify-icon icon="lucide:linkedin"></iconify-icon>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Nidal — Marketing Manager -->
-                    <div class="group relative rounded-2xl overflow-hidden border border-white/8 bg-ink-800/60 hover-lift">
-                        <div class="aspect-[4/5] overflow-hidden">
-                            <img src="https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/nidal.jpg" alt="Nidal, Marketing Manager at Typixel" loading="lazy" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 grayscale group-hover:grayscale-0">
-                        </div>
-                        <div class="p-6">
-                            <h3 class="text-lg font-bold">Nidal</h3>
-                            <p class="text-brand-500 text-xs font-semibold uppercase tracking-wider mb-3">Marketing Manager</p>
-                            <p class="text-sm text-gray-400 mb-4">Drives outreach, content strategy, and campaign performance for client brands.</p>
-                            <div class="flex gap-3">
-                                <a href="https://www.instagram.com/typixelofficial/" target="_blank" rel="noopener" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:bg-brand-600 hover:text-white transition-colors">
-                                    <iconify-icon icon="lucide:instagram"></iconify-icon>
-                                </a>
-                                <a href="https://www.linkedin.com/" target="_blank" rel="noopener" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:bg-brand-600 hover:text-white transition-colors">
-                                    <iconify-icon icon="lucide:linkedin"></iconify-icon>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Shadin — Creative Director -->
-                    <div class="group relative rounded-2xl overflow-hidden border border-white/8 bg-ink-800/60 hover-lift">
-                        <div class="aspect-[4/5] overflow-hidden">
-                            <img src="https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/shadin.jpg" alt="Shadin, Creative Director at Typixel" loading="lazy" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 grayscale group-hover:grayscale-0">
-                        </div>
-                        <div class="p-6">
-                            <h3 class="text-lg font-bold">Shadin</h3>
-                            <p class="text-brand-500 text-xs font-semibold uppercase tracking-wider mb-3">Creative Director</p>
-                            <p class="text-sm text-gray-400 mb-4">Owns visual direction, design quality, and creative consistency across projects.</p>
-                            <div class="flex gap-3">
-                                <a href="https://www.instagram.com/typixelofficial/" target="_blank" rel="noopener" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:bg-brand-600 hover:text-white transition-colors">
-                                    <iconify-icon icon="lucide:instagram"></iconify-icon>
-                                </a>
-                                <a href="https://www.behance.net/hashimmhd" target="_blank" rel="noopener" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:bg-brand-600 hover:text-white transition-colors">
-                                    <iconify-icon icon="mdi:behance"></iconify-icon>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Afsal — Brand Strategist -->
-                    <div class="group relative rounded-2xl overflow-hidden border border-white/8 bg-ink-800/60 hover-lift">
-                        <div class="aspect-[4/5] overflow-hidden">
-                            <img src="https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/afsal.jpg" alt="Afsal, Brand Strategist at Typixel" loading="lazy" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 grayscale group-hover:grayscale-0">
-                        </div>
-                        <div class="p-6">
-                            <h3 class="text-lg font-bold">Afsal</h3>
-                            <p class="text-brand-500 text-xs font-semibold uppercase tracking-wider mb-3">Brand Strategist</p>
-                            <p class="text-sm text-gray-400 mb-4">Shapes positioning, naming, and brand systems that give designs strategic depth.</p>
-                            <div class="flex gap-3">
-                                <a href="https://www.instagram.com/typixelofficial/" target="_blank" rel="noopener" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:bg-brand-600 hover:text-white transition-colors">
-                                    <iconify-icon icon="lucide:instagram"></iconify-icon>
-                                </a>
-                                <a href="https://www.linkedin.com/" target="_blank" rel="noopener" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:bg-brand-600 hover:text-white transition-colors">
-                                    <iconify-icon icon="lucide:linkedin"></iconify-icon>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </section>
-
-        <!-- FAQ (new) -->
+        <!-- FAQ -->
         <section id="faq" class="py-24">
             <div class="max-w-3xl mx-auto px-5 sm:px-8">
                 <div class="text-center mb-14">
@@ -790,18 +758,34 @@
                 <div class="space-y-3">
                     <details class="bg-ink-800/60 border border-white/8 rounded-2xl p-6 group">
                         <summary class="flex items-center justify-between gap-4">
-                            <span class="font-semibold text-white">How do I start a project?</span>
+                            <span class="font-semibold text-white">What graphic design services does Typixel offer?</span>
                             <iconify-icon icon="lucide:plus" class="faq-icon text-brand-500 text-lg"></iconify-icon>
                         </summary>
-                        <p class="text-sm text-gray-400 mt-4 leading-relaxed">Fill out the contact form below or message us on WhatsApp. We'll respond with a short brief, timeline, and quote — usually within a few hours during working days.</p>
+                        <p class="text-sm text-gray-400 mt-4 leading-relaxed">We offer comprehensive branding, logo design, social media creatives, web design, packaging design, print design, and YouTube thumbnail design for businesses of all sizes.</p>
                     </details>
 
                     <details class="bg-ink-800/60 border border-white/8 rounded-2xl p-6 group">
                         <summary class="flex items-center justify-between gap-4">
-                            <span class="font-semibold text-white">How long does delivery take?</span>
+                            <span class="font-semibold text-white">Do you work with businesses outside Kerala?</span>
                             <iconify-icon icon="lucide:plus" class="faq-icon text-brand-500 text-lg"></iconify-icon>
                         </summary>
-                        <p class="text-sm text-gray-400 mt-4 leading-relaxed">Single creatives typically take 24–72 hours. Full brand identity systems take 5–10 days depending on revisions and scope.</p>
+                        <p class="text-sm text-gray-400 mt-4 leading-relaxed">Yes. While we are based in Malappuram, Kerala, we work with clients globally over email, WhatsApp, and Zoom. Time zones are handled with async updates.</p>
+                    </details>
+
+                    <details class="bg-ink-800/60 border border-white/8 rounded-2xl p-6 group">
+                        <summary class="flex items-center justify-between gap-4">
+                            <span class="font-semibold text-white">How does the design process work?</span>
+                            <iconify-icon icon="lucide:plus" class="faq-icon text-brand-500 text-lg"></iconify-icon>
+                        </summary>
+                        <p class="text-sm text-gray-400 mt-4 leading-relaxed">Our process follows four clear steps: Discovery (understanding your goals), Strategy (mapping direction), Design (iterative feedback), and Launch (final asset delivery).</p>
+                    </details>
+
+                    <details class="bg-ink-800/60 border border-white/8 rounded-2xl p-6 group">
+                        <summary class="flex items-center justify-between gap-4">
+                            <span class="font-semibold text-white">How long does logo design take?</span>
+                            <iconify-icon icon="lucide:plus" class="faq-icon text-brand-500 text-lg"></iconify-icon>
+                        </summary>
+                        <p class="text-sm text-gray-400 mt-4 leading-relaxed">A single logo concept typically takes 24–72 hours. A full brand identity system takes 5–10 days depending on revisions and scope.</p>
                     </details>
 
                     <details class="bg-ink-800/60 border border-white/8 rounded-2xl p-6 group">
@@ -809,7 +793,7 @@
                             <span class="font-semibold text-white">How many revisions are included?</span>
                             <iconify-icon icon="lucide:plus" class="faq-icon text-brand-500 text-lg"></iconify-icon>
                         </summary>
-                        <p class="text-sm text-gray-400 mt-4 leading-relaxed">Starter includes 2 revisions, Business includes 5, and Premium includes unlimited revisions within the project scope.</p>
+                        <p class="text-sm text-gray-400 mt-4 leading-relaxed">Revisions are included within the agreed project scope. Starter includes 2 revisions, Business includes 5, and Premium includes unlimited revisions within the project scope.</p>
                     </details>
 
                     <details class="bg-ink-800/60 border border-white/8 rounded-2xl p-6 group">
@@ -825,21 +809,13 @@
                             <span class="font-semibold text-white">How does payment work?</span>
                             <iconify-icon icon="lucide:plus" class="faq-icon text-brand-500 text-lg"></iconify-icon>
                         </summary>
-                        <p class="text-sm text-gray-400 mt-4 leading-relaxed">We typically take 50% advance to begin and 50% on delivery. UPI, bank transfer, and international options are available.</p>
-                    </details>
-
-                    <details class="bg-ink-800/60 border border-white/8 rounded-2xl p-6 group">
-                        <summary class="flex items-center justify-between gap-4">
-                            <span class="font-semibold text-white">Do you work with clients outside Kerala/India?</span>
-                            <iconify-icon icon="lucide:plus" class="faq-icon text-brand-500 text-lg"></iconify-icon>
-                        </summary>
-                        <p class="text-sm text-gray-400 mt-4 leading-relaxed">Yes. We work with clients globally over email, WhatsApp, and Zoom. Time zones are handled with async updates.</p>
+                        <p class="text-sm text-gray-400 mt-4 leading-relaxed">We typically take 50% advance to begin the project and 50% on delivery. UPI, bank transfer, and international options are available.</p>
                     </details>
                 </div>
             </div>
         </section>
 
-        <!-- CONTACT (improved) -->
+        <!-- CONTACT -->
         <section id="contact" class="py-24 border-t border-white/5 bg-ink-900/40">
             <div class="max-w-7xl mx-auto px-5 sm:px-8">
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
@@ -849,7 +825,7 @@
                         <p class="text-base text-gray-400 font-light leading-relaxed mb-10">Tell us about your brand, your goals, and your timeline. We usually respond within a few hours on working days.</p>
 
                         <div class="space-y-5">
-                            <a href="https://wa.me/919072891142?text=Hi%20Typixel,%20I%20want%20to%20collaborate." target="_blank" rel="noopener" class="flex items-center gap-4 group">
+                            <a href="https://wa.me/919072891142?text=Hi%20Typixel,%20I%20want%20to%20collaborate." target="_blank" rel="noopener noreferrer" class="flex items-center gap-4 group">
                                 <div class="w-11 h-11 rounded-xl bg-green-600/10 flex items-center justify-center group-hover:bg-green-600 transition-all duration-300">
                                     <iconify-icon icon="lucide:message-circle" class="text-green-500 group-hover:text-white text-lg transition-colors"></iconify-icon>
                                 </div>
@@ -883,14 +859,7 @@
 
                     <div>
                         <div class="bg-ink-800/60 border border-white/8 rounded-3xl p-6 sm:p-8">
-                            <!-- 
-                                NOTE: The Web3Forms access_key below is intentionally client-visible.
-                                Web3Forms keys are designed to be public (they only accept submissions to your email).
-                                For stronger spam protection we add a honeypot field + botcheck.
-                                To fully lock this down, proxy submissions through a serverless function
-                                (Vercel/Netlify) and keep the key in environment variables.
-                            -->
-                            <form action="https://api.web3forms.com/submit" method="POST" id="contact-form" class="space-y-5">
+                            <form action="https://api.web3forms.com/submit" method="POST" id="contact-form" class="space-y-5" novalidate>
                                 <input type="hidden" name="access_key" value="d350e23d-beb1-4d69-a2d2-6e83681ecb14">
                                 <input type="hidden" name="subject" value="New Project Inquiry — Typixel">
                                 <input type="hidden" name="from_name" value="Typixel Website">
@@ -975,13 +944,23 @@
                                 </div>
 
                                 <p class="text-xs text-gray-500 leading-relaxed">
-                                    By submitting, you agree to be contacted about your inquiry. We respect your privacy — your details are never shared. See our <a href="/privacy.html" class="text-brand-500 hover:underline">Privacy Policy</a>.
+                                    By submitting, you agree to be contacted about your inquiry. We respect your privacy — see our <a href="/privacy.html" class="text-brand-500 hover:underline">Privacy Policy</a>.
                                 </p>
 
                                 <button type="submit" id="contact-btn" class="w-full bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold uppercase tracking-widest py-4 rounded-xl flex items-center justify-center gap-2 transition-all">
                                     <iconify-icon icon="lucide:send" class="text-base"></iconify-icon>
                                     Start My Project
                                 </button>
+                                
+                                <!-- Success state with optional WhatsApp button -->
+                                <div id="form-success" class="hidden mt-4 p-4 bg-green-600/10 border border-green-600/30 rounded-xl text-center">
+                                    <p class="text-green-400 font-semibold mb-2">Inquiry sent successfully!</p>
+                                    <p class="text-gray-400 text-sm mb-4">Want to continue the conversation faster? Connect with us directly on WhatsApp.</p>
+                                    <a id="wa-continue" href="#" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-6 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-semibold rounded-full transition-colors">
+                                        <iconify-icon icon="lucide:message-circle"></iconify-icon>
+                                        Continue on WhatsApp
+                                    </a>
+                                </div>
                             </form>
                         </div>
                     </div>
@@ -1005,7 +984,7 @@
                     </div>
 
                     <div>
-                        <h4 class="text-white font-semibold uppercase tracking-widest text-xs mb-4">Quick Links</h4>
+                        <h2 class="text-white font-semibold uppercase tracking-widest text-xs mb-4">Quick Links</h2>
                         <ul class="space-y-2">
                             <li><a href="#work" class="text-sm text-gray-400 hover:text-brand-500 transition-colors">Work</a></li>
                             <li><a href="#services" class="text-sm text-gray-400 hover:text-brand-500 transition-colors">Services</a></li>
@@ -1017,59 +996,57 @@
                     </div>
 
                     <div>
-                        <h4 class="text-white font-semibold uppercase tracking-widest text-xs mb-4">Services</h4>
+                        <h2 class="text-white font-semibold uppercase tracking-widest text-xs mb-4">Services</h2>
                         <ul class="space-y-2">
-                            <li><span class="text-sm text-gray-400">Logo Design</span></li>
-                            <li><span class="text-sm text-gray-400">Branding & Identity</span></li>
-                            <li><span class="text-sm text-gray-400">Social Media Design</span></li>
-                            <li><span class="text-sm text-gray-400">YouTube Thumbnails</span></li>
-                            <li><span class="text-sm text-gray-400">Print Design</span></li>
-                            <li><span class="text-sm text-gray-400">Packaging Design</span></li>
+                            <li><a href="/services/branding.html" class="text-sm text-gray-400 hover:text-brand-500 transition-colors">Branding & Identity</a></li>
+                            <li><a href="/services/graphic-design.html" class="text-sm text-gray-400 hover:text-brand-500 transition-colors">Graphic Design</a></li>
+                            <li><a href="/services/web-design.html" class="text-sm text-gray-400 hover:text-brand-500 transition-colors">Web Design</a></li>
+                            <li><a href="/services/social-media-design.html" class="text-sm text-gray-400 hover:text-brand-500 transition-colors">Social Media Creatives</a></li>
+                            <li><a href="/services/packaging-design.html" class="text-sm text-gray-400 hover:text-brand-500 transition-colors">Packaging Design</a></li>
                         </ul>
                     </div>
 
                     <div>
-                        <h4 class="text-white font-semibold uppercase tracking-widest text-xs mb-4">Contact</h4>
-                        <ul class="space-y-3 text-sm text-gray-400 mb-6">
-                            <li class="flex items-center gap-2">
+                        <h2 class="text-white font-semibold uppercase tracking-widest text-xs mb-4">Contact</h2>
+                        <address class="not-italic space-y-3 text-sm text-gray-400 mb-6">
+                            <p class="flex items-center gap-2">
                                 <iconify-icon icon="lucide:map-pin" class="text-brand-500"></iconify-icon>
                                 <span>Kottakkal, Malappuram, Kerala, India</span>
-                            </li>
-                            <li class="flex items-center gap-2">
+                            </p>
+                            <p class="flex items-center gap-2">
                                 <iconify-icon icon="lucide:mail" class="text-brand-500"></iconify-icon>
                                 <a href="mailto:typixelofficial@gmail.com" class="hover:text-white transition-colors">typixelofficial@gmail.com</a>
-                            </li>
-                            <li class="flex items-center gap-2">
+                            </p>
+                            <p class="flex items-center gap-2">
                                 <iconify-icon icon="lucide:phone" class="text-brand-500"></iconify-icon>
                                 <a href="tel:+919072891142" class="hover:text-white transition-colors">+91 90728 91142</a>
-                            </li>
-                        </ul>
+                            </p>
+                        </address>
 
-                        <h4 class="text-white font-semibold uppercase tracking-widest text-xs mb-3">Follow Us</h4>
+                        <h2 class="text-white font-semibold uppercase tracking-widest text-xs mb-3">Follow Us</h2>
                         <div class="flex gap-3">
-                            <a href="https://www.instagram.com/typixelofficial/" target="_blank" rel="noopener" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-brand-600 hover:text-white text-gray-400 transition-all">
+                            <a href="https://www.instagram.com/typixelofficial/" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-brand-600 hover:text-white text-gray-400 transition-all" aria-label="Visit Typixel on Instagram">
                                 <iconify-icon icon="lucide:instagram"></iconify-icon>
                             </a>
-                            <a href="https://www.behance.net/hashimmhd" target="_blank" rel="noopener" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-brand-600 hover:text-white text-gray-400 transition-all">
+                            <a href="https://www.behance.net/hashimmhd" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-brand-600 hover:text-white text-gray-400 transition-all" aria-label="Visit Typixel on Behance">
                                 <iconify-icon icon="mdi:behance"></iconify-icon>
                             </a>
                         </div>
                     </div>
                 </div>
 
-                <!-- Newsletter (fixed error handling) -->
                 <div class="border-t border-white/5 py-10 mb-8">
                     <div class="max-w-lg mx-auto text-center">
-                        <h4 class="text-white font-semibold mb-2">Stay Updated</h4>
+                        <h2 class="text-white font-semibold mb-2">Get Design Updates</h2>
                         <p class="text-sm text-gray-500 mb-4">Subscribe for the latest designs & offers.</p>
 
-                        <form id="newsletter-form" class="flex gap-2" action="https://api.web3forms.com/submit" method="POST">
+                        <form id="newsletter-form" class="flex gap-2" action="https://api.web3forms.com/submit" method="POST" novalidate>
                             <input type="hidden" name="access_key" value="d350e23d-beb1-4d69-a2d2-6e83681ecb14">
                             <input type="hidden" name="subject" value="New Newsletter Subscription from Typixel">
                             <input type="hidden" name="from_name" value="Newsletter Subscriber">
                             <input type="checkbox" name="botcheck" class="hp-field" tabindex="-1" autocomplete="off">
 
-                            <input type="email" name="email" placeholder="your@email.com" required
+                            <input type="email" name="email" placeholder="your@email.com" required aria-label="Email for newsletter"
                                 class="flex-1 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-brand-600 transition-colors">
                             <button type="submit" id="newsletter-btn" class="px-6 py-2 bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold uppercase rounded-full transition-colors">Subscribe</button>
                         </form>
@@ -1077,7 +1054,7 @@
                 </div>
 
                 <div class="border-t border-white/5 pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-gray-500 gap-4">
-                    <p>© 2026 Typixel. All Rights Reserved.</p>
+                    <p>© 2024 Typixel. All Rights Reserved.</p>
                     <div class="flex gap-6">
                         <a href="/privacy.html" class="hover:text-white transition-colors">Privacy Policy</a>
                         <a href="/terms.html" class="hover:text-white transition-colors">Terms & Conditions</a>
@@ -1088,14 +1065,13 @@
         </footer>
 
         <!-- FLOATING WHATSAPP -->
-        <a href="https://wa.me/919072891142?text=Hi%20Typixel,%20I%20am%20interested%20in%20a%20design%20collaboration." target="_blank" rel="noopener"
-           class="fixed bottom-6 right-6 z-50 w-14 h-14 bg-green-500 hover:bg-green-600 rounded-full flex items-center justify-center shadow-2xl shadow-green-500/30 hover:scale-105 transition-all duration-300">
+        <a href="https://wa.me/919072891142?text=Hi%20Typixel,%20I%20am%20interested%20in%20a%20design%20collaboration." target="_blank" rel="noopener noreferrer"
+           class="fixed bottom-6 right-6 z-50 w-14 h-14 bg-green-500 hover:bg-green-600 rounded-full flex items-center justify-center shadow-2xl shadow-green-500/30 hover:scale-105 transition-all duration-300" aria-label="Chat with Typixel on WhatsApp">
             <iconify-icon icon="lucide:message-circle" class="text-white text-2xl"></iconify-icon>
         </a>
 
         <!-- SCRIPTS -->
         <script>
-            // ============ PROJECT DATA ============
             const PROJECTS = {
                 'branding-chamayam': {
                     title: 'Chamayam — Brand Identity',
@@ -1104,8 +1080,7 @@
                     image: 'https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/Branding.jpg',
                     story: 'Chamayam needed a contemporary identity that still respected their textile heritage. We built a modular mark, warm color palette, and a complete guideline set rolled out across signage, packaging, and social.',
                     services: ['Logo Design', 'Brand Guidelines', 'Color & Typography', 'Social Templates'],
-                    before: '',
-                    after: ''
+                    before: '', after: ''
                 },
                 'website-skillovia': {
                     title: 'Skillovia — Website Design',
@@ -1114,8 +1089,7 @@
                     image: 'https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/website.png',
                     story: 'A clean, conversion-focused website for an upskilling platform. We led with clear value propositions, simplified navigation, and a modular UI kit that scales with their content.',
                     services: ['UI Design', 'UX Wireframes', 'Responsive Layout', 'Design System'],
-                    before: '',
-                    after: ''
+                    before: '', after: ''
                 },
                 'poster-cinema': {
                     title: 'Cinematic Poster Series',
@@ -1124,8 +1098,7 @@
                     image: 'https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/Cinema.jpg',
                     story: 'A poster series built around mood, contrast, and typography. Each poster was designed to work as both print and digital — strong at thumbnail size, dramatic full-size.',
                     services: ['Poster Design', 'Typography', 'Photo Editing', 'Print Ready Files'],
-                    before: '',
-                    after: ''
+                    before: '', after: ''
                 },
                 'brochure': {
                     title: 'Brochure Design',
@@ -1134,8 +1107,7 @@
                     image: 'https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/Brouchere.jpg',
                     story: 'A tri-fold brochure balancing information density with readability. Designed with a clear visual hierarchy and print-ready color profiles.',
                     services: ['Layout Design', 'Print Production', 'Typography'],
-                    before: '',
-                    after: ''
+                    before: '', after: ''
                 },
                 'menu-card': {
                     title: 'Menu Card Design',
@@ -1144,8 +1116,7 @@
                     image: 'https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/Menu Card.jpg',
                     story: 'A menu system designed to feel premium and easy to scan. Modular layout allows seasonal swaps without redesigning the entire card.',
                     services: ['Layout Design', 'Typography', 'Print Ready Files'],
-                    before: '',
-                    after: ''
+                    before: '', after: ''
                 },
                 'logo': {
                     title: 'Logo Design',
@@ -1154,18 +1125,16 @@
                     image: 'https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/logo.jpg',
                     story: 'A selection of logo marks designed for different industries — each built around a single clear idea that works at every size.',
                     services: ['Logo Concepts', 'Vector Files', 'Variations', 'Brand Mark'],
-                    before: '',
-                    after: ''
+                    before: '', after: ''
                 },
                 'youtube': {
                     title: 'YouTube Thumbnail Design',
-                    category: 'Social',
+                    category: 'Social Media',
                     client: 'Content Creators',
                     image: 'https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/YouTube.jpg',
                     story: 'Click-optimized thumbnails built around bold focal points, expressive faces, and clear text hierarchy — proven to lift CTR.',
                     services: ['Thumbnail Design', 'A/B Variations', 'Channel Branding'],
-                    before: '',
-                    after: ''
+                    before: '', after: ''
                 },
                 'coupon': {
                     title: 'Coupon Design',
@@ -1174,8 +1143,7 @@
                     image: 'https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/Coupon.jpg',
                     story: 'Promotional coupons designed for both digital sharing and print. Clear call-to-action and scannable codes.',
                     services: ['Promo Design', 'Print Ready Files'],
-                    before: '',
-                    after: ''
+                    before: '', after: ''
                 },
                 'poster': {
                     title: 'Posters',
@@ -1184,12 +1152,10 @@
                     image: 'https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/poster.jpg',
                     story: 'A series of promotional posters balancing type, image, and brand color. Designed to work as a set or standalone.',
                     services: ['Poster Design', 'Typography', 'Photo Editing'],
-                    before: '',
-                    after: ''
+                    before: '', after: ''
                 }
             };
 
-            // ============ PORTFOLIO GRID RENDER ============
             const portfolioOrder = ['branding-chamayam', 'website-skillovia', 'poster-cinema', 'brochure', 'menu-card', 'logo', 'youtube', 'coupon', 'poster'];
 
             function renderPortfolio() {
@@ -1198,8 +1164,8 @@
                 grid.innerHTML = portfolioOrder.map(key => {
                     const p = PROJECTS[key];
                     return `
-                        <button onclick="openProject('${key}')" class="group text-left block overflow-hidden rounded-2xl relative aspect-[4/3] cursor-pointer hover-lift bg-ink-800 border border-white/8">
-                            <img src="${p.image}" alt="${p.title}" loading="lazy" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                        <button onclick="openProject('${key}')" class="group text-left block overflow-hidden rounded-2xl relative aspect-[4/3] cursor-pointer hover-lift bg-ink-800 border border-white/8" aria-label="View project: ${p.title}">
+                            <img src="${p.image}" alt="${p.title} project preview" loading="lazy" width="400" height="300" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
                             <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
                                 <span class="text-[10px] uppercase tracking-widest text-brand-500 font-semibold mb-1">${p.category}</span>
                                 <h3 class="text-lg font-bold text-white">${p.title}</h3>
@@ -1210,12 +1176,17 @@
                 }).join('');
             }
 
-            // ============ MODAL ============
+            // Modal variables
+            let lastFocused = null;
+
             function openProject(key) {
                 const p = PROJECTS[key];
                 if (!p) return;
+                
+                lastFocused = document.activeElement;
+                
                 document.getElementById('pm-image').src = p.image;
-                document.getElementById('pm-image').alt = p.title;
+                document.getElementById('pm-image').alt = p.title + " project image";
                 document.getElementById('pm-category').textContent = p.category;
                 document.getElementById('pm-client').textContent = p.client;
                 document.getElementById('pm-title').textContent = p.title;
@@ -1234,32 +1205,53 @@
                 const modal = document.getElementById('project-modal');
                 modal.classList.remove('hidden');
                 document.body.style.overflow = 'hidden';
+                
+                // Focus trap setup
+                document.getElementById('pm-title').focus();
+                document.addEventListener('keydown', modalKeyHandler);
             }
 
             function closeProjectModal() {
-                document.getElementById('project-modal').classList.add('hidden');
+                const modal = document.getElementById('project-modal');
+                modal.classList.add('hidden');
                 document.body.style.overflow = '';
+                document.removeEventListener('keydown', modalKeyHandler);
+                if (lastFocused) lastFocused.focus();
             }
 
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape') closeProjectModal();
-            });
+            function modalKeyHandler(e) {
+                if (e.key === 'Escape') {
+                    closeProjectModal();
+                }
+                // Basic focus trap
+                const modal = document.getElementById('project-modal');
+                if (!modal.classList.contains('hidden')) {
+                    const focusable = modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+                    if (e.key === 'Tab') {
+                        if (e.shiftKey && document.activeElement === focusable[0]) {
+                            e.preventDefault();
+                            focusable[focusable.length - 1].focus();
+                        } else if (!e.shiftKey && document.activeElement === focusable[focusable.length - 1]) {
+                            e.preventDefault();
+                            focusable[0].focus();
+                        }
+                    }
+                }
+            }
 
-            // ============ LOADER ============
+            // Loader
             window.addEventListener('load', () => {
                 const loader = document.getElementById('app-loader');
-                const content = document.getElementById('main-content');
                 setTimeout(() => {
                     loader.style.opacity = '0';
                     setTimeout(() => {
                         loader.style.display = 'none';
-                        content.style.display = 'block';
-                        initFadeUps();
                     }, 500);
-                }, 400);
+                }, 300);
+                initFadeUps();
             });
 
-            // ============ FADE-UP OBSERVER ============
+            // Fade Up Observer
             function initFadeUps() {
                 const els = document.querySelectorAll('.fade-up');
                 const io = new IntersectionObserver((entries) => {
@@ -1273,15 +1265,30 @@
                 els.forEach(el => io.observe(el));
             }
 
-            // ============ MOBILE MENU ============
+            // Mobile Menu Accessibility
             function toggleMenu() {
                 const menu = document.getElementById('mobile-menu');
+                const btn = document.getElementById('menu-toggle');
+                const isHidden = menu.classList.contains('hidden');
+                
                 menu.classList.toggle('hidden');
                 menu.classList.toggle('flex');
+                btn.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
             }
 
-            // ============ TOAST ============
+            // Close mobile menu on outside click
+            document.addEventListener('click', (e) => {
+                const menu = document.getElementById('mobile-menu');
+                const btn = document.getElementById('menu-toggle');
+                if (!menu.classList.contains('hidden') && !menu.contains(e.target) && !btn.contains(e.target)) {
+                    toggleMenu();
+                }
+            });
+
+            // Toast Notification
+            let toastTimer;
             function showToast(message, type = 'success') {
+                clearTimeout(toastTimer);
                 const toast = document.getElementById('toast');
                 const msg = document.getElementById('toast-msg');
                 const icon = toast.querySelector('iconify-icon');
@@ -1303,10 +1310,10 @@
                 }
 
                 toast.classList.add('active');
-                setTimeout(() => { toast.classList.remove('active'); }, 3500);
+                toastTimer = setTimeout(() => { toast.classList.remove('active'); }, 3500);
             }
 
-            // ============ NAV SCROLL SPY ============
+            // Scroll Spy
             document.addEventListener("DOMContentLoaded", () => {
                 renderPortfolio();
 
@@ -1334,12 +1341,13 @@
                 sections.forEach((section) => observer.observe(section));
             });
 
-            // ============ CONTACT FORM (with honeypot + proper validation) ============
+            // Contact Form Validation & Handling
             document.getElementById('contact-form').addEventListener('submit', async function(event) {
                 event.preventDefault();
 
                 const form = this;
                 const submitBtn = document.getElementById('contact-btn');
+                const successDiv = document.getElementById('form-success');
                 const formData = new FormData(form);
 
                 // Honeypot check
@@ -1348,7 +1356,6 @@
                     return;
                 }
 
-                // Simple validation
                 const name = document.getElementById('contact-name').value.trim();
                 const email = document.getElementById('contact-email').value.trim();
                 const phone = document.getElementById('contact-phone').value.trim();
@@ -1365,10 +1372,17 @@
                     return;
                 }
 
+                const phoneRegex = /^[+]?[\d\s-]{8,}$/;
+                if (!phoneRegex.test(phone)) {
+                    showToast("Please enter a valid phone number.", "error");
+                    return;
+                }
+
                 const originalBtnContent = submitBtn.innerHTML;
                 submitBtn.innerHTML = '<iconify-icon icon="lucide:loader-2" class="text-base animate-spin"></iconify-icon> Sending...';
                 submitBtn.disabled = true;
                 submitBtn.classList.add('opacity-75', 'cursor-not-allowed');
+                successDiv.classList.add('hidden');
 
                 try {
                     const response = await fetch("https://api.web3forms.com/submit", {
@@ -1379,15 +1393,17 @@
                     const data = await response.json();
 
                     if (response.ok && data.success) {
-                        showToast("Inquiry sent! Opening WhatsApp...", "success");
+                        showToast("Inquiry sent successfully!", "success");
                         form.reset();
-
-                        const waMessage = `Hi Typixel, I am interested in collaborating.\n\nName: ${name}\nService: ${service}\nEmail: ${email}\nPhone: ${phone}`;
+                        
+                        // Generate WhatsApp link for optional continuation
+                        const waMessage = `Hi Typixel, I just submitted an inquiry.\n\nName: ${name}\nService: ${service}\nEmail: ${email}\nPhone: ${phone}`;
                         const encodedMessage = encodeURIComponent(waMessage);
-
-                        setTimeout(() => {
-                            window.open(`https://wa.me/919072891142?text=${encodedMessage}`, '_blank');
-                        }, 1200);
+                        document.getElementById('wa-continue').href = `https://wa.me/919072891142?text=${encodedMessage}`;
+                        
+                        // Show success div with WhatsApp option
+                        successDiv.classList.remove('hidden');
+                        successDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
                     } else {
                         showToast(data.message || "Submission failed. Please try again.", "error");
@@ -1403,7 +1419,7 @@
                 }
             });
 
-            // ============ NEWSLETTER (FIXED — no false success on failure) ============
+            // Newsletter Form Handling
             document.getElementById('newsletter-form').addEventListener('submit', async function(event) {
                 event.preventDefault();
 
@@ -1411,9 +1427,15 @@
                 const btn = document.getElementById('newsletter-btn');
                 const formData = new FormData(form);
 
-                // Honeypot
                 if (formData.get('botcheck')) {
                     showToast("Spam detected.", "error");
+                    return;
+                }
+
+                const email = form.querySelector('input[type="email"]').value.trim();
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(email)) {
+                    showToast("Please enter a valid email address.", "error");
                     return;
                 }
 
@@ -1437,7 +1459,6 @@
                     }
                 } catch (error) {
                     console.error(error);
-                    // FIXED: do not show success on network failure
                     showToast("Network error. Please try again later.", "error");
                 } finally {
                     btn.innerHTML = originalBtnContent;
@@ -1445,6 +1466,6 @@
                 }
             });
         </script>
-    </div>
+    </main>
 </body>
 </html>
