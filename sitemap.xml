@@ -1,25 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-
-  <url>
-    <loc>https://typixel.vercel.app/</loc>
-    <lastmod>2026-07-09T00:00:00Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
-  </url>
-
-  <url>
-    <loc>https://typixel.vercel.app/price.html</loc>
-    <lastmod>2026-07-09T00:00:00Z</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://typixel.vercel.app/team.html</loc>
-    <lastmod>2026-07-09T00:00:00Z</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
+    <url>
+        <loc>https://typixel.vercel.app/</loc>
+        <changefreq>weekly</changefreq>
+        <priority>1.0</priority>
+    </url>
+    <url>
+        <loc>https://typixel.vercel.app/privacy.html</loc>
+        <changefreq>yearly</changefreq>
+        <priority>0.3</priority>
+    </url>
+    <url>
+        <loc>https://typixel.vercel.app/terms.html</loc>
+        <changefreq>yearly</changefreq>
+        <priority>0.3</priority>
+    </url>
+    <url>
+        <loc>https://typixel.vercel.app/refund-policy.html</loc>
+        <changefreq>yearly</changefreq>
+        <priority>0.3</priority>
+    </url>
+    <!-- Add service pages here once created -->
 </urlset>
