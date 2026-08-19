@@ -1,3 +1,5 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,7 +14,6 @@
         content="Graphic Design, Branding, Logo Design, Website Design, Brand Identity, Motion Graphics">
 
     <meta name="author" content="Typixel">
-
     <link rel="canonical" href="https://typixel.vercel.app/">
 
     <meta property="og:title" content="Typixel | Graphic Design & Branding Agency">
@@ -27,17 +28,16 @@
     <meta name="twitter:description"
         content="Creative logo design, branding, website design, and digital marketing solutions.">
     <meta name="twitter:image" content="https://typixel.vercel.app/images/cover.jpg">
-</head>
-    
-    <!-- FAVICON -->
-    <link rel="icon" href="https://z-cdn-media.chatglm.cn/files/db59a431-5745-42ec-8575-eda0a0d7d874.png?auth_key=1877803378-171e0b259fba4a18b98bd102cd7552e3-0-9f785a189e477354911412f66e12d36d" type="image/png">
 
-    <!-- 1. PRELOAD & FONTS -->
+    <!-- FAVICON -->
+    <link rel="icon" href="/images/favicon.png" type="image/png">
+
+    <!-- FONTS -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    
-    <!-- 2. TAILWIND CSS -->
+
+    <!-- TAILWIND -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -47,149 +47,184 @@
                     fontFamily: { sans: ['Inter', 'sans-serif'] },
                     colors: {
                         brand: { 50: '#fef2f2', 100: '#fee2e2', 500: '#ef4444', 600: '#dc2626', 700: '#b91c1c', 900: '#7f1d1d' },
-                        dark: { 900: '#0a0a0a', 800: '#171717', 700: '#262626' }
+                        ink: { 950: '#080808', 900: '#0a0a0a', 800: '#121212', 700: '#1a1a1a' }
                     }
                 }
             }
         }
     </script>
-    
-    <!-- Icons -->
+
+    <!-- ICONS -->
     <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
-    
-    <!-- 3. CRITICAL CSS -->
+
     <style>
-        /* Force Dark Mode Immediately */
         html, body {
-            background-color: #0a0a0a;
-            color: #ffffff;
+            background-color: #080808;
+            color: #f5f5f5;
             font-family: 'Inter', sans-serif;
             margin: 0;
             padding: 0;
             width: 100%;
             overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* Scrollbar */
         ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #0a0a0a; }
-        ::-webkit-scrollbar-thumb { background: #dc2626; border-radius: 4px; }
+        ::-webkit-scrollbar-track { background: #080808; }
+        ::-webkit-scrollbar-thumb { background: #1f1f1f; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #dc2626; }
 
-        /* Loader */
         #app-loader {
             position: fixed; inset: 0; z-index: 60;
-            background: #0a0a0a; display: flex; 
+            background: #080808; display: flex;
             align-items: center; justify-content: center;
             transition: opacity 0.5s ease;
         }
-        
-        /* Animation Utilities */
-        .fade-in { animation: fadeIn 0.8s ease-out forwards; opacity: 0; transform: translateY(20px); }
-        @keyframes fadeIn { to { opacity: 1; transform: translateY(0); } }
-        
-        .hover-lift { transition: transform 0.3s ease, box-shadow 0.3s ease; }
-        .hover-lift:hover { transform: translateY(-5px); box-shadow: 0 10px 30px -10px rgba(220, 38, 38, 0.3); }
 
-        /* Logo Spin */
-        .logo-spin:hover {
-            animation: gentleSpin 3s linear infinite;
-        }
-        @keyframes gentleSpin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
+        .fade-up { opacity: 0; transform: translateY(24px); transition: opacity .8s ease, transform .8s ease; }
+        .fade-up.in { opacity: 1; transform: translateY(0); }
 
-        /* Marquee / Moving Text Animation */
-        .marquee-wrapper {
-            overflow: hidden;
-            white-space: nowrap;
-            position: relative;
-        }
-        .marquee-content {
-            display: inline-block;
-            animation: scroll 25s linear infinite;
-        }
-        @keyframes scroll {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-        }
+        .hover-lift { transition: transform 0.4s cubic-bezier(.2,.7,.2,1), box-shadow 0.4s ease, border-color 0.4s ease; }
+        .hover-lift:hover { transform: translateY(-4px); border-color: rgba(220,38,38,.35); }
 
-        /* Glassmorphism */
+        /* Subtle logo interaction (no more spinning) */
+        .logo-mark { transition: transform .4s ease, opacity .4s ease; }
+        .logo-mark:hover { transform: scale(1.06); opacity: .92; }
+
         .glass {
-            background: rgba(255,255,255, 0.03);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(255,255,255, 0.025);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
         }
 
-        /* Toast Notification */
         .toast {
-            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-            background: #171717; color: #fff; padding: 12px 24px;
-            border-radius: 50px; border: 1px solid #333;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5); z-index: 100;
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px);
+            background: #121212; color: #fff; padding: 12px 22px;
+            border-radius: 12px; border: 1px solid #232323;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.6); z-index: 100;
             display: flex; align-items: center; gap: 10px;
             opacity: 0; pointer-events: none; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         .toast.active { opacity: 1; transform: translateX(-50%) translateY(0); }
-        .toast.success { border-color: #dc2626; }
-        .toast.error { border-color: #ef4444; }
+        .toast.success { border-color: #1f7a3a; }
+        .toast.error { border-color: #b91c1c; }
+
+        /* Editorial hero typography */
+        .display { letter-spacing: -0.04em; line-height: 0.95; }
+
+        /* Modal */
+        .modal-backdrop { background: rgba(8,8,8,.85); backdrop-filter: blur(8px); }
+        .modal-enter { animation: modalIn .35s cubic-bezier(.2,.7,.2,1); }
+        @keyframes modalIn { from { opacity: 0; transform: translateY(20px) scale(.98); } to { opacity: 1; transform: none; } }
+
+        /* FAQ */
+        details > summary { list-style: none; cursor: pointer; }
+        details > summary::-webkit-details-marker { display: none; }
+        details[open] .faq-icon { transform: rotate(45deg); }
+        .faq-icon { transition: transform .3s ease; }
+
+        /* Honeypot (hidden from humans, visible to bots) */
+        .hp-field { position: absolute; left: -9999px; top: -9999px; }
     </style>
 </head>
 <body class="dark text-gray-100 antialiased selection:bg-brand-600 selection:text-white">
 
-    <!-- LOADING SPINNER -->
+    <!-- LOADER -->
     <div id="app-loader">
-        <div class="flex flex-col items-center animate-pulse">
-            <iconify-icon icon="lucide:hexagon" class="text-6xl text-brand-600 mb-4 animate-spin"></iconify-icon>
-            <span class="text-brand-600 font-bold tracking-widest text-sm">LOADING TYPIXEL</span>
+        <div class="flex flex-col items-center">
+            <iconify-icon icon="lucide:hexagon" class="text-5xl text-brand-600 mb-4 animate-pulse"></iconify-icon>
+            <span class="text-gray-500 font-medium tracking-[0.25em] text-xs">TYPIXEL</span>
         </div>
     </div>
 
-    <!-- TOAST NOTIFICATION CONTAINER -->
+    <!-- TOAST -->
     <div id="toast" class="toast">
         <iconify-icon icon="lucide:check-circle" class="text-green-500"></iconify-icon>
         <span id="toast-msg" class="text-sm font-medium">Notification</span>
     </div>
 
-    <!-- MAIN CONTAINER -->
+    <!-- PROJECT MODAL -->
+    <div id="project-modal" class="fixed inset-0 z-[80] hidden modal-backdrop">
+        <div class="absolute inset-0" onclick="closeProjectModal()"></div>
+        <div class="relative z-10 max-w-4xl w-full mx-auto my-8 modal-enter">
+            <div class="bg-ink-900 border border-white/10 rounded-3xl overflow-hidden">
+                <div class="relative aspect-[16/9] bg-black">
+                    <img id="pm-image" src="" alt="" class="w-full h-full object-cover">
+                    <button onclick="closeProjectModal()" class="absolute top-4 right-4 w-10 h-10 rounded-full bg-black/60 border border-white/10 flex items-center justify-center text-white hover:bg-black">
+                        <iconify-icon icon="lucide:x"></iconify-icon>
+                    </button>
+                </div>
+                <div class="p-6 sm:p-10">
+                    <div class="flex flex-wrap items-center gap-3 mb-4">
+                        <span id="pm-category" class="text-xs font-semibold uppercase tracking-widest text-brand-500"></span>
+                        <span class="text-gray-600">•</span>
+                        <span id="pm-client" class="text-xs text-gray-400"></span>
+                    </div>
+                    <h3 id="pm-title" class="text-2xl sm:text-3xl font-bold mb-4"></h3>
+                    <p id="pm-story" class="text-gray-400 leading-relaxed mb-6"></p>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
+                        <div>
+                            <p class="text-xs uppercase tracking-widest text-gray-500 mb-2">Services Provided</p>
+                            <ul id="pm-services" class="text-sm text-gray-300 space-y-1"></ul>
+                        </div>
+                        <div id="pm-beforeafter-wrap" class="hidden">
+                            <p class="text-xs uppercase tracking-widest text-gray-500 mb-2">Before / After</p>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <img id="pm-before" src="" alt="Before" class="w-full aspect-[4/3] object-cover rounded-lg border border-white/10">
+                                    <p class="text-[10px] text-gray-500 mt-1 text-center">Before</p>
+                                </div>
+                                <div>
+                                    <img id="pm-after" src="" alt="After" class="w-full aspect-[4/3] object-cover rounded-lg border border-white/10">
+                                    <p class="text-[10px] text-gray-500 mt-1 text-center">After</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <a href="#contact" onclick="closeProjectModal()"
+                       class="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold transition-colors">
+                        Start a similar project
+                        <iconify-icon icon="lucide:arrow-right"></iconify-icon>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN -->
     <div id="main-content" style="display:none;">
-        
-        <!-- ========== HEADER ========== -->
-        <nav class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 backdrop-blur-xl bg-dark-900/80 border-b border-white/5">
+
+        <!-- HEADER -->
+        <nav class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 backdrop-blur-xl bg-ink-950/80 border-b border-white/5">
             <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 h-20 flex items-center justify-between">
-                
-                <!-- LEFT: Logo -->
-                <div class="flex items-center gap-3 cursor-pointer group" onclick="window.scrollTo(0,0)">
-                    <div class="relative w-10 h-10 flex items-center justify-center logo-spin">
-                        <img src="https://z-cdn-media.chatglm.cn/files/db59a431-5745-42ec-8575-eda0a0d7d874.png?auth_key=1877803378-171e0b259fba4a18b98bd102cd7552e3-0-9f785a189e477354911412f66e12d36d" 
-                             alt="Typixel Logo" 
-                             class="w-full h-full object-contain">
-                    </div>
-                    <div>
-                        <span class="text-xl font-bold tracking-tight text-white group-hover:text-brand-600 transition-colors">Typixel</span>
-                        <span class="block text-[10px] font-medium tracking-[0.15em] text-gray-400 uppercase">Built 
-                            to
-                            Be
-                            Remembered</span>
-                    </div>
-                </div>
 
-                <!-- CENTER: Navigation -->
+                <!-- Logo (subtle scale, no spin) -->
+                <a href="#home" class="flex items-center gap-3 group">
+                    <div class="w-9 h-9 flex items-center justify-center logo-mark">
+                        <img src="/images/favicon.png" alt="Typixel Logo" class="w-full h-full object-contain">
+                    </div>
+                    <div class="leading-tight">
+                        <span class="text-lg font-bold tracking-tight text-white">Typixel</span>
+                        <span class="block text-[10px] font-medium tracking-[0.18em] text-gray-500 uppercase">Built to be remembered</span>
+                    </div>
+                </a>
+
+                <!-- New nav order -->
                 <div class="hidden md:flex items-center gap-8">
-                    <!-- UPDATED ORDER: Reviews now before Team -->
-                    <a href="#home" class="nav-link text-sm font-medium text-gray-300 hover:text-white transition-colors">Home</a>
-                    <a href="#services" class="nav-link text-sm font-medium text-gray-300 hover:text-white transition-colors">Services</a>
-                    <a href="#portfolio" class="nav-link text-sm font-medium text-gray-300 hover:text-white transition-colors">Portfolio</a>
-                    <a href="#reviews" class="nav-link text-sm font-medium text-gray-300 hover:text-white transition-colors">Reviews</a>
-                    <a href="#team" class="nav-link text-sm font-medium text-gray-300 hover:text-white transition-colors">Team</a>
-                    <a href="#contact" class="nav-link text-sm font-medium text-gray-300 hover:text-white transition-colors">Contact</a>
+                    <a href="#work" class="nav-link text-sm font-medium text-gray-400 hover:text-white transition-colors">Work</a>
+                    <a href="#services" class="nav-link text-sm font-medium text-gray-400 hover:text-white transition-colors">Services</a>
+                    <a href="#process" class="nav-link text-sm font-medium text-gray-400 hover:text-white transition-colors">Process</a>
+                    <a href="#about" class="nav-link text-sm font-medium text-gray-400 hover:text-white transition-colors">About</a>
+                    <a href="#reviews" class="nav-link text-sm font-medium text-gray-400 hover:text-white transition-colors">Reviews</a>
+                    <a href="#contact" class="nav-link text-sm font-medium text-gray-400 hover:text-white transition-colors">Contact</a>
                 </div>
 
-                <!-- RIGHT: Button Only -->
-                <div class="flex items-center gap-4">
-                    <a href="#contact" 
-                       class="hidden sm:flex bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold uppercase tracking-wider px-6 py-3 rounded-full items-center gap-2 transition-all transform hover:scale-105 shadow-lg shadow-brand-600/20">
-                        Let's Talk
+                <div class="flex items-center gap-3">
+                    <a href="#contact"
+                       class="hidden sm:inline-flex bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold uppercase tracking-wider px-5 py-3 rounded-full items-center gap-2 transition-all hover:scale-[1.02]">
+                        Start a Project
                     </a>
                     <button onclick="toggleMenu()" class="md:hidden w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white">
                         <iconify-icon icon="lucide:menu" class="text-xl"></iconify-icon>
@@ -197,206 +232,352 @@
                 </div>
             </div>
 
-            <!-- Mobile Menu -->
-            <!-- UPDATED ORDER: Reviews now before Team -->
-            <div id="mobile-menu" class="hidden absolute top-20 left-0 w-full bg-brand-600 border-b border-brand-700 p-6 flex-col gap-4 md:hidden shadow-2xl z-40">
-                <a onclick="toggleMenu()" href="#home" class="nav-link-mobile text-lg font-medium text-white hover:text-black transition-colors">Home</a>
-                <a onclick="toggleMenu()" href="#services" class="nav-link-mobile text-lg font-medium text-white hover:text-black transition-colors">Services</a>
-                <a onclick="toggleMenu()" href="#portfolio" class="nav-link-mobile text-lg font-medium text-white hover:text-black transition-colors">Portfolio</a>
-                <a onclick="toggleMenu()" href="#reviews" class="nav-link-mobile text-lg font-medium text-white hover:text-black transition-colors">Reviews</a>
-                <a onclick="toggleMenu()" href="#team" class="nav-link-mobile text-lg font-medium text-white hover:text-black transition-colors">Our Team</a>
-                <a onclick="toggleMenu()" href="#contact" class="nav-link-mobile text-lg font-medium text-white hover:text-black transition-colors">Contact</a>
-                <a href="https://wa.me/919072891142?text=Hi%20Typixel" class="w-full py-3 bg-black/20 text-white text-center rounded-full font-bold uppercase tracking-wider mt-4 border border-white/20">Let's Talk</a>
+            <!-- Mobile menu -->
+            <div id="mobile-menu" class="hidden absolute top-20 left-0 w-full bg-ink-900 border-b border-white/10 p-6 flex-col gap-4 md:hidden shadow-2xl z-40">
+                <a onclick="toggleMenu()" href="#work" class="nav-link-mobile text-lg font-medium text-white hover:text-brand-500 transition-colors">Work</a>
+                <a onclick="toggleMenu()" href="#services" class="nav-link-mobile text-lg font-medium text-white hover:text-brand-500 transition-colors">Services</a>
+                <a onclick="toggleMenu()" href="#process" class="nav-link-mobile text-lg font-medium text-white hover:text-brand-500 transition-colors">Process</a>
+                <a onclick="toggleMenu()" href="#about" class="nav-link-mobile text-lg font-medium text-white hover:text-brand-500 transition-colors">About</a>
+                <a onclick="toggleMenu()" href="#reviews" class="nav-link-mobile text-lg font-medium text-white hover:text-brand-500 transition-colors">Reviews</a>
+                <a onclick="toggleMenu()" href="#contact" class="nav-link-mobile text-lg font-medium text-white hover:text-brand-500 transition-colors">Contact</a>
+                <a href="#contact" onclick="toggleMenu()" class="w-full py-3 bg-brand-600 text-white text-center rounded-full font-bold uppercase tracking-wider mt-4">Start a Project</a>
             </div>
         </nav>
 
-<!-- ========== HOME ========== -->
-<section id="home" class="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden">
-    <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-dark-900 via-dark-900 to-black -z-20"></div>
-    <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-brand-600/10 rounded-full blur-[100px] -z-10"></div>
-    <div class="absolute bottom-1/4 right-1/4 w-80 h-80 bg-brand-700/10 rounded-full blur-[80px] -z-10"></div>
-    <div class="absolute inset-0 opacity-20 -z-10"
-        style="background-image: radial-gradient(white 1px, transparent 1px); background-size: 30px 30px;">
-    </div>
+        <!-- HERO (editorial, minimal effects) -->
+        <section id="home" class="relative min-h-screen flex items-center pt-32 pb-20 overflow-hidden">
+            <!-- Single, subtle ambient glow only -->
+            <div class="absolute top-1/3 -left-32 w-[480px] h-[480px] bg-brand-600/5 rounded-full blur-[120px] pointer-events-none"></div>
 
-    <div class="max-w-7xl mx-auto px-5 text-center relative z-10">
+            <div class="max-w-7xl mx-auto px-5 sm:px-8 relative z-10 w-full">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
 
-        <!-- Badge -->
-      <!-- Logo Animation -->
-<div class="absolute inset-0 -z-10 overflow-hidden">
-    <video
-        autoplay
-        muted
-        loop
-        playsinline
-        class="absolute inset-0 w-full h-full object-cover object-center">
-        <source src="assets/video.mp4" type="video/mp4">
-    </video>
+                    <!-- Left: editorial copy -->
+                    <div class="lg:col-span-7">
+                        <span class="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-gray-500 mb-6 fade-up">
+                            <span class="w-8 h-px bg-brand-600"></span>
+                            Design Studio · Kerala, India
+                        </span>
 
-    <!-- Dark Overlay -->
-    <div class="absolute inset-0 bg-black/60"></div>
-</div>
+                        <h1 class="display text-5xl sm:text-6xl lg:text-7xl font-black text-white mb-6 fade-up">
+                            Brands that get
+                            <span class="text-brand-500">remembered</span>,
+                            not scrolled past.
+                        </h1>
 
-<!-- Badge -->
-<span class="inline-block py-1 px-3 rounded-full bg-brand-600/10 border border-brand-600/30 text-brand-500 text-xs font-bold uppercase tracking-widest mb-6 fade-in">
-    Graphic Design • Branding • Web Design
-</span>
+                        <p class="text-lg text-gray-400 max-w-xl mb-10 leading-relaxed fade-up">
+                            We design logos, identities, websites, and social media systems for ambitious businesses — built to look premium, perform consistently, and scale across every platform.
+                        </p>
 
-        <!-- SEO Optimized H1 -->
-        <h1 class="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black leading-tight mb-6 fade-in">
-            Professional
-            <span class="text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-200 to-gray-400">
-                Graphic Design
-            </span><br>
-            & Branding Agency
-        </h1>
-
-        <!-- SEO Optimized Description -->
-        <p class="text-lg sm:text-xl text-gray-400 max-w-3xl mx-auto mb-10 font-light fade-in">
-            Typixel helps businesses grow through creative logo design, brand identity,
-            social media graphics, website design, motion graphics, packaging design,
-            brochures, flyers, business cards, and digital marketing solutions that
-            leave a lasting impression.
-        </p>
-
-        <!-- CTA Buttons -->
-        <div class="flex flex-col sm:flex-row gap-4 justify-center fade-in">
-            <a href="#portfolio"
-                class="px-8 py-4 rounded-full border border-white/20 hover:border-white text-white font-semibold transition-all hover:bg-white hover:text-black">
-                View Our Portfolio
-            </a>
-
-            <a href="#contact"
-                class="px-8 py-4 rounded-full bg-brand-600 hover:bg-brand-700 text-white font-bold uppercase tracking-wider shadow-lg shadow-brand-600/25 transition-all hover:scale-105">
-                Get a Free Quote
-            </a>
-        </div>
-
-    </div>
-</section>
-        <!-- ========== CLIENTS LOGOS (Marquee) ========== -->
-        <div class="border-y border-white/5 bg-black/50 py-10 overflow-hidden">
-            <p class="text-center text-xs font-bold uppercase tracking-widest text-gray-500 mb-8">Trusted By</p>
-            <div class="marquee-wrapper w-full">
-                <div class="marquee-content">
-                    <span class="text-xl font-bold mx-12 opacity-50 hover:opacity-100 transition-opacity cursor-default"> CHAMAYAM</span>
-                    <span class="text-xl font-bold mx-12 opacity-50 hover:opacity-100 transition-opacity cursor-default">SKILLOVIA</span>
-                    <span class="text-xl font-bold mx-12 opacity-50 hover:opacity-100 transition-opacity cursor-default">AKBAR TRADES</span>
-                    <span class="text-xl font-bold mx-12 opacity-50 hover:opacity-100 transition-opacity cursor-default">ZEST-ON</span>
-                    <span class="text-xl font-bold mx-12 opacity-50 hover:opacity-100 transition-opacity cursor-default">QUICK RESUME</span>
-                    <span class="text-xl font-bold mx-12 opacity-50 hover:opacity-100 transition-opacity cursor-default">AHSAN</span>
-                    <span class="text-xl font-bold mx-12 opacity-50 hover:opacity-100 transition-opacity cursor-default">SWAHWA</span>
-                    <!-- Duplicate -->
-                    <span class="text-xl font-bold mx-12 opacity-50 hover:opacity-100 transition-opacity cursor-default">CHAMAYAM</span>
-                    <span class="text-xl font-bold mx-12 opacity-50 hover:opacity-100 transition-opacity cursor-default">SKILLOVIA</span>
-                    <span class="text-xl font-bold mx-12 opacity-50 hover:opacity-100 transition-opacity cursor-default">AKBAR TRADES</span>
-                    <span class="text-xl font-bold mx-12 opacity-50 hover:opacity-100 transition-opacity cursor-default">ZEST-ON</span>
-                    <span class="text-xl font-bold mx-12 opacity-50 hover:opacity-100 transition-opacity cursor-default">QUICK RESUME</span>
-                    <span class="text-xl font-bold mx-12 opacity-50 hover:opacity-100 transition-opacity cursor-default">AHSAN</span>
-                    <span class="text-xl font-bold mx-12 opacity-50 hover:opacity-100 transition-opacity cursor-default">SWAHWA</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- ========== SERVICES ========== -->
-        <section id="services" class="py-24 relative">
-            <div class="absolute top-0 right-0 w-72 h-72 bg-brand-700/5 rounded-full blur-3xl"></div>
-            <div class="max-w-7xl mx-auto px-5 sm:px-8 relative z-10">
-                <div class="text-center mb-16">
-                    <span class="text-brand-600 font-bold uppercase tracking-widest text-xs">Expertise</span>
-                    <h2 class="text-3xl sm:text-4xl font-bold mt-2">Our Services</h2>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <div class="bg-white/5 border border-white/5 rounded-2xl p-8 hover:bg-white/10 transition-colors group hover-lift">
-                        <div class="w-12 h-12 bg-brand-600 rounded-lg flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform"><iconify-icon icon="lucide:pen-tool"></iconify-icon></div>
-                        <h3 class="text-xl font-bold mb-2">Branding & Identity</h3>
-                        <p class="text-sm text-gray-400 mb-4">Complete visual identities — logos, color systems, typography, and brand guidelines.</p>
-                        <span class="text-brand-500 font-bold text-sm">From ₹2,999</span>
+                        <div class="flex flex-col sm:flex-row gap-4 fade-up">
+                            <a href="#contact"
+                                class="inline-flex items-center justify-center gap-2 px-7 py-4 rounded-full bg-brand-600 hover:bg-brand-700 text-white font-semibold transition-all hover:scale-[1.02]">
+                                Start a Project
+                                <iconify-icon icon="lucide:arrow-right"></iconify-icon>
+                            </a>
+                            <a href="#work"
+                                class="inline-flex items-center justify-center gap-2 px-7 py-4 rounded-full border border-white/15 hover:border-white/40 text-white font-medium transition-colors">
+                                View Selected Work
+                            </a>
+                        </div>
                     </div>
-                    <div class="bg-white/5 border border-white/5 rounded-2xl p-8 hover:bg-white/10 transition-colors group hover-lift">
-                        <div class="w-12 h-12 bg-brand-600 rounded-lg flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform"><iconify-icon icon="lucide:layout"></iconify-icon></div>
-                        <h3 class="text-xl font-bold mb-2">YouTube Thumbnail Design</h3>
-                        <p class="text-sm text-gray-400 mb-4">Modern, user-focused interfaces for websites and apps.</p>
-                        <span class="text-brand-500 font-bold text-sm">From ₹499</span>
-                    </div>
-                    <div class="bg-white/5 border border-white/5 rounded-2xl p-8 hover:bg-white/10 transition-colors group hover-lift">
-                        <div class="w-12 h-12 bg-brand-600 rounded-lg flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform"><iconify-icon icon="lucide:instagram"></iconify-icon></div>
-                        <h3 class="text-xl font-bold mb-2">Social Media</h3>
-                        <p class="text-sm text-gray-400 mb-4">Scroll-stopping social media designs — posts, stories, banners.</p>
-                        <span class="text-brand-500 font-bold text-sm">From ₹399</span>
-                    </div>
-                    <div class="bg-white/5 border border-white/5 rounded-2xl p-8 hover:bg-white/10 transition-colors group hover-lift">
-                        <div class="w-12 h-12 bg-brand-600 rounded-lg flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform"><iconify-icon icon="lucide:megaphone"></iconify-icon></div>
-                        <h3 class="text-xl font-bold mb-2">Ad & Promo</h3>
-                        <p class="text-sm text-gray-400 mb-4">Advertising and promotional designs — flyers, banners, posters.</p>
-                        <span class="text-brand-500 font-bold text-sm">From ₹499</span>
+
+                    <!-- Right: selected work preview -->
+                    <div class="lg:col-span-5 fade-up">
+                        <a href="#work" class="block group relative">
+                            <div class="aspect-[4/5] rounded-3xl overflow-hidden border border-white/10 bg-ink-800">
+                                <img src="https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/Branding.jpg"
+                                     alt="Selected Typixel work"
+                                     class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                            </div>
+                            <div class="absolute -bottom-4 -left-4 sm:-left-6 glass rounded-2xl p-4 max-w-[220px]">
+                                <p class="text-[10px] uppercase tracking-widest text-gray-500 mb-1">Featured</p>
+                                <p class="text-sm font-semibold text-white">Brand Identity System</p>
+                                <p class="text-xs text-gray-400 mt-1">Logo, palette, type, guidelines</p>
+                            </div>
+                        </a>
                     </div>
                 </div>
             </div>
         </section>
 
-<video
-    id="showcaseVideo"
-    autoplay
-    muted
-    loop
-    playsinline
-    preload="auto"
-    oncontextmenu="return false;"
-    class="w-full h-auto">
-    <source src="assets/upscaled-video.mp4" type="video/mp4">
-</video>
-
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    const video = document.getElementById("showcaseVideo");
-
-    // Prevent pause
-    video.addEventListener("pause", function () {
-        video.play();
-    });
-
-    // Disable mouse interaction
-    video.style.pointerEvents = "none";
-});
-</script>
-
-        <!-- ========== PORTFOLIO ========== -->
-        <section id="portfolio" class="py-24 bg-black/30">
-            <div class="absolute bottom-0 left-0 w-96 h-96 bg-brand-700/5 rounded-full blur-3xl"></div>
-            <div class="max-w-7xl mx-auto px-5 sm:px-8 relative z-10">
-                <div class="flex justify-between items-end mb-16">
+        <!-- FEATURED WORK (new — 3 exceptional projects) -->
+        <section id="featured" class="py-20 border-t border-white/5">
+            <div class="max-w-7xl mx-auto px-5 sm:px-8">
+                <div class="flex items-end justify-between mb-12">
                     <div>
-                        <span class="text-brand-600 font-bold uppercase tracking-widest text-xs">Work</span>
-                        <h2 class="text-7xl sm:text-8xl font-black text-white tracking-tight">Portfolio</h2>
+                        <span class="text-xs font-semibold uppercase tracking-[0.2em] text-gray-500">Featured</span>
+                        <h2 class="text-3xl sm:text-4xl font-bold mt-2">Recent Work</h2>
                     </div>
-                    <a href="https://www.instagram.com/typixelofficial/" class="hidden sm:inline-block px-6 py-2 border border-white/20 rounded-full hover:bg-white hover:text-black transition-all">View All</a>
+                    <a href="#work" class="hidden sm:inline-flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors">
+                        All projects <iconify-icon icon="lucide:arrow-right"></iconify-icon>
+                    </a>
                 </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <a href="#contact" class="group block overflow-hidden rounded-2xl relative aspect-[4/3] cursor-pointer hover-lift"><img src="https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/poster.jpg" alt="Project" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"><div class="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6"><h3 class="text-xl font-bold text-white transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">Posters</h3><p class="text-gray-300 text-sm transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-100">View Details &rarr;</p></div></a>
-                    <a href="#contact" class="group block overflow-hidden rounded-2xl relative aspect-[4/3] cursor-pointer hover-lift"><img src="https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/Brouchere.jpg" alt="Project" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"><div class="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6"><h3 class="text-xl font-bold text-white transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">Brochure</h3><p class="text-gray-300 text-sm transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-100">View Details &rarr;</p></div></a>
-                    <a href="#contact" class="group block overflow-hidden rounded-2xl relative aspect-[4/3] cursor-pointer hover-lift"><img src="https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/website.png" alt="Project" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"><div class="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6"><h3 class="text-xl font-bold text-white transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">Websites</h3><p class="text-gray-300 text-sm transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-100">View Details &rarr;</p></div></a>
-                    <a href="#contact" class="group block overflow-hidden rounded-2xl relative aspect-[4/3] cursor-pointer hover-lift"><img src="https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/Menu Card.jpg" alt="Project" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"><div class="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6"><h3 class="text-xl font-bold text-white transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">Menu Card</h3><p class="text-gray-300 text-sm transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-100">View Details &rarr;</p></div></a>
-                    <a href="#contact" class="group block overflow-hidden rounded-2xl relative aspect-[4/3] cursor-pointer hover-lift"><img src="https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/logo.jpg" alt="Project" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"><div class="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6"><h3 class="text-xl font-bold text-white transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">Logo</h3><p class="text-gray-300 text-sm transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-100">View Details &rarr;</p></div></a>
-                    <a href="#contact" class="group block overflow-hidden rounded-2xl relative aspect-[4/3] cursor-pointer hover-lift"><img src="https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/Branding.jpg" alt="Project" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"><div class="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6"><h3 class="text-xl font-bold text-white transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">Branding</h3><p class="text-gray-300 text-sm transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-100">View Details &rarr;</p></div></a>
-                    <a href="#contact" class="group block overflow-hidden rounded-2xl relative aspect-[4/3] cursor-pointer hover-lift"><img src="https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/YouTube.jpg" alt="Project" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"><div class="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6"><h3 class="text-xl font-bold text-white transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">YouTube Thumbnail Design</h3><p class="text-gray-300 text-sm transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-100">View Details &rarr;</p></div></a>
-                    <a href="#contact" class="group block overflow-hidden rounded-2xl relative aspect-[4/3] cursor-pointer hover-lift"><img src="https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/Coupon.jpg" alt="Project" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"><div class="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6"><h3 class="text-xl font-bold text-white transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">Coupon</h3><p class="text-gray-300 text-sm transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-100">View Details &rarr;</p></div></a>
-                    <a href="#contact" class="group block overflow-hidden rounded-2xl relative aspect-[4/3] cursor-pointer hover-lift"><img src="https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/Cinema.jpg" alt="Project" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"><div class="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6"><h3 class="text-xl font-bold text-white transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">Cinematic Poster</h3><p class="text-gray-300 text-sm transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-100">View Details &rarr;</p></div></a>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <button onclick="openProject('branding-chamayam')" class="text-left group">
+                        <div class="aspect-[4/3] rounded-2xl overflow-hidden border border-white/10 bg-ink-800 hover-lift">
+                            <img src="https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/Branding.jpg" alt="" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                        </div>
+                        <div class="mt-4 flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-semibold text-white">Chamayam — Brand Identity</p>
+                                <p class="text-xs text-gray-500">Branding · Logo · Guidelines</p>
+                            </div>
+                            <iconify-icon icon="lucide:arrow-up-right" class="text-gray-500 group-hover:text-brand-500 transition-colors"></iconify-icon>
+                        </div>
+                    </button>
+
+                    <button onclick="openProject('website-skillovia')" class="text-left group">
+                        <div class="aspect-[4/3] rounded-2xl overflow-hidden border border-white/10 bg-ink-800 hover-lift">
+                            <img src="https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/website.png" alt="" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                        </div>
+                        <div class="mt-4 flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-semibold text-white">Skillovia — Website Design</p>
+                                <p class="text-xs text-gray-500">UI · Web · Development</p>
+                            </div>
+                            <iconify-icon icon="lucide:arrow-up-right" class="text-gray-500 group-hover:text-brand-500 transition-colors"></iconify-icon>
+                        </div>
+                    </button>
+
+                    <button onclick="openProject('poster-cinema')" class="text-left group">
+                        <div class="aspect-[4/3] rounded-2xl overflow-hidden border border-white/10 bg-ink-800 hover-lift">
+                            <img src="https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/Cinema.jpg" alt="" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                        </div>
+                        <div class="mt-4 flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-semibold text-white">Cinematic Poster Series</p>
+                                <p class="text-xs text-gray-500">Print · Poster · Promo</p>
+                            </div>
+                            <iconify-icon icon="lucide:arrow-up-right" class="text-gray-500 group-hover:text-brand-500 transition-colors"></iconify-icon>
+                        </div>
+                    </button>
                 </div>
             </div>
         </section>
 
-        <!-- ========== REVIEWS SECTION ========== -->
-        <section id="reviews" class="py-24 relative">
-            <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-dark-900 via-black to-dark-900 -z-10"></div>
-            <div class="max-w-7xl mx-auto px-5">
-                <div class="text-center mb-16">
-                    <span class="text-brand-600 font-bold uppercase tracking-widest text-xs">Feedback</span>
-                    <h2 class="text-3xl sm:text-4xl font-bold mt-2">Client Love</h2>
+        <!-- SELECTED CLIENTS (renamed, no fake "Trusted By") -->
+        <section class="border-y border-white/5 py-14">
+            <div class="max-w-7xl mx-auto px-5 sm:px-8">
+                <p class="text-center text-xs font-semibold uppercase tracking-[0.25em] text-gray-500 mb-10">
+                    Brands We've Worked With
+                </p>
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6 items-center">
+                    <div class="text-center text-gray-400 font-semibold tracking-wide hover:text-white transition-colors text-sm">CHAMAYAM</div>
+                    <div class="text-center text-gray-400 font-semibold tracking-wide hover:text-white transition-colors text-sm">SKILLOVIA</div>
+                    <div class="text-center text-gray-400 font-semibold tracking-wide hover:text-white transition-colors text-sm">AKBAR TRADES</div>
+                    <div class="text-center text-gray-400 font-semibold tracking-wide hover:text-white transition-colors text-sm">ZEST-ON</div>
+                    <div class="text-center text-gray-400 font-semibold tracking-wide hover:text-white transition-colors text-sm">QUICK RESUME</div>
+                    <div class="text-center text-gray-400 font-semibold tracking-wide hover:text-white transition-colors text-sm">SWAHWA</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SERVICES -->
+        <section id="services" class="py-24">
+            <div class="max-w-7xl mx-auto px-5 sm:px-8">
+                <div class="max-w-2xl mb-14">
+                    <span class="text-xs font-semibold uppercase tracking-[0.2em] text-gray-500">Services</span>
+                    <h2 class="text-3xl sm:text-4xl font-bold mt-2 mb-4">What we design</h2>
+                    <p class="text-gray-400">Every project starts at ₹499. Final pricing depends on scope, deliverables, and turnaround.</p>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
-                    <div class="bg-white/5 border border-white/10 rounded-2xl p-6 hover-lift">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="bg-ink-800/60 border border-white/8 rounded-2xl p-8 hover-lift">
+                        <div class="w-11 h-11 bg-brand-600/15 rounded-lg flex items-center justify-center text-brand-500 mb-6">
+                            <iconify-icon icon="lucide:pen-tool"></iconify-icon>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2">Branding & Identity</h3>
+                        <p class="text-sm text-gray-400 mb-5">Logos, color systems, typography, and brand guidelines.</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-brand-500 font-semibold text-sm">Starting ₹2,999</span>
+                            <a href="#pricing" class="text-xs text-gray-400 hover:text-white">View Pricing →</a>
+                        </div>
+                    </div>
+
+                    <div class="bg-ink-800/60 border border-white/8 rounded-2xl p-8 hover-lift">
+                        <div class="w-11 h-11 bg-brand-600/15 rounded-lg flex items-center justify-center text-brand-500 mb-6">
+                            <iconify-icon icon="lucide:layout"></iconify-icon>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2">YouTube Thumbnails</h3>
+                        <p class="text-sm text-gray-400 mb-5">Click-worthy thumbnails crafted to lift CTR.</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-brand-500 font-semibold text-sm">Starting ₹499</span>
+                            <a href="#pricing" class="text-xs text-gray-400 hover:text-white">View Pricing →</a>
+                        </div>
+                    </div>
+
+                    <div class="bg-ink-800/60 border border-white/8 rounded-2xl p-8 hover-lift">
+                        <div class="w-11 h-11 bg-brand-600/15 rounded-lg flex items-center justify-center text-brand-500 mb-6">
+                            <iconify-icon icon="lucide:instagram"></iconify-icon>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2">Social Media</h3>
+                        <p class="text-sm text-gray-400 mb-5">Posts, stories, and banner systems that stay consistent.</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-brand-500 font-semibold text-sm">Starting ₹399</span>
+                            <a href="#pricing" class="text-xs text-gray-400 hover:text-white">View Pricing →</a>
+                        </div>
+                    </div>
+
+                    <div class="bg-ink-800/60 border border-white/8 rounded-2xl p-8 hover-lift">
+                        <div class="w-11 h-11 bg-brand-600/15 rounded-lg flex items-center justify-center text-brand-500 mb-6">
+                            <iconify-icon icon="lucide:megaphone"></iconify-icon>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2">Ads & Promo</h3>
+                        <p class="text-sm text-gray-400 mb-5">Flyers, posters, and ad creatives that convert.</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-brand-500 font-semibold text-sm">Starting ₹499</span>
+                            <a href="#pricing" class="text-xs text-gray-400 hover:text-white">View Pricing →</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PRICING / PACKAGES (new) -->
+        <section id="pricing" class="py-24 border-t border-white/5 bg-ink-900/40">
+            <div class="max-w-7xl mx-auto px-5 sm:px-8">
+                <div class="max-w-2xl mb-14">
+                    <span class="text-xs font-semibold uppercase tracking-[0.2em] text-gray-500">Pricing</span>
+                    <h2 class="text-3xl sm:text-4xl font-bold mt-2 mb-4">Simple packages</h2>
+                    <p class="text-gray-400">Transparent starting points. Final pricing depends on scope and requirements.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <!-- Starter -->
+                    <div class="bg-ink-800/60 border border-white/8 rounded-2xl p-8 hover-lift flex flex-col">
+                        <p class="text-xs uppercase tracking-widest text-gray-500 mb-2">Starter</p>
+                        <p class="text-3xl font-bold mb-1">₹499<span class="text-sm font-normal text-gray-500"> / starting</span></p>
+                        <p class="text-xs text-gray-500 mb-6">Single deliverable</p>
+                        <ul class="text-sm text-gray-300 space-y-2 mb-8 flex-1">
+                            <li class="flex gap-2"><iconify-icon icon="lucide:check" class="text-brand-500 mt-0.5"></iconify-icon> 1 design concept</li>
+                            <li class="flex gap-2"><iconify-icon icon="lucide:check" class="text-brand-500 mt-0.5"></iconify-icon> 2 revisions</li>
+                            <li class="flex gap-2"><iconify-icon icon="lucide:check" class="text-brand-500 mt-0.5"></iconify-icon> 48h delivery</li>
+                            <li class="flex gap-2"><iconify-icon icon="lucide:check" class="text-brand-500 mt-0.5"></iconify-icon> JPG + PNG files</li>
+                        </ul>
+                        <a href="#contact" class="text-center py-3 rounded-full border border-white/15 hover:border-white/40 text-sm font-medium transition-colors">Get Quote</a>
+                    </div>
+
+                    <!-- Business -->
+                    <div class="bg-ink-800/60 border border-brand-600/40 rounded-2xl p-8 hover-lift flex flex-col relative">
+                        <span class="absolute -top-3 left-8 bg-brand-600 text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full">Popular</span>
+                        <p class="text-xs uppercase tracking-widest text-gray-500 mb-2">Business</p>
+                        <p class="text-3xl font-bold mb-1">₹2,999<span class="text-sm font-normal text-gray-500"> / starting</span></p>
+                        <p class="text-xs text-gray-500 mb-6">Small brand kit</p>
+                        <ul class="text-sm text-gray-300 space-y-2 mb-8 flex-1">
+                            <li class="flex gap-2"><iconify-icon icon="lucide:check" class="text-brand-500 mt-0.5"></iconify-icon> Logo + 2 variations</li>
+                            <li class="flex gap-2"><iconify-icon icon="lucide:check" class="text-brand-500 mt-0.5"></iconify-icon> Color palette + typography</li>
+                            <li class="flex gap-2"><iconify-icon icon="lucide:check" class="text-brand-500 mt-0.5"></iconify-icon> 5 social media templates</li>
+                            <li class="flex gap-2"><iconify-icon icon="lucide:check" class="text-brand-500 mt-0.5"></iconify-icon> 5 revisions</li>
+                            <li class="flex gap-2"><iconify-icon icon="lucide:check" class="text-brand-500 mt-0.5"></iconify-icon> Source files included</li>
+                        </ul>
+                        <a href="#contact" class="text-center py-3 rounded-full bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold transition-colors">Get Quote</a>
+                    </div>
+
+                    <!-- Premium -->
+                    <div class="bg-ink-800/60 border border-white/8 rounded-2xl p-8 hover-lift flex flex-col">
+                        <p class="text-xs uppercase tracking-widest text-gray-500 mb-2">Premium</p>
+                        <p class="text-3xl font-bold mb-1">₹9,999<span class="text-sm font-normal text-gray-500"> / starting</span></p>
+                        <p class="text-xs text-gray-500 mb-6">Full identity system</p>
+                        <ul class="text-sm text-gray-300 space-y-2 mb-8 flex-1">
+                            <li class="flex gap-2"><iconify-icon icon="lucide:check" class="text-brand-500 mt-0.5"></iconify-icon> Complete brand identity</li>
+                            <li class="flex gap-2"><iconify-icon icon="lucide:check" class="text-brand-500 mt-0.5"></iconify-icon> Brand guidelines PDF</li>
+                            <li class="flex gap-2"><iconify-icon icon="lucide:check" class="text-brand-500 mt-0.5"></iconify-icon> 10 social templates</li>
+                            <li class="flex gap-2"><iconify-icon icon="lucide:check" class="text-brand-500 mt-0.5"></iconify-icon> Unlimited revisions</li>
+                            <li class="flex gap-2"><iconify-icon icon="lucide:check" class="text-brand-500 mt-0.5"></iconify-icon> Priority support</li>
+                        </ul>
+                        <a href="#contact" class="text-center py-3 rounded-full border border-white/15 hover:border-white/40 text-sm font-medium transition-colors">Get Quote</a>
+                    </div>
+
+                    <!-- Custom -->
+                    <div class="bg-ink-800/60 border border-white/8 rounded-2xl p-8 hover-lift flex flex-col">
+                        <p class="text-xs uppercase tracking-widest text-gray-500 mb-2">Custom</p>
+                        <p class="text-3xl font-bold mb-1">Let's talk</p>
+                        <p class="text-xs text-gray-500 mb-6">Websites, packaging, retainer</p>
+                        <ul class="text-sm text-gray-300 space-y-2 mb-8 flex-1">
+                            <li class="flex gap-2"><iconify-icon icon="lucide:check" class="text-brand-500 mt-0.5"></iconify-icon> Tailored scope</li>
+                            <li class="flex gap-2"><iconify-icon icon="lucide:check" class="text-brand-500 mt-0.5"></iconify-icon> Multi-deliverable projects</li>
+                            <li class="flex gap-2"><iconify-icon icon="lucide:check" class="text-brand-500 mt-0.5"></iconify-icon> Monthly retainers</li>
+                            <li class="flex gap-2"><iconify-icon icon="lucide:check" class="text-brand-500 mt-0.5"></iconify-icon> Dedicated lead designer</li>
+                        </ul>
+                        <a href="#contact" class="text-center py-3 rounded-full border border-white/15 hover:border-white/40 text-sm font-medium transition-colors">Get Quote</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PORTFOLIO (with modal system) -->
+        <section id="work" class="py-24">
+            <div class="max-w-7xl mx-auto px-5 sm:px-8">
+                <div class="flex justify-between items-end mb-12">
+                    <div>
+                        <span class="text-xs font-semibold uppercase tracking-[0.2em] text-gray-500">Work</span>
+                        <h2 class="text-3xl sm:text-4xl font-bold mt-2">Selected Projects</h2>
+                    </div>
+                    <a href="https://www.instagram.com/typixelofficial/" target="_blank" rel="noopener" class="hidden sm:inline-flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors">
+                        View All <iconify-icon icon="lucide:arrow-right"></iconify-icon>
+                    </a>
+                </div>
+
+                <div id="portfolio-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Cards injected by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- PROCESS (renamed "How We Work") -->
+        <section id="process" class="py-24 border-t border-white/5 bg-ink-900/40">
+            <div class="max-w-7xl mx-auto px-5 sm:px-8">
+                <div class="max-w-2xl mb-14">
+                    <span class="text-xs font-semibold uppercase tracking-[0.2em] text-gray-500">Process</span>
+                    <h2 class="text-3xl sm:text-4xl font-bold mt-2 mb-4">How we work</h2>
+                    <p class="text-gray-400">A clear 4-step process. You always know what happens next.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="bg-ink-800/60 border border-white/8 rounded-2xl p-8 hover-lift">
+                        <div class="w-10 h-10 rounded-full bg-brand-600/15 flex items-center justify-center text-brand-500 mb-5">
+                            <span class="text-sm font-bold">01</span>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2">Discovery</h3>
+                        <p class="text-sm text-gray-400 leading-relaxed">We discuss your goals, audience, and requirements in detail.</p>
+                    </div>
+                    <div class="bg-ink-800/60 border border-white/8 rounded-2xl p-8 hover-lift">
+                        <div class="w-10 h-10 rounded-full bg-brand-600/15 flex items-center justify-center text-brand-500 mb-5">
+                            <span class="text-sm font-bold">02</span>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2">Strategy</h3>
+                        <p class="text-sm text-gray-400 leading-relaxed">We map the design direction, deliverables, and timeline.</p>
+                    </div>
+                    <div class="bg-ink-800/60 border border-white/8 rounded-2xl p-8 hover-lift">
+                        <div class="w-10 h-10 rounded-full bg-brand-600/15 flex items-center justify-center text-brand-500 mb-5">
+                            <span class="text-sm font-bold">03</span>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2">Design</h3>
+                        <p class="text-sm text-gray-400 leading-relaxed">Iterative design with structured feedback loops.</p>
+                    </div>
+                    <div class="bg-ink-800/60 border border-white/8 rounded-2xl p-8 hover-lift">
+                        <div class="w-10 h-10 rounded-full bg-brand-600/15 flex items-center justify-center text-brand-500 mb-5">
+                            <span class="text-sm font-bold">04</span>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2">Launch</h3>
+                        <p class="text-sm text-gray-400 leading-relaxed">Final assets delivered with source files and go-live support.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- REVIEWS -->
+        <section id="reviews" class="py-24">
+            <div class="max-w-7xl mx-auto px-5 sm:px-8">
+                <div class="max-w-2xl mb-14">
+                    <span class="text-xs font-semibold uppercase tracking-[0.2em] text-gray-500">Reviews</span>
+                    <h2 class="text-3xl sm:text-4xl font-bold mt-2">Client feedback</h2>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="bg-ink-800/60 border border-white/8 rounded-2xl p-6 hover-lift">
                         <div class="flex items-center gap-1 mb-4">
                             <iconify-icon icon="lucide:star" class="text-amber-400 text-sm"></iconify-icon>
                             <iconify-icon icon="lucide:star" class="text-amber-400 text-sm"></iconify-icon>
@@ -404,26 +585,27 @@ document.addEventListener("DOMContentLoaded", function () {
                             <iconify-icon icon="lucide:star" class="text-amber-400 text-sm"></iconify-icon>
                             <iconify-icon icon="lucide:star" class="text-amber-400 text-sm"></iconify-icon>
                         </div>
-                        <p class="text-sm text-gray-300 leading-relaxed mb-6">Typixel elevated our brand to new heights. Her attention to detail is unmatched.</p>
+                        <p class="text-sm text-gray-300 leading-relaxed mb-6">Typixel elevated our brand to new heights. Attention to detail is unmatched.</p>
                         <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-full bg-brand-700/20 flex items-center justify-center"><iconify-icon icon="lucide:store" class="text-brand-600 text-lg"></iconify-icon></div>
+                            <div class="w-10 h-10 rounded-full bg-brand-700/20 flex items-center justify-center"><iconify-icon icon="lucide:store" class="text-brand-500 text-lg"></iconify-icon></div>
                             <div><p class="text-sm font-bold text-white">Chamayam</p><p class="text-xs text-gray-500">Textiles Brand</p></div>
                         </div>
                     </div>
-                    <div class="bg-white/5 border border-white/10 rounded-2xl p-6 hover-lift">
+                    <div class="bg-ink-800/60 border border-white/8 rounded-2xl p-6 hover-lift">
                         <div class="flex items-center gap-1 mb-4">
                             <iconify-icon icon="lucide:star" class="text-amber-400 text-sm"></iconify-icon>
                             <iconify-icon icon="lucide:star" class="text-amber-400 text-sm"></iconify-icon>
                             <iconify-icon icon="lucide:star" class="text-amber-400 text-sm"></iconify-icon>
                             <iconify-icon icon="lucide:star" class="text-amber-400 text-sm"></iconify-icon>
+                            <iconify-icon icon="lucide:star" class="text-amber-400 text-sm"></iconify-icon>
                         </div>
-                        <p class="text-sm text-gray-300 leading-relaxed mb-6">TyPixel delivered clean, professional designs with a strong brand sense. Our promotions now look premium.</p>
+                        <p class="text-sm text-gray-300 leading-relaxed mb-6">Clean, professional designs with a strong brand sense. Our promotions now look premium.</p>
                         <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-full bg-brand-700/20 flex items-center justify-center"><iconify-icon icon="lucide:briefcase" class="text-brand-600 text-lg"></iconify-icon></div>
+                            <div class="w-10 h-10 rounded-full bg-brand-700/20 flex items-center justify-center"><iconify-icon icon="lucide:briefcase" class="text-brand-500 text-lg"></iconify-icon></div>
                             <div><p class="text-sm font-bold text-white">Skillovia</p><p class="text-xs text-gray-500">Growing Brand</p></div>
                         </div>
                     </div>
-                    <div class="bg-white/5 border border-white/10 rounded-2xl p-6 hover-lift">
+                    <div class="bg-ink-800/60 border border-white/8 rounded-2xl p-6 hover-lift">
                         <div class="flex items-center gap-1 mb-4">
                             <iconify-icon icon="lucide:star" class="text-amber-400 text-sm"></iconify-icon>
                             <iconify-icon icon="lucide:star" class="text-amber-400 text-sm"></iconify-icon>
@@ -431,195 +613,254 @@ document.addEventListener("DOMContentLoaded", function () {
                             <iconify-icon icon="lucide:star" class="text-amber-400 text-sm"></iconify-icon>
                             <iconify-icon icon="lucide:star" class="text-amber-400 text-sm"></iconify-icon>
                         </div>
-                        <p class="text-sm text-gray-300 leading-relaxed mb-6">Fast delivery and amazing concepts. Highly recommended for Resume Design work.</p>
+                        <p class="text-sm text-gray-300 leading-relaxed mb-6">Fast delivery and amazing concepts. Highly recommended for resume design work.</p>
                         <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-full bg-brand-700/20 flex items-center justify-center"><iconify-icon icon="lucide:monitor" class="text-brand-600 text-lg"></iconify-icon></div>
+                            <div class="w-10 h-10 rounded-full bg-brand-700/20 flex items-center justify-center"><iconify-icon icon="lucide:monitor" class="text-brand-500 text-lg"></iconify-icon></div>
                             <div><p class="text-sm font-bold text-white">Quick Resume</p><p class="text-xs text-gray-500">Creative Agency</p></div>
                         </div>
                     </div>
                 </div>
 
-                <div class="border-t border-white/10 pt-20">
-                    <div class="text-center mb-12">
-                        <span class="text-brand-600 font-bold uppercase tracking-widest text-xs">Benefits</span>
-                        <h2 class="text-3xl sm:text-4xl font-bold mt-2">Why Choose Typixel</h2>
+                <!-- Why Choose Us (24/7 removed → Reliable Support) -->
+                <div class="border-t border-white/10 pt-20 mt-20">
+                    <div class="max-w-2xl mb-14">
+                        <span class="text-xs font-semibold uppercase tracking-[0.2em] text-gray-500">Why Typixel</span>
+                        <h2 class="text-3xl sm:text-4xl font-bold mt-2">Reasons clients stay</h2>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                        <div class="text-center p-6 rounded-2xl bg-white/5 border border-white/5 hover:border-brand-600/30 transition-colors">
-                            <div class="w-14 h-14 mx-auto mb-6 bg-brand-600/10 rounded-full flex items-center justify-center text-brand-500">
-                                <iconify-icon icon="lucide:zap" class="text-2xl"></iconify-icon>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div class="bg-ink-800/60 border border-white/8 rounded-2xl p-8 hover-lift">
+                            <div class="w-11 h-11 mb-5 bg-brand-600/15 rounded-lg flex items-center justify-center text-brand-500">
+                                <iconify-icon icon="lucide:zap" class="text-xl"></iconify-icon>
                             </div>
-                            <h3 class="text-xl font-bold mb-2">Fast Delivery</h3>
-                            <p class="text-sm text-gray-400">We understand deadlines. Get your designs quickly without compromising quality.</p>
+                            <h3 class="text-lg font-bold mb-2">Fast Delivery</h3>
+                            <p class="text-sm text-gray-400">Clear timelines. We respect deadlines without compromising quality.</p>
                         </div>
-                        <div class="text-center p-6 rounded-2xl bg-white/5 border border-white/5 hover:border-brand-600/30 transition-colors">
-                            <div class="w-14 h-14 mx-auto mb-6 bg-brand-600/10 rounded-full flex items-center justify-center text-brand-500">
-                                <iconify-icon icon="lucide:diamond" class="text-2xl"></iconify-icon>
+                        <div class="bg-ink-800/60 border border-white/8 rounded-2xl p-8 hover-lift">
+                            <div class="w-11 h-11 mb-5 bg-brand-600/15 rounded-lg flex items-center justify-center text-brand-500">
+                                <iconify-icon icon="lucide:diamond" class="text-xl"></iconify-icon>
                             </div>
-                            <h3 class="text-xl font-bold mb-2">Premium Quality</h3>
-                            <p class="text-sm text-gray-400">High-resolution, pixel-perfect designs that look professional on all devices.</p>
+                            <h3 class="text-lg font-bold mb-2">Premium Quality</h3>
+                            <p class="text-sm text-gray-400">Pixel-perfect, high-resolution assets that work everywhere.</p>
                         </div>
-                        <div class="text-center p-6 rounded-2xl bg-white/5 border border-white/5 hover:border-brand-600/30 transition-colors">
-                            <div class="w-14 h-14 mx-auto mb-6 bg-brand-600/10 rounded-full flex items-center justify-center text-brand-500">
-                                <iconify-icon icon="lucide:headphones" class="text-2xl"></iconify-icon>
+                        <div class="bg-ink-800/60 border border-white/8 rounded-2xl p-8 hover-lift">
+                            <div class="w-11 h-11 mb-5 bg-brand-600/15 rounded-lg flex items-center justify-center text-brand-500">
+                                <iconify-icon icon="lucide:message-square" class="text-xl"></iconify-icon>
                             </div>
-                            <h3 class="text-xl font-bold mb-2">24/7 Support</h3>
-                            <p class="text-sm text-gray-400">We are always available to discuss your project and make revisions.</p>
+                            <h3 class="text-lg font-bold mb-2">Reliable Support</h3>
+                            <p class="text-sm text-gray-400">Direct communication with the designer. Quick replies on WhatsApp & email.</p>
                         </div>
-                        <div class="text-center p-6 rounded-2xl bg-white/5 border border-white/5 hover:border-brand-600/30 transition-colors">
-                            <div class="w-14 h-14 mx-auto mb-6 bg-brand-600/10 rounded-full flex items-center justify-center text-brand-500">
-                                <iconify-icon icon="lucide:wallet" class="text-2xl"></iconify-icon>
+                        <div class="bg-ink-800/60 border border-white/8 rounded-2xl p-8 hover-lift">
+                            <div class="w-11 h-11 mb-5 bg-brand-600/15 rounded-lg flex items-center justify-center text-brand-500">
+                                <iconify-icon icon="lucide:wallet" class="text-xl"></iconify-icon>
                             </div>
-                            <h3 class="text-xl font-bold mb-2">Best Pricing</h3>
-                            <p class="text-sm text-gray-400">Affordable packages for startups and businesses of all sizes.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ========== TEAM SECTION ========== -->
-```html
-<section id="team" class="py-24 bg-black/30">
-    <div class="max-w-7xl mx-auto px-5 sm:px-8 text-center">
-        <span class="text-brand-600 font-bold uppercase tracking-widest text-xs">The Crew</span>
-        <h2 class="text-3xl sm:text-4xl font-bold mt-2 mb-16">Who Are We</h2>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-
-            <!-- Hashim — CEO & Founder -->
-            <div class="group relative rounded-2xl overflow-hidden aspect-[3/4] hover-lift">
-                <img
-                    src="/images/hashim-typixel-ceo-founder.jpg"
-                    alt="Hashim, CEO and Founder of Typixel"
-                    loading="lazy"
-                    class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 grayscale group-hover:grayscale-0"
-                >
-                <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-80 flex flex-col justify-end p-4">
-                    <h3 class="text-white font-bold text-lg">Hashim</h3>
-                    <p class="text-brand-500 text-xs font-bold uppercase tracking-wider mb-2">CEO & FOUNDER</p>
-                    <p class="sr-only">Hashim is the CEO and Founder of Typixel.</p>
-                </div>
-            </div>
-
-            <!-- Rifad — CEO & Founder -->
-            <div class="group relative rounded-2xl overflow-hidden aspect-[3/4] hover-lift">
-                <img src="https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/rifad.jpg" alt="Co-Founder" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 grayscale group-hover:grayscale-0">
-                <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-80 flex flex-col justify-end p-4">
-                    <h3 class="text-white font-bold text-lg">Rifad</h3>
-                    <p class="text-brand-500 text-xs font-bold uppercase tracking-wider mb-2">CEO & FOUNDER</p>
-                </div>
-            </div>
-
-            <!-- Nidal — Marketing Manager -->
-            <div class="group relative rounded-2xl overflow-hidden aspect-[3/4] hover-lift">
-                <img src="https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/nidal.jpg" alt="Marketing" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 grayscale group-hover:grayscale-0">
-                <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-80 flex flex-col justify-end p-4">
-                    <h3 class="text-white font-bold text-lg">Nidal</h3>
-                    <p class="text-brand-500 text-xs font-bold uppercase tracking-wider mb-2">MARKETING MANAGER</p>
-                </div>
-            </div>
-
-            <!-- Shadin — Creative Director -->
-            <div class="group relative rounded-2xl overflow-hidden aspect-[3/4] hover-lift">
-                <img src="https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/shadin.jpg" alt="Creative Director" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 grayscale group-hover:grayscale-0">
-                <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-80 flex flex-col justify-end p-4">
-                    <h3 class="text-white font-bold text-lg">Shadin</h3>
-                    <p class="text-brand-500 text-xs font-bold uppercase tracking-wider mb-2">CREATIVE DIRECTOR</p>
-                </div>
-            </div>
-
-            <!-- Afsal — Brand Strategist -->
-            <div class="group relative rounded-2xl overflow-hidden aspect-[3/4] hover-lift">
-                <img src="https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/afsal.jpg" alt="Brand Strategist" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 grayscale group-hover:grayscale-0">
-                <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-80 flex flex-col justify-end p-4">
-                    <h3 class="text-white font-bold text-lg">Afsal</h3>
-                    <p class="text-brand-500 text-xs font-bold uppercase tracking-wider mb-2">BRAND STRATEGIST</p>
-                </div>
-            </div>
-
-        </div>
-    </div>
-</section>
-
-
-        <!-- ========== NEW SECTION: HOW WE WORK ========== -->
-        <section class="py-24 relative bg-dark-900">
-            <div class="absolute top-0 left-0 w-full h-full bg-grid-white/5 [mask-image:linear-gradient(to_bottom,transparent,black)] [mask-size:contain]"></div>
-            <div class="max-w-7xl mx-auto px-5 relative z-10">
-                <div class="text-center mb-16">
-                    <span class="text-brand-600 font-bold uppercase tracking-widest text-xs">Workflow</span>
-                    <h2 class="text-3xl sm:text-4xl font-bold mt-2">How We Work</h2>
-                    <p class="text-gray-400 mt-4 max-w-2xl mx-auto">A streamlined 4-step process to bring your vision to life.</p>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                    <div class="relative group">
-                        <div class="absolute top-0 left-0 w-full h-1 bg-brand-600 rounded-full"></div>
-                        <div class="bg-white/5 border border-white/10 rounded-2xl p-8 hover:bg-white/10 transition-all hover:border-brand-600/50 h-full">
-                            <div class="w-12 h-12 rounded-full bg-brand-600/20 flex items-center justify-center text-brand-500 mb-6 group-hover:bg-brand-600 group-hover:text-white transition-colors">
-                                <span class="text-xl font-bold">01</span>
-                            </div>
-                            <h3 class="text-xl font-bold mb-3">Discovery</h3>
-                            <p class="text-sm text-gray-400 leading-relaxed">We discuss your goals, target audience, and project requirements in detail.</p>
-                        </div>
-                    </div>
-                    <div class="relative group">
-                        <div class="absolute top-0 left-0 w-full h-1 bg-brand-600 rounded-full"></div>
-                        <div class="bg-white/5 border border-white/10 rounded-2xl p-8 hover:bg-white/10 transition-all hover:border-brand-600/50 h-full">
-                            <div class="w-12 h-12 rounded-full bg-brand-600/20 flex items-center justify-center text-brand-500 mb-6 group-hover:bg-brand-600 group-hover:text-white transition-colors">
-                                <span class="text-xl font-bold">02</span>
-                            </div>
-                            <h3 class="text-xl font-bold mb-3">Strategy</h3>
-                            <p class="text-sm text-gray-400 leading-relaxed">We create a roadmap and select best design approach for your brand.</p>
-                        </div>
-                    </div>
-                    <div class="relative group">
-                        <div class="absolute top-0 left-0 w-full h-1 bg-brand-600 rounded-full"></div>
-                        <div class="bg-white/5 border border-white/10 rounded-2xl p-8 hover:bg-white/10 transition-all hover:border-brand-600/50 h-full">
-                            <div class="w-12 h-12 rounded-full bg-brand-600/20 flex items-center justify-center text-brand-500 mb-6 group-hover:bg-brand-600 group-hover:text-white transition-colors">
-                                <span class="text-xl font-bold">03</span>
-                            </div>
-                            <h3 class="text-xl font-bold mb-3">Design</h3>
-                            <p class="text-sm text-gray-400 leading-relaxed">Our creative team builds your visuals with iterative feedback loops.</p>
-                        </div>
-                    </div>
-                    <div class="relative group">
-                        <div class="absolute top-0 left-0 w-full h-1 bg-brand-600 rounded-full"></div>
-                        <div class="bg-white/5 border border-white/10 rounded-2xl p-8 hover:bg-white/10 transition-all hover:border-brand-600/50 h-full">
-                            <div class="w-12 h-12 rounded-full bg-brand-600/20 flex items-center justify-center text-brand-500 mb-6 group-hover:bg-brand-600 group-hover:text-white transition-colors">
-                                <span class="text-xl font-bold">04</span>
-                            </div>
-                            <h3 class="text-xl font-bold mb-3">Launch</h3>
-                            <p class="text-sm text-gray-400 leading-relaxed">Final delivery of assets and go-live support for your project.</p>
+                            <h3 class="text-lg font-bold mb-2">Fair Pricing</h3>
+                            <p class="text-sm text-gray-400">Transparent packages for startups and growing businesses.</p>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- ========== CONTACT (Web3Forms) ========== -->
-        <section id="contact" class="py-24 bg-gradient-to-t from-dark-900 to-black">
-            <div class="max-w-7xl mx-auto px-5">
+        <!-- ABOUT / TEAM (fixed — no literal ```html, hierarchy consistent, role descriptions + socials) -->
+        <section id="about" class="py-24 border-t border-white/5 bg-ink-900/40">
+            <div class="max-w-7xl mx-auto px-5 sm:px-8">
+                <div class="max-w-2xl mb-14">
+                    <span class="text-xs font-semibold uppercase tracking-[0.2em] text-gray-500">About</span>
+                    <h2 class="text-3xl sm:text-4xl font-bold mt-2 mb-4">The team</h2>
+                    <p class="text-gray-400">A small, focused team handling strategy, design, and delivery end-to-end.</p>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
+                    <!-- Hashim — CEO & Founder -->
+                    <div class="group relative rounded-2xl overflow-hidden border border-white/8 bg-ink-800/60 hover-lift">
+                        <div class="aspect-[4/5] overflow-hidden">
+                            <img src="/images/hashim-typixel-ceo-founder.jpg" alt="Hashim, CEO and Founder of Typixel" loading="lazy" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 grayscale group-hover:grayscale-0">
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-lg font-bold">Hashim</h3>
+                            <p class="text-brand-500 text-xs font-semibold uppercase tracking-wider mb-3">CEO & Founder</p>
+                            <p class="text-sm text-gray-400 mb-4">Leads overall direction, client strategy, and creative direction across every project.</p>
+                            <div class="flex gap-3">
+                                <a href="https://www.instagram.com/typixelofficial/" target="_blank" rel="noopener" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:bg-brand-600 hover:text-white transition-colors">
+                                    <iconify-icon icon="lucide:instagram"></iconify-icon>
+                                </a>
+                                <a href="https://www.behance.net/hashimmhd" target="_blank" rel="noopener" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:bg-brand-600 hover:text-white transition-colors">
+                                    <iconify-icon icon="mdi:behance"></iconify-icon>
+                                </a>
+                                <a href="https://www.linkedin.com/" target="_blank" rel="noopener" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:bg-brand-600 hover:text-white transition-colors">
+                                    <iconify-icon icon="lucide:linkedin"></iconify-icon>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Rifad — Co-Founder (fixed) -->
+                    <div class="group relative rounded-2xl overflow-hidden border border-white/8 bg-ink-800/60 hover-lift">
+                        <div class="aspect-[4/5] overflow-hidden">
+                            <img src="https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/rifad.jpg" alt="Rifad, Co-Founder of Typixel" loading="lazy" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 grayscale group-hover:grayscale-0">
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-lg font-bold">Rifad</h3>
+                            <p class="text-brand-500 text-xs font-semibold uppercase tracking-wider mb-3">Co-Founder</p>
+                            <p class="text-sm text-gray-400 mb-4">Oversees operations and partnerships, ensuring smooth delivery from brief to launch.</p>
+                            <div class="flex gap-3">
+                                <a href="https://www.instagram.com/typixelofficial/" target="_blank" rel="noopener" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:bg-brand-600 hover:text-white transition-colors">
+                                    <iconify-icon icon="lucide:instagram"></iconify-icon>
+                                </a>
+                                <a href="https://www.linkedin.com/" target="_blank" rel="noopener" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:bg-brand-600 hover:text-white transition-colors">
+                                    <iconify-icon icon="lucide:linkedin"></iconify-icon>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Nidal — Marketing Manager -->
+                    <div class="group relative rounded-2xl overflow-hidden border border-white/8 bg-ink-800/60 hover-lift">
+                        <div class="aspect-[4/5] overflow-hidden">
+                            <img src="https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/nidal.jpg" alt="Nidal, Marketing Manager at Typixel" loading="lazy" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 grayscale group-hover:grayscale-0">
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-lg font-bold">Nidal</h3>
+                            <p class="text-brand-500 text-xs font-semibold uppercase tracking-wider mb-3">Marketing Manager</p>
+                            <p class="text-sm text-gray-400 mb-4">Drives outreach, content strategy, and campaign performance for client brands.</p>
+                            <div class="flex gap-3">
+                                <a href="https://www.instagram.com/typixelofficial/" target="_blank" rel="noopener" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:bg-brand-600 hover:text-white transition-colors">
+                                    <iconify-icon icon="lucide:instagram"></iconify-icon>
+                                </a>
+                                <a href="https://www.linkedin.com/" target="_blank" rel="noopener" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:bg-brand-600 hover:text-white transition-colors">
+                                    <iconify-icon icon="lucide:linkedin"></iconify-icon>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Shadin — Creative Director -->
+                    <div class="group relative rounded-2xl overflow-hidden border border-white/8 bg-ink-800/60 hover-lift">
+                        <div class="aspect-[4/5] overflow-hidden">
+                            <img src="https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/shadin.jpg" alt="Shadin, Creative Director at Typixel" loading="lazy" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 grayscale group-hover:grayscale-0">
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-lg font-bold">Shadin</h3>
+                            <p class="text-brand-500 text-xs font-semibold uppercase tracking-wider mb-3">Creative Director</p>
+                            <p class="text-sm text-gray-400 mb-4">Owns visual direction, design quality, and creative consistency across projects.</p>
+                            <div class="flex gap-3">
+                                <a href="https://www.instagram.com/typixelofficial/" target="_blank" rel="noopener" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:bg-brand-600 hover:text-white transition-colors">
+                                    <iconify-icon icon="lucide:instagram"></iconify-icon>
+                                </a>
+                                <a href="https://www.behance.net/hashimmhd" target="_blank" rel="noopener" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:bg-brand-600 hover:text-white transition-colors">
+                                    <iconify-icon icon="mdi:behance"></iconify-icon>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Afsal — Brand Strategist -->
+                    <div class="group relative rounded-2xl overflow-hidden border border-white/8 bg-ink-800/60 hover-lift">
+                        <div class="aspect-[4/5] overflow-hidden">
+                            <img src="https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/afsal.jpg" alt="Afsal, Brand Strategist at Typixel" loading="lazy" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 grayscale group-hover:grayscale-0">
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-lg font-bold">Afsal</h3>
+                            <p class="text-brand-500 text-xs font-semibold uppercase tracking-wider mb-3">Brand Strategist</p>
+                            <p class="text-sm text-gray-400 mb-4">Shapes positioning, naming, and brand systems that give designs strategic depth.</p>
+                            <div class="flex gap-3">
+                                <a href="https://www.instagram.com/typixelofficial/" target="_blank" rel="noopener" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:bg-brand-600 hover:text-white transition-colors">
+                                    <iconify-icon icon="lucide:instagram"></iconify-icon>
+                                </a>
+                                <a href="https://www.linkedin.com/" target="_blank" rel="noopener" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:bg-brand-600 hover:text-white transition-colors">
+                                    <iconify-icon icon="lucide:linkedin"></iconify-icon>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ (new) -->
+        <section id="faq" class="py-24">
+            <div class="max-w-3xl mx-auto px-5 sm:px-8">
+                <div class="text-center mb-14">
+                    <span class="text-xs font-semibold uppercase tracking-[0.2em] text-gray-500">FAQ</span>
+                    <h2 class="text-3xl sm:text-4xl font-bold mt-2">Common questions</h2>
+                </div>
+
+                <div class="space-y-3">
+                    <details class="bg-ink-800/60 border border-white/8 rounded-2xl p-6 group">
+                        <summary class="flex items-center justify-between gap-4">
+                            <span class="font-semibold text-white">How do I start a project?</span>
+                            <iconify-icon icon="lucide:plus" class="faq-icon text-brand-500 text-lg"></iconify-icon>
+                        </summary>
+                        <p class="text-sm text-gray-400 mt-4 leading-relaxed">Fill out the contact form below or message us on WhatsApp. We'll respond with a short brief, timeline, and quote — usually within a few hours during working days.</p>
+                    </details>
+
+                    <details class="bg-ink-800/60 border border-white/8 rounded-2xl p-6 group">
+                        <summary class="flex items-center justify-between gap-4">
+                            <span class="font-semibold text-white">How long does delivery take?</span>
+                            <iconify-icon icon="lucide:plus" class="faq-icon text-brand-500 text-lg"></iconify-icon>
+                        </summary>
+                        <p class="text-sm text-gray-400 mt-4 leading-relaxed">Single creatives typically take 24–72 hours. Full brand identity systems take 5–10 days depending on revisions and scope.</p>
+                    </details>
+
+                    <details class="bg-ink-800/60 border border-white/8 rounded-2xl p-6 group">
+                        <summary class="flex items-center justify-between gap-4">
+                            <span class="font-semibold text-white">How many revisions are included?</span>
+                            <iconify-icon icon="lucide:plus" class="faq-icon text-brand-500 text-lg"></iconify-icon>
+                        </summary>
+                        <p class="text-sm text-gray-400 mt-4 leading-relaxed">Starter includes 2 revisions, Business includes 5, and Premium includes unlimited revisions within the project scope.</p>
+                    </details>
+
+                    <details class="bg-ink-800/60 border border-white/8 rounded-2xl p-6 group">
+                        <summary class="flex items-center justify-between gap-4">
+                            <span class="font-semibold text-white">Do you provide source files?</span>
+                            <iconify-icon icon="lucide:plus" class="faq-icon text-brand-500 text-lg"></iconify-icon>
+                        </summary>
+                        <p class="text-sm text-gray-400 mt-4 leading-relaxed">Yes. Business and Premium packages include editable source files (AI, PSD, Figma, or SVG depending on the project).</p>
+                    </details>
+
+                    <details class="bg-ink-800/60 border border-white/8 rounded-2xl p-6 group">
+                        <summary class="flex items-center justify-between gap-4">
+                            <span class="font-semibold text-white">How does payment work?</span>
+                            <iconify-icon icon="lucide:plus" class="faq-icon text-brand-500 text-lg"></iconify-icon>
+                        </summary>
+                        <p class="text-sm text-gray-400 mt-4 leading-relaxed">We typically take 50% advance to begin and 50% on delivery. UPI, bank transfer, and international options are available.</p>
+                    </details>
+
+                    <details class="bg-ink-800/60 border border-white/8 rounded-2xl p-6 group">
+                        <summary class="flex items-center justify-between gap-4">
+                            <span class="font-semibold text-white">Do you work with clients outside Kerala/India?</span>
+                            <iconify-icon icon="lucide:plus" class="faq-icon text-brand-500 text-lg"></iconify-icon>
+                        </summary>
+                        <p class="text-sm text-gray-400 mt-4 leading-relaxed">Yes. We work with clients globally over email, WhatsApp, and Zoom. Time zones are handled with async updates.</p>
+                    </details>
+                </div>
+            </div>
+        </section>
+
+        <!-- CONTACT (improved) -->
+        <section id="contact" class="py-24 border-t border-white/5 bg-ink-900/40">
+            <div class="max-w-7xl mx-auto px-5 sm:px-8">
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
                     <div>
-                        <p class="text-brand-600 font-bold uppercase tracking-widest text-xs mb-3">Get In Touch</p>
-                        <h2 class="text-3xl sm:text-4xl font-bold text-white tracking-tight mb-6">Let's Collaborate</h2>
-                        <p class="text-base text-gray-400 font-light leading-relaxed mb-10">Have a project in mind? Fill out form below. It will send an email and also open WhatsApp for a quick collaboration chat.</p>
-                        
-                        <div class="space-y-6">
-                            <a href="https://wa.me/919072891142?text=Hi%20Typixel,%20I%20want%20to%20collaborate." target="_blank" class="flex items-center gap-4 group">
-                                <div class="w-12 h-12 rounded-xl bg-green-600/10 flex items-center justify-center group-hover:bg-green-600 transition-all duration-300">
-                                    <iconify-icon icon="lucide:message-circle" class="text-green-600 group-hover:text-white text-xl transition-colors"></iconify-icon>
+                        <span class="text-xs font-semibold uppercase tracking-[0.2em] text-gray-500">Contact</span>
+                        <h2 class="text-3xl sm:text-4xl font-bold text-white tracking-tight mt-2 mb-4">Start my project</h2>
+                        <p class="text-base text-gray-400 font-light leading-relaxed mb-10">Tell us about your brand, your goals, and your timeline. We usually respond within a few hours on working days.</p>
+
+                        <div class="space-y-5">
+                            <a href="https://wa.me/919072891142?text=Hi%20Typixel,%20I%20want%20to%20collaborate." target="_blank" rel="noopener" class="flex items-center gap-4 group">
+                                <div class="w-11 h-11 rounded-xl bg-green-600/10 flex items-center justify-center group-hover:bg-green-600 transition-all duration-300">
+                                    <iconify-icon icon="lucide:message-circle" class="text-green-500 group-hover:text-white text-lg transition-colors"></iconify-icon>
                                 </div>
                                 <div>
                                     <p class="text-sm font-bold text-white">WhatsApp</p>
                                     <p class="text-sm text-gray-400">+91 90728 91142</p>
                                 </div>
                             </a>
-                            <a href="mailto:typixelofficial@gmail.com?subject=Collaboration%20Inquiry" class="flex items-center gap-4 group">
-                                <div class="w-12 h-12 rounded-xl bg-brand-600/10 flex items-center justify-center group-hover:bg-brand-600 transition-all duration-300">
-                                    <iconify-icon icon="lucide:mail" class="text-brand-600 group-hover:text-white text-xl transition-colors"></iconify-icon>
+                            <a href="mailto:typixelofficial@gmail.com?subject=Project%20Inquiry" class="flex items-center gap-4 group">
+                                <div class="w-11 h-11 rounded-xl bg-brand-600/10 flex items-center justify-center group-hover:bg-brand-600 transition-all duration-300">
+                                    <iconify-icon icon="lucide:mail" class="text-brand-500 group-hover:text-white text-lg transition-colors"></iconify-icon>
                                 </div>
                                 <div>
                                     <p class="text-sm font-bold text-white">Email</p>
@@ -628,60 +869,118 @@ document.addEventListener("DOMContentLoaded", function () {
                             </a>
                         </div>
 
-                        <!-- NEW HIGHLIGHTED LINKS -->
-                        <div class="grid grid-cols-2 gap-4 mt-8">
-                            <a href="price.html" class="group flex flex-col items-center justify-center gap-2 p-4 rounded-xl border border-brand-500/30 bg-brand-500/5 hover:bg-brand-600 hover:border-brand-600 transition-all duration-300 text-brand-400 hover:text-white">
-                                <iconify-icon icon="lucide:list" class="text-xl transition-transform group-hover:scale-110"></iconify-icon>
-                                <span class="text-sm font-bold uppercase tracking-wider">Price List</span>
+                        <div class="grid grid-cols-2 gap-3 mt-8">
+                            <a href="price.html" class="group flex flex-col items-center justify-center gap-2 p-4 rounded-xl border border-white/8 hover:border-brand-600/40 hover:bg-brand-600/5 transition-all duration-300">
+                                <iconify-icon icon="lucide:list" class="text-xl text-brand-500 transition-transform group-hover:scale-110"></iconify-icon>
+                                <span class="text-xs font-semibold uppercase tracking-wider text-gray-300">Price List</span>
                             </a>
-                            <a href="team.html" class="group flex flex-col items-center justify-center gap-2 p-4 rounded-xl border border-brand-500/30 bg-brand-500/5 hover:bg-brand-600 hover:border-brand-600 transition-all duration-300 text-brand-400 hover:text-white">
-                                <iconify-icon icon="lucide:users" class="text-xl transition-transform group-hover:scale-110"></iconify-icon>
-                                <span class="text-sm font-bold uppercase tracking-wider">Join Our Team</span>
+                            <a href="team.html" class="group flex flex-col items-center justify-center gap-2 p-4 rounded-xl border border-white/8 hover:border-brand-600/40 hover:bg-brand-600/5 transition-all duration-300">
+                                <iconify-icon icon="lucide:users" class="text-xl text-brand-500 transition-transform group-hover:scale-110"></iconify-icon>
+                                <span class="text-xs font-semibold uppercase tracking-wider text-gray-300">Join Our Team</span>
                             </a>
                         </div>
-                        <!-- END HIGHLIGHTED LINKS -->
                     </div>
 
                     <div>
-                        <div class="bg-white/5 border border-white/10 rounded-3xl p-8 backdrop-blur-xl">
+                        <div class="bg-ink-800/60 border border-white/8 rounded-3xl p-6 sm:p-8">
+                            <!-- 
+                                NOTE: The Web3Forms access_key below is intentionally client-visible.
+                                Web3Forms keys are designed to be public (they only accept submissions to your email).
+                                For stronger spam protection we add a honeypot field + botcheck.
+                                To fully lock this down, proxy submissions through a serverless function
+                                (Vercel/Netlify) and keep the key in environment variables.
+                            -->
                             <form action="https://api.web3forms.com/submit" method="POST" id="contact-form" class="space-y-5">
                                 <input type="hidden" name="access_key" value="d350e23d-beb1-4d69-a2d2-6e83681ecb14">
+                                <input type="hidden" name="subject" value="New Project Inquiry — Typixel">
+                                <input type="hidden" name="from_name" value="Typixel Website">
+
+                                <!-- Honeypot (anti-spam) -->
+                                <input type="checkbox" name="botcheck" class="hp-field" tabindex="-1" autocomplete="off">
 
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                                     <div>
-                                        <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">Your Name *</label>
-                                        <input type="text" id="contact-name" name="name" required placeholder="Your name" class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white text-sm placeholder:text-gray-600 focus:outline-none focus:border-brand-600 transition-colors">
+                                        <label for="contact-name" class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">Your Name *</label>
+                                        <input type="text" id="contact-name" name="name" required placeholder="Your name"
+                                            class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white text-sm placeholder:text-gray-600 focus:outline-none focus:border-brand-600 transition-colors">
                                     </div>
                                     <div>
-                                        <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">Phone / WhatsApp *</label>
-                                        <input type="tel" id="contact-phone" name="phone" required placeholder="+91 XXXXX XXXXX" class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white text-sm placeholder:text-gray-600 focus:outline-none focus:border-brand-600 transition-colors">
+                                        <label for="contact-phone" class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">Phone / WhatsApp *</label>
+                                        <input type="tel" id="contact-phone" name="phone" required placeholder="+91 XXXXX XXXXX"
+                                            class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white text-sm placeholder:text-gray-600 focus:outline-none focus:border-brand-600 transition-colors">
                                     </div>
                                 </div>
+
                                 <div>
-                                    <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">Email *</label>
-                                    <input type="email" id="contact-email" name="email" required placeholder="your@email.com" class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white text-sm placeholder:text-gray-600 focus:outline-none focus:border-brand-600 transition-colors">
+                                    <label for="contact-email" class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">Email *</label>
+                                    <input type="email" id="contact-email" name="email" required placeholder="your@email.com"
+                                        class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white text-sm placeholder:text-gray-600 focus:outline-none focus:border-brand-600 transition-colors">
                                 </div>
+
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                                     <div>
-                                        <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">Service Needed *</label>
-                                        <select id="contact-service" name="service" required class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white text-sm focus:outline-none focus:border-brand-600 transition-all appearance-none">
+                                        <label for="contact-service" class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">Service Needed *</label>
+                                        <select id="contact-service" name="service" required
+                                            class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white text-sm focus:outline-none focus:border-brand-600 transition-all appearance-none">
                                             <option value="" class="bg-black">Select service</option>
-                                            <option value="Branding">Branding & Identity</option>
-                                            <option value="YouTube Thumbnail Design">YouTube Thumbnail Design</option>
-                                            <option value="Website">Website Design</option>
-                                            <option value="Social Media">Social Media Creatives</option>
-                                            <option value="Packaging">Packaging Design</option>
+                                            <option value="Branding" class="bg-black">Branding & Identity</option>
+                                            <option value="YouTube Thumbnail" class="bg-black">YouTube Thumbnail</option>
+                                            <option value="Website" class="bg-black">Website Design</option>
+                                            <option value="Social Media" class="bg-black">Social Media Creatives</option>
+                                            <option value="Packaging" class="bg-black">Packaging Design</option>
+                                            <option value="Other" class="bg-black">Other</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label for="contact-budget" class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">Budget Range</label>
+                                        <select id="contact-budget" name="budget"
+                                            class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white text-sm focus:outline-none focus:border-brand-600 transition-all appearance-none">
+                                            <option value="" class="bg-black">Select range</option>
+                                            <option value="₹500 - ₹2,000" class="bg-black">₹500 – ₹2,000</option>
+                                            <option value="₹2,000 - ₹5,000" class="bg-black">₹2,000 – ₹5,000</option>
+                                            <option value="₹5,000 - ₹15,000" class="bg-black">₹5,000 – ₹15,000</option>
+                                            <option value="₹15,000+" class="bg-black">₹15,000+</option>
                                         </select>
                                     </div>
                                 </div>
-                                <div>
-                                    <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">Message</label>
-                                    <textarea id="contact-message" name="message" rows="4" placeholder="Describe your brand, what you need..." class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white text-sm placeholder:text-gray-600 focus:outline-none focus:border-brand-600 transition-all resize-none"></textarea>
+
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                                    <div>
+                                        <label for="contact-deadline" class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">Deadline</label>
+                                        <input type="text" id="contact-deadline" name="deadline" placeholder="e.g. 2 weeks, flexible"
+                                            class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white text-sm placeholder:text-gray-600 focus:outline-none focus:border-brand-600 transition-colors">
+                                    </div>
+                                    <div>
+                                        <label for="contact-pref" class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">Preferred Contact</label>
+                                        <select id="contact-pref" name="preferred_contact"
+                                            class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white text-sm focus:outline-none focus:border-brand-600 transition-all appearance-none">
+                                            <option value="" class="bg-black">Select</option>
+                                            <option value="WhatsApp" class="bg-black">WhatsApp</option>
+                                            <option value="Email" class="bg-black">Email</option>
+                                            <option value="Phone Call" class="bg-black">Phone Call</option>
+                                        </select>
+                                    </div>
                                 </div>
-                                
+
+                                <div>
+                                    <label for="contact-ref" class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">Reference / Inspiration Link</label>
+                                    <input type="url" id="contact-ref" name="reference_link" placeholder="https://..."
+                                        class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white text-sm placeholder:text-gray-600 focus:outline-none focus:border-brand-600 transition-colors">
+                                </div>
+
+                                <div>
+                                    <label for="contact-message" class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">Project Details</label>
+                                    <textarea id="contact-message" name="message" rows="4" placeholder="Describe your brand, what you need, and any specific goals..."
+                                        class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white text-sm placeholder:text-gray-600 focus:outline-none focus:border-brand-600 transition-all resize-none"></textarea>
+                                </div>
+
+                                <p class="text-xs text-gray-500 leading-relaxed">
+                                    By submitting, you agree to be contacted about your inquiry. We respect your privacy — your details are never shared. See our <a href="/privacy.html" class="text-brand-500 hover:underline">Privacy Policy</a>.
+                                </p>
+
                                 <button type="submit" id="contact-btn" class="w-full bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold uppercase tracking-widest py-4 rounded-xl flex items-center justify-center gap-2 transition-all">
                                     <iconify-icon icon="lucide:send" class="text-base"></iconify-icon>
-                                    Send Collaboration Inquiry
+                                    Start My Project
                                 </button>
                             </form>
                         </div>
@@ -690,58 +989,51 @@ document.addEventListener("DOMContentLoaded", function () {
             </div>
         </section>
 
-        <!-- ========== FOOTER (Simple & Professional) ========== -->
-        <footer class="bg-black border-t border-white/10 pt-16 pb-8">
-            <div class="max-w-7xl mx-auto px-5">
-                <!-- Top Grid -->
+        <!-- FOOTER -->
+        <footer class="bg-ink-950 border-t border-white/10 pt-16 pb-8">
+            <div class="max-w-7xl mx-auto px-5 sm:px-8">
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
-                    
-                    <!-- 1. Brand Section -->
+
                     <div class="space-y-4">
                         <div class="flex items-center gap-3">
-                            <img src="https://z-cdn-media.chatglm.cn/files/db59a431-5745-42ec-8575-eda0a0d7d874.png?auth_key=1877803378-171e0b259fba4a18b98bd102cd7552e3-0-9f785a189e477354911412f66e12d36d" alt="Typixel Logo" class="w-10 h-10 object-contain logo-spin">
-                            <span class="text-xl font-bold tracking-tight text-white">Typixel</span>
+                            <img src="/images/favicon.png" alt="Typixel Logo" class="w-9 h-9 object-contain logo-mark">
+                            <span class="text-lg font-bold tracking-tight text-white">Typixel</span>
                         </div>
                         <p class="text-sm text-gray-400 leading-relaxed">
-                            Creative design solutions that bring ideas to life.<br>
-                            We craft visuals that speak, inspire, and convert.
+                            Creative design solutions that bring ideas to life. We craft visuals that speak, inspire, and convert.
                         </p>
                     </div>
 
-                    <!-- 2. Quick Links -->
-                    <!-- UPDATED ORDER: Reviews now before Team -->
                     <div>
-                        <h4 class="text-white font-bold uppercase tracking-widest text-sm mb-4">Quick Links</h4>
+                        <h4 class="text-white font-semibold uppercase tracking-widest text-xs mb-4">Quick Links</h4>
                         <ul class="space-y-2">
-                            <li><a href="#home" class="text-sm text-gray-400 hover:text-brand-500 transition-colors">Home</a></li>
+                            <li><a href="#work" class="text-sm text-gray-400 hover:text-brand-500 transition-colors">Work</a></li>
                             <li><a href="#services" class="text-sm text-gray-400 hover:text-brand-500 transition-colors">Services</a></li>
-                            <li><a href="#portfolio" class="text-sm text-gray-400 hover:text-brand-500 transition-colors">Portfolio</a></li>
+                            <li><a href="#process" class="text-sm text-gray-400 hover:text-brand-500 transition-colors">Process</a></li>
+                            <li><a href="#about" class="text-sm text-gray-400 hover:text-brand-500 transition-colors">About</a></li>
                             <li><a href="#reviews" class="text-sm text-gray-400 hover:text-brand-500 transition-colors">Reviews</a></li>
-                            <li><a href="#team" class="text-sm text-gray-400 hover:text-brand-500 transition-colors">Team</a></li>
                             <li><a href="#contact" class="text-sm text-gray-400 hover:text-brand-500 transition-colors">Contact</a></li>
                         </ul>
                     </div>
 
-                    <!-- 3. Services -->
                     <div>
-                        <h4 class="text-white font-bold uppercase tracking-widest text-sm mb-4">Services</h4>
+                        <h4 class="text-white font-semibold uppercase tracking-widest text-xs mb-4">Services</h4>
                         <ul class="space-y-2">
                             <li><span class="text-sm text-gray-400">Logo Design</span></li>
                             <li><span class="text-sm text-gray-400">Branding & Identity</span></li>
                             <li><span class="text-sm text-gray-400">Social Media Design</span></li>
-                            <li><span class="text-sm text-gray-400">YouTube Thumbnail Design</span></li>
+                            <li><span class="text-sm text-gray-400">YouTube Thumbnails</span></li>
                             <li><span class="text-sm text-gray-400">Print Design</span></li>
                             <li><span class="text-sm text-gray-400">Packaging Design</span></li>
                         </ul>
                     </div>
 
-                    <!-- 4. Contact Info & Socials -->
                     <div>
-                        <h4 class="text-white font-bold uppercase tracking-widest text-sm mb-4">Contact</h4>
+                        <h4 class="text-white font-semibold uppercase tracking-widest text-xs mb-4">Contact</h4>
                         <ul class="space-y-3 text-sm text-gray-400 mb-6">
                             <li class="flex items-center gap-2">
                                 <iconify-icon icon="lucide:map-pin" class="text-brand-500"></iconify-icon>
-                                <span>Kotakkal, Malappuram, Kerala, India</span>
+                                <span>Kottakkal, Malappuram, Kerala, India</span>
                             </li>
                             <li class="flex items-center gap-2">
                                 <iconify-icon icon="lucide:mail" class="text-brand-500"></iconify-icon>
@@ -749,60 +1041,211 @@ document.addEventListener("DOMContentLoaded", function () {
                             </li>
                             <li class="flex items-center gap-2">
                                 <iconify-icon icon="lucide:phone" class="text-brand-500"></iconify-icon>
-                                <a href="tel:+919072891142" class="hover:text-white transition-colors">+91 9072891142</a>
+                                <a href="tel:+919072891142" class="hover:text-white transition-colors">+91 90728 91142</a>
                             </li>
                         </ul>
-                        
-                        <h4 class="text-white font-bold uppercase tracking-widest text-sm mb-3">Follow Us</h4>
-                        <div class="flex gap-4">
-                            <a href="https://www.instagram.com/typixelofficial/" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-brand-600 hover:text-white text-gray-400 transition-all">
+
+                        <h4 class="text-white font-semibold uppercase tracking-widest text-xs mb-3">Follow Us</h4>
+                        <div class="flex gap-3">
+                            <a href="https://www.instagram.com/typixelofficial/" target="_blank" rel="noopener" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-brand-600 hover:text-white text-gray-400 transition-all">
                                 <iconify-icon icon="lucide:instagram"></iconify-icon>
                             </a>
-                            <a href="https://www.behance.net/hashimmhd" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-brand-600 hover:text-white text-gray-400 transition-all">
+                            <a href="https://www.behance.net/hashimmhd" target="_blank" rel="noopener" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-brand-600 hover:text-white text-gray-400 transition-all">
                                 <iconify-icon icon="mdi:behance"></iconify-icon>
                             </a>
                         </div>
                     </div>
                 </div>
 
-                <!-- 5. Newsletter Section -->
+                <!-- Newsletter (fixed error handling) -->
                 <div class="border-t border-white/5 py-10 mb-8">
                     <div class="max-w-lg mx-auto text-center">
-                        <h4 class="text-white font-bold mb-2">Stay Updated</h4>
-                        <p class="text-sm text-gray-500 mb-4">Subscribe to our newsletter for the latest designs & offers.</p>
-                        
-                        <!-- WORKING NEWSLETTER FORM -->
+                        <h4 class="text-white font-semibold mb-2">Stay Updated</h4>
+                        <p class="text-sm text-gray-500 mb-4">Subscribe for the latest designs & offers.</p>
+
                         <form id="newsletter-form" class="flex gap-2" action="https://api.web3forms.com/submit" method="POST">
                             <input type="hidden" name="access_key" value="d350e23d-beb1-4d69-a2d2-6e83681ecb14">
                             <input type="hidden" name="subject" value="New Newsletter Subscription from Typixel">
-                            <input type="text" name="from_name" value="Newsletter Subscriber" style="display:none;">
-                            
-                            <input type="email" name="email" placeholder="your email" required class="flex-1 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-brand-600 transition-colors">
+                            <input type="hidden" name="from_name" value="Newsletter Subscriber">
+                            <input type="checkbox" name="botcheck" class="hp-field" tabindex="-1" autocomplete="off">
+
+                            <input type="email" name="email" placeholder="your@email.com" required
+                                class="flex-1 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-brand-600 transition-colors">
                             <button type="submit" id="newsletter-btn" class="px-6 py-2 bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold uppercase rounded-full transition-colors">Subscribe</button>
                         </form>
                     </div>
                 </div>
 
-                <!-- 6. Bottom Bar -->
                 <div class="border-t border-white/5 pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-gray-500 gap-4">
                     <p>© 2026 Typixel. All Rights Reserved.</p>
                     <div class="flex gap-6">
-                        <a href="#" class="hover:text-white transition-colors">Privacy Policy</a>
-                        <a href="#" class="hover:text-white transition-colors">Terms & Conditions</a>
+                        <a href="/privacy.html" class="hover:text-white transition-colors">Privacy Policy</a>
+                        <a href="/terms.html" class="hover:text-white transition-colors">Terms & Conditions</a>
+                        <a href="/refund-policy.html" class="hover:text-white transition-colors">Refund Policy</a>
                     </div>
                 </div>
             </div>
         </footer>
 
-        <!-- ========== FLOATING WHATSAPP ========== -->
-        <a href="https://wa.me/919072891142?text=Hi%20Typixel,%20I%20am%20interested%20in%20a%20design%20collaboration." target="_blank" class="fixed bottom-6 right-6 z-50 w-14 h-14 bg-green-500 hover:bg-green-600 rounded-full flex items-center justify-center shadow-2xl shadow-green-500/30 hover:shadow-green-500/50 hover:scale-110 transition-all duration-300">
+        <!-- FLOATING WHATSAPP -->
+        <a href="https://wa.me/919072891142?text=Hi%20Typixel,%20I%20am%20interested%20in%20a%20design%20collaboration." target="_blank" rel="noopener"
+           class="fixed bottom-6 right-6 z-50 w-14 h-14 bg-green-500 hover:bg-green-600 rounded-full flex items-center justify-center shadow-2xl shadow-green-500/30 hover:scale-105 transition-all duration-300">
             <iconify-icon icon="lucide:message-circle" class="text-white text-2xl"></iconify-icon>
         </a>
 
-        <!-- ========== LOGIC (NAV HIGHLIGHT & FORMS) ========== -->
+        <!-- SCRIPTS -->
         <script>
-            // --- 1. LOADER & UI LOGIC ---
+            // ============ PROJECT DATA ============
+            const PROJECTS = {
+                'branding-chamayam': {
+                    title: 'Chamayam — Brand Identity',
+                    category: 'Branding',
+                    client: 'Chamayam Textiles',
+                    image: 'https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/Branding.jpg',
+                    story: 'Chamayam needed a contemporary identity that still respected their textile heritage. We built a modular mark, warm color palette, and a complete guideline set rolled out across signage, packaging, and social.',
+                    services: ['Logo Design', 'Brand Guidelines', 'Color & Typography', 'Social Templates'],
+                    before: '',
+                    after: ''
+                },
+                'website-skillovia': {
+                    title: 'Skillovia — Website Design',
+                    category: 'Web Design',
+                    client: 'Skillovia',
+                    image: 'https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/website.png',
+                    story: 'A clean, conversion-focused website for an upskilling platform. We led with clear value propositions, simplified navigation, and a modular UI kit that scales with their content.',
+                    services: ['UI Design', 'UX Wireframes', 'Responsive Layout', 'Design System'],
+                    before: '',
+                    after: ''
+                },
+                'poster-cinema': {
+                    title: 'Cinematic Poster Series',
+                    category: 'Print & Promo',
+                    client: 'Independent Film',
+                    image: 'https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/Cinema.jpg',
+                    story: 'A poster series built around mood, contrast, and typography. Each poster was designed to work as both print and digital — strong at thumbnail size, dramatic full-size.',
+                    services: ['Poster Design', 'Typography', 'Photo Editing', 'Print Ready Files'],
+                    before: '',
+                    after: ''
+                },
+                'brochure': {
+                    title: 'Brochure Design',
+                    category: 'Print',
+                    client: 'Confidential',
+                    image: 'https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/Brouchere.jpg',
+                    story: 'A tri-fold brochure balancing information density with readability. Designed with a clear visual hierarchy and print-ready color profiles.',
+                    services: ['Layout Design', 'Print Production', 'Typography'],
+                    before: '',
+                    after: ''
+                },
+                'menu-card': {
+                    title: 'Menu Card Design',
+                    category: 'Print',
+                    client: 'Restaurant',
+                    image: 'https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/Menu Card.jpg',
+                    story: 'A menu system designed to feel premium and easy to scan. Modular layout allows seasonal swaps without redesigning the entire card.',
+                    services: ['Layout Design', 'Typography', 'Print Ready Files'],
+                    before: '',
+                    after: ''
+                },
+                'logo': {
+                    title: 'Logo Design',
+                    category: 'Branding',
+                    client: 'Various',
+                    image: 'https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/logo.jpg',
+                    story: 'A selection of logo marks designed for different industries — each built around a single clear idea that works at every size.',
+                    services: ['Logo Concepts', 'Vector Files', 'Variations', 'Brand Mark'],
+                    before: '',
+                    after: ''
+                },
+                'youtube': {
+                    title: 'YouTube Thumbnail Design',
+                    category: 'Social',
+                    client: 'Content Creators',
+                    image: 'https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/YouTube.jpg',
+                    story: 'Click-optimized thumbnails built around bold focal points, expressive faces, and clear text hierarchy — proven to lift CTR.',
+                    services: ['Thumbnail Design', 'A/B Variations', 'Channel Branding'],
+                    before: '',
+                    after: ''
+                },
+                'coupon': {
+                    title: 'Coupon Design',
+                    category: 'Promo',
+                    client: 'Retail',
+                    image: 'https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/Coupon.jpg',
+                    story: 'Promotional coupons designed for both digital sharing and print. Clear call-to-action and scannable codes.',
+                    services: ['Promo Design', 'Print Ready Files'],
+                    before: '',
+                    after: ''
+                },
+                'poster': {
+                    title: 'Posters',
+                    category: 'Print & Promo',
+                    client: 'Various',
+                    image: 'https://raw.githubusercontent.com/Inksphere/Portfolio/main/Images/poster.jpg',
+                    story: 'A series of promotional posters balancing type, image, and brand color. Designed to work as a set or standalone.',
+                    services: ['Poster Design', 'Typography', 'Photo Editing'],
+                    before: '',
+                    after: ''
+                }
+            };
 
+            // ============ PORTFOLIO GRID RENDER ============
+            const portfolioOrder = ['branding-chamayam', 'website-skillovia', 'poster-cinema', 'brochure', 'menu-card', 'logo', 'youtube', 'coupon', 'poster'];
+
+            function renderPortfolio() {
+                const grid = document.getElementById('portfolio-grid');
+                if (!grid) return;
+                grid.innerHTML = portfolioOrder.map(key => {
+                    const p = PROJECTS[key];
+                    return `
+                        <button onclick="openProject('${key}')" class="group text-left block overflow-hidden rounded-2xl relative aspect-[4/3] cursor-pointer hover-lift bg-ink-800 border border-white/8">
+                            <img src="${p.image}" alt="${p.title}" loading="lazy" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
+                                <span class="text-[10px] uppercase tracking-widest text-brand-500 font-semibold mb-1">${p.category}</span>
+                                <h3 class="text-lg font-bold text-white">${p.title}</h3>
+                                <p class="text-gray-300 text-xs mt-1">View Details →</p>
+                            </div>
+                        </button>
+                    `;
+                }).join('');
+            }
+
+            // ============ MODAL ============
+            function openProject(key) {
+                const p = PROJECTS[key];
+                if (!p) return;
+                document.getElementById('pm-image').src = p.image;
+                document.getElementById('pm-image').alt = p.title;
+                document.getElementById('pm-category').textContent = p.category;
+                document.getElementById('pm-client').textContent = p.client;
+                document.getElementById('pm-title').textContent = p.title;
+                document.getElementById('pm-story').textContent = p.story;
+                document.getElementById('pm-services').innerHTML = p.services.map(s => `<li class="flex items-center gap-2"><iconify-icon icon="lucide:check" class="text-brand-500"></iconify-icon> ${s}</li>`).join('');
+
+                const baWrap = document.getElementById('pm-beforeafter-wrap');
+                if (p.before && p.after) {
+                    baWrap.classList.remove('hidden');
+                    document.getElementById('pm-before').src = p.before;
+                    document.getElementById('pm-after').src = p.after;
+                } else {
+                    baWrap.classList.add('hidden');
+                }
+
+                const modal = document.getElementById('project-modal');
+                modal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeProjectModal() {
+                document.getElementById('project-modal').classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') closeProjectModal();
+            });
+
+            // ============ LOADER ============
             window.addEventListener('load', () => {
                 const loader = document.getElementById('app-loader');
                 const content = document.getElementById('main-content');
@@ -811,103 +1254,118 @@ document.addEventListener("DOMContentLoaded", function () {
                     setTimeout(() => {
                         loader.style.display = 'none';
                         content.style.display = 'block';
-                        content.querySelectorAll('.fade-in').forEach(el => {
-                            el.style.animationName = 'fadeIn';
-                        });
+                        initFadeUps();
                     }, 500);
-                }, 800);
+                }, 400);
             });
 
+            // ============ FADE-UP OBSERVER ============
+            function initFadeUps() {
+                const els = document.querySelectorAll('.fade-up');
+                const io = new IntersectionObserver((entries) => {
+                    entries.forEach((entry, i) => {
+                        if (entry.isIntersecting) {
+                            setTimeout(() => entry.target.classList.add('in'), i * 80);
+                            io.unobserve(entry.target);
+                        }
+                    });
+                }, { threshold: 0.15 });
+                els.forEach(el => io.observe(el));
+            }
+
+            // ============ MOBILE MENU ============
             function toggleMenu() {
                 const menu = document.getElementById('mobile-menu');
                 menu.classList.toggle('hidden');
                 menu.classList.toggle('flex');
             }
 
+            // ============ TOAST ============
             function showToast(message, type = 'success') {
                 const toast = document.getElementById('toast');
                 const msg = document.getElementById('toast-msg');
                 const icon = toast.querySelector('iconify-icon');
-                
+
                 msg.innerText = message;
-                
+
                 if (type === 'success') {
                     toast.classList.add('success');
                     toast.classList.remove('error');
                     icon.setAttribute('icon', 'lucide:check-circle');
-                    icon.classList.replace('text-red-500', 'text-green-500');
+                    icon.classList.remove('text-red-500');
+                    icon.classList.add('text-green-500');
                 } else {
                     toast.classList.add('error');
                     toast.classList.remove('success');
                     icon.setAttribute('icon', 'lucide:x-circle');
-                    icon.classList.replace('text-green-500', 'text-red-500');
+                    icon.classList.remove('text-green-500');
+                    icon.classList.add('text-red-500');
                 }
 
                 toast.classList.add('active');
-                setTimeout(() => { toast.classList.remove('active'); }, 3000);
+                setTimeout(() => { toast.classList.remove('active'); }, 3500);
             }
 
-            // --- 2. SCROLL SPY LOGIC (NAV HIGHLIGHTING) ---
-            
+            // ============ NAV SCROLL SPY ============
             document.addEventListener("DOMContentLoaded", () => {
-                const sections = document.querySelectorAll("section");
+                renderPortfolio();
+
+                const sections = document.querySelectorAll("section[id]");
                 const navLinks = document.querySelectorAll(".nav-link");
                 const mobileLinks = document.querySelectorAll(".nav-link-mobile");
-
-                // This observer will trigger when a section takes up 50% of the viewport
-                const observerOptions = {
-                    root: null,
-                    rootMargin: '0px',
-                    threshold: 0.3 // Trigger when 30% of the section is visible
-                };
 
                 const observer = new IntersectionObserver((entries) => {
                     entries.forEach((entry) => {
                         if (entry.isIntersecting) {
-                            // Remove active class from all links
+                            const id = entry.target.getAttribute("id");
                             navLinks.forEach(link => {
-                                link.classList.remove("text-brand-600");
-                                link.classList.add("text-gray-300");
+                                const active = link.getAttribute("href") === `#${id}`;
+                                link.classList.toggle("text-white", active);
+                                link.classList.toggle("text-gray-400", !active);
                             });
                             mobileLinks.forEach(link => {
-                                link.classList.remove("text-white", "font-black"); // Mobile highlight style
+                                const active = link.getAttribute("href") === `#${id}`;
+                                link.classList.toggle("text-brand-500", active);
                             });
-
-                            // Add active class to the current link
-                            const id = entry.target.getAttribute("id");
-                            const activeLink = document.querySelector(`.nav-link[href="#${id}"]`);
-                            const activeMobileLink = document.querySelector(`.nav-link-mobile[href="#${id}"]`);
-
-                            if (activeLink) {
-                                activeLink.classList.remove("text-gray-300");
-                                activeLink.classList.add("text-brand-600");
-                            }
-
-                            if (activeMobileLink) {
-                                activeMobileLink.classList.add("text-white", "font-black");
-                            }
                         }
                     });
-                }, observerOptions);
+                }, { threshold: 0.3 });
 
                 sections.forEach((section) => observer.observe(section));
             });
 
-            // --- 3. CONTACT FORM LOGIC ---
-
+            // ============ CONTACT FORM (with honeypot + proper validation) ============
             document.getElementById('contact-form').addEventListener('submit', async function(event) {
                 event.preventDefault();
-                
+
                 const form = this;
                 const submitBtn = document.getElementById('contact-btn');
                 const formData = new FormData(form);
-                const originalBtnContent = submitBtn.innerHTML;
 
-                const name = document.getElementById('contact-name').value;
+                // Honeypot check
+                if (formData.get('botcheck')) {
+                    showToast("Spam detected. Submission blocked.", "error");
+                    return;
+                }
+
+                // Simple validation
+                const name = document.getElementById('contact-name').value.trim();
+                const email = document.getElementById('contact-email').value.trim();
+                const phone = document.getElementById('contact-phone').value.trim();
                 const service = document.getElementById('contact-service').value;
-                const budget = document.getElementById('contact-budget').value;
 
-                // Loading State
+                if (!name || !email || !phone || !service) {
+                    showToast("Please fill in all required fields.", "error");
+                    return;
+                }
+
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(email)) {
+                    showToast("Please enter a valid email address.", "error");
+                    return;
+                }
+
+                const originalBtnContent = submitBtn.innerHTML;
                 submitBtn.innerHTML = '<iconify-icon icon="lucide:loader-2" class="text-base animate-spin"></iconify-icon> Sending...';
                 submitBtn.disabled = true;
                 submitBtn.classList.add('opacity-75', 'cursor-not-allowed');
@@ -920,23 +1378,24 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     const data = await response.json();
 
-                    if (response.ok) {
-                        showToast("Success! Opening WhatsApp...", "success");
+                    if (response.ok && data.success) {
+                        showToast("Inquiry sent! Opening WhatsApp...", "success");
                         form.reset();
 
-                        const waMessage = `Hi Typixel, I am interested in collaborating.\n\nName: ${name}\nService: ${service}\nBudget: ${budget}`;
+                        const waMessage = `Hi Typixel, I am interested in collaborating.\n\nName: ${name}\nService: ${service}\nEmail: ${email}\nPhone: ${phone}`;
                         const encodedMessage = encodeURIComponent(waMessage);
 
                         setTimeout(() => {
                             window.open(`https://wa.me/919072891142?text=${encodedMessage}`, '_blank');
-                        }, 1500); 
+                        }, 1200);
 
                     } else {
-                        showToast("Error: " + data.message, "error");
+                        showToast(data.message || "Submission failed. Please try again.", "error");
                     }
 
                 } catch (error) {
-                    showToast("Something went wrong. Please try again.", "error");
+                    console.error(error);
+                    showToast("Network error. Please check your connection and try again.", "error");
                 } finally {
                     submitBtn.innerHTML = originalBtnContent;
                     submitBtn.disabled = false;
@@ -944,17 +1403,21 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             });
 
-            // --- 4. NEWSLETTER FORM LOGIC (WORKING) ---
-
+            // ============ NEWSLETTER (FIXED — no false success on failure) ============
             document.getElementById('newsletter-form').addEventListener('submit', async function(event) {
                 event.preventDefault();
-                
+
                 const form = this;
                 const btn = document.getElementById('newsletter-btn');
-                const originalBtnContent = btn.innerHTML;
                 const formData = new FormData(form);
 
-                // Loading State
+                // Honeypot
+                if (formData.get('botcheck')) {
+                    showToast("Spam detected.", "error");
+                    return;
+                }
+
+                const originalBtnContent = btn.innerHTML;
                 btn.innerHTML = '<iconify-icon icon="lucide:loader-2" class="text-base animate-spin"></iconify-icon>';
                 btn.disabled = true;
 
@@ -966,24 +1429,22 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     const data = await response.json();
 
-                    if (response.ok) {
+                    if (response.ok && data.success) {
                         showToast("Subscribed successfully!", "success");
                         form.reset();
                     } else {
-                        showToast("Error subscribing.", "error");
+                        showToast(data.message || "Subscription failed. Please try again.", "error");
                     }
                 } catch (error) {
                     console.error(error);
-                    // Even if API fails (e.g. rate limit), show success for UX in this demo context
-                    // or remove this block for strict error handling.
-                    showToast("Network error, but received!", "success"); 
-                    form.reset();
+                    // FIXED: do not show success on network failure
+                    showToast("Network error. Please try again later.", "error");
                 } finally {
                     btn.innerHTML = originalBtnContent;
                     btn.disabled = false;
                 }
             });
         </script>
-       
+    </div>
 </body>
 </html>
