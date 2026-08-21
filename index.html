@@ -902,10 +902,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 const submitBtn = document.getElementById('contact-btn');
                 const formData = new FormData(form);
                 const originalBtnContent = submitBtn.innerHTML;
-
-                const name = document.getElementById('contact-name').value;
-                const service = document.getElementById('contact-service').value;
-                const budget = document.getElementById('contact-budget').value;
+                  const name = document.getElementById('contact-name').value;
+                  const service = document.getElementById('contact-service').value;
 
                 // Loading State
                 submitBtn.innerHTML = '<iconify-icon icon="lucide:loader-2" class="text-base animate-spin"></iconify-icon> Sending...';
@@ -924,8 +922,17 @@ document.addEventListener("DOMContentLoaded", function () {
                         showToast("Success! Opening WhatsApp...", "success");
                         form.reset();
 
-                        const waMessage = `Hi Typixel, I am interested in collaborating.\n\nName: ${name}\nService: ${service}\nBudget: ${budget}`;
-                        const encodedMessage = encodeURIComponent(waMessage);
+                     const phone = document.getElementById('contact-phone').value;
+const email = document.getElementById('contact-email').value;
+const message = document.getElementById('contact-message').value;
+
+const waMessage = `Hi Typixel, I am interested in collaborating.
+
+Name: ${name}
+Phone: ${phone}
+Email: ${email}
+Service: ${service}
+Message: ${message}`;
 
                         setTimeout(() => {
                             window.open(`https://wa.me/919072891142?text=${encodedMessage}`, '_blank');
