@@ -27,6 +27,17 @@
     <meta name="twitter:description"
         content="Creative logo design, branding, website design, and digital marketing solutions.">
     <meta name="twitter:image" content="https://typixel.vercel.app/images/cover.jpg">
+<style>#main-content{padding-top:40px}</style>
+
+<style id="typixel-offer-offset">
+/* Keep fixed navigation below the announcement bar */
+nav.fixed, nav[class*="fixed"] { top: 40px !important; }
+@media (max-width: 640px) {
+    nav.fixed, nav[class*="fixed"] { top: 40px !important; }
+}
+#offer-track { will-change: transform; }
+</style>
+
 </head>
     
     <!-- FAVICON -->
@@ -152,9 +163,44 @@
     </div>
 
     <!-- MAIN CONTAINER -->
-    <div id="main-content" style="display:none;">
+    <div id="main-content" style="display:block;">
         
         <!-- ========== HEADER ========== -->
+
+<!-- ========== TYPOPIXEL OFFER / ANNOUNCEMENT BAR ========== -->
+<div id="offer-bar"
+     class="fixed top-0 left-0 right-0 z-[100] h-10 bg-gradient-to-r from-brand-700 via-brand-600 to-brand-700 text-white overflow-hidden shadow-lg shadow-brand-600/20">
+    <div class="h-full max-w-7xl mx-auto px-4 flex items-center gap-3">
+        <span class="shrink-0 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/15 border border-white/20 text-[10px] sm:text-xs font-black uppercase tracking-widest">
+            <iconify-icon icon="lucide:sparkles"></iconify-icon>
+            <span id="offer-badge">OFFER</span>
+        </span>
+
+        <div class="relative flex-1 overflow-hidden whitespace-nowrap">
+            <div id="offer-track" class="inline-flex items-center gap-8 text-xs sm:text-sm font-semibold">
+                <span id="offer-text">Loading latest offer...</span>
+                <span class="opacity-50">•</span>
+                <span id="offer-text-copy" aria-hidden="true"></span>
+            </div>
+        </div>
+
+        <a id="offer-cta"
+           href="https://wa.me/919072891142?text=Hi%20Typixel,%20I%20want%20to%20know%20about%20the%20latest%20offer."
+           target="_blank"
+           rel="noopener noreferrer"
+           class="hidden sm:inline-flex shrink-0 items-center gap-1.5 px-4 py-1.5 rounded-full bg-white text-black text-[10px] font-black uppercase tracking-wider hover:scale-105 transition-transform">
+            Claim Offer
+            <iconify-icon icon="lucide:arrow-up-right"></iconify-icon>
+        </a>
+
+        <button id="offer-close" type="button" aria-label="Close offer bar"
+                class="shrink-0 w-7 h-7 rounded-full hover:bg-white/15 flex items-center justify-center transition-colors">
+            <iconify-icon icon="lucide:x"></iconify-icon>
+        </button>
+    </div>
+</div>
+
+
         <nav class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 backdrop-blur-xl bg-dark-900/80 border-b border-white/5">
             <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 h-20 flex items-center justify-between">
                 
@@ -387,7 +433,58 @@ document.addEventListener("DOMContentLoaded", function () {
         </section>
 
         <!-- ========== REVIEWS SECTION ========== -->
-        <section id="reviews" class="py-24 relative">
+        
+<!-- ========== LATEST ON INSTAGRAM ========== -->
+<section id="instagram" class="relative py-24 overflow-hidden bg-black">
+    <div class="absolute inset-0 pointer-events-none">
+        <div class="absolute top-1/4 left-0 w-72 h-72 bg-brand-600/10 rounded-full blur-[100px]"></div>
+        <div class="absolute bottom-0 right-0 w-96 h-96 bg-purple-600/5 rounded-full blur-[120px]"></div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-5 relative z-10">
+        <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-12">
+            <div>
+                <span class="inline-flex items-center gap-2 py-1.5 px-3 rounded-full bg-brand-600/10 border border-brand-600/25 text-brand-500 text-xs font-bold uppercase tracking-widest">
+                    <iconify-icon icon="lucide:instagram"></iconify-icon>
+                    Social Feed
+                </span>
+                <h2 class="text-4xl sm:text-5xl md:text-6xl font-black mt-4 leading-tight">
+                    Latest on <span class="text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-300 to-gray-500">Instagram</span>
+                </h2>
+                <p class="text-gray-400 max-w-2xl mt-4">
+                    Fresh work, creative experiments and recent designs from Typixel.
+                </p>
+            </div>
+
+            <a href="https://www.instagram.com/typixelofficial/"
+               target="_blank"
+               rel="noopener noreferrer"
+               class="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full border border-white/15 bg-white/5 hover:bg-white hover:text-black text-white font-bold transition-all">
+                <iconify-icon icon="lucide:instagram"></iconify-icon>
+                Follow @typixelofficial
+                <iconify-icon icon="lucide:arrow-up-right"></iconify-icon>
+            </a>
+        </div>
+
+        <div id="instagram-grid"
+             class="grid grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6"
+             aria-live="polite">
+            <!-- Posts are rendered by JavaScript from the instagramPosts array below. -->
+        </div>
+
+        <div class="mt-10 text-center">
+            <a href="https://www.instagram.com/typixelofficial/"
+               target="_blank"
+               rel="noopener noreferrer"
+               class="inline-flex items-center gap-2 text-sm font-bold text-gray-300 hover:text-white transition-colors">
+                See more work on Instagram
+                <iconify-icon icon="lucide:arrow-right"></iconify-icon>
+            </a>
+        </div>
+    </div>
+</section>
+
+<section id="reviews" class="py-24 relative">
             <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-dark-900 via-black to-dark-900 -z-10"></div>
             <div class="max-w-7xl mx-auto px-5">
                 <div class="text-center mb-16">
@@ -800,23 +897,219 @@ document.addEventListener("DOMContentLoaded", function () {
         </a>
 
         <!-- ========== LOGIC (NAV HIGHLIGHT & FORMS) ========== -->
+
+<script>
+/* =========================================================
+   TYPOPIXEL — OFFER BAR + INSTAGRAM FEED CONFIGURATION
+   Edit ONLY the values in these two objects to update content.
+   ========================================================= */
+
+const typixelOffer = {
+    enabled: true,
+    badge: "LIMITED OFFER",
+    text: "Get a special offer on selected design services — Let's build something great together.",
+    ctaText: "Claim Offer",
+    ctaUrl: "https://wa.me/919072891142?text=Hi%20Typixel,%20I%20want%20to%20know%20about%20the%20latest%20offer.",
+    autoScroll: true
+};
+
+/*
+  Add your newest Instagram posters here.
+  Replace the sample image paths and Instagram URLs with your real posts.
+  Keep the newest post FIRST.
+*/
+const instagramPosts = [
+    {
+        image: "assets/instagram/post-01.jpg",
+        url: "https://www.instagram.com/typixelofficial/",
+        title: "Latest Typixel Poster",
+        category: "Creative Design"
+    },
+    {
+        image: "assets/instagram/post-02.jpg",
+        url: "https://www.instagram.com/typixelofficial/",
+        title: "Branding & Visual Identity",
+        category: "Branding"
+    },
+    {
+        image: "assets/instagram/post-03.jpg",
+        url: "https://www.instagram.com/typixelofficial/",
+        title: "Social Media Creative",
+        category: "Social Media"
+    },
+    {
+        image: "assets/instagram/post-04.jpg",
+        url: "https://www.instagram.com/typixelofficial/",
+        title: "Premium Poster Design",
+        category: "Poster Design"
+    },
+    {
+        image: "assets/instagram/post-05.jpg",
+        url: "https://www.instagram.com/typixelofficial/",
+        title: "Creative Campaign",
+        category: "Campaign"
+    },
+    {
+        image: "assets/instagram/post-06.jpg",
+        url: "https://www.instagram.com/typixelofficial/",
+        title: "Recent Work",
+        category: "Typixel"
+    }
+];
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    /* ---------- OFFER BAR ---------- */
+    const offerBar = document.getElementById("offer-bar");
+    const offerText = document.getElementById("offer-text");
+    const offerTextCopy = document.getElementById("offer-text-copy");
+    const offerBadge = document.getElementById("offer-badge");
+    const offerCta = document.getElementById("offer-cta");
+    const offerClose = document.getElementById("offer-close");
+
+    if (offerBar && typixelOffer.enabled) {
+        offerBadge.textContent = typixelOffer.badge;
+        offerText.textContent = typixelOffer.text;
+        offerTextCopy.textContent = typixelOffer.text;
+        offerCta.textContent = typixelOffer.ctaText;
+        offerCta.href = typixelOffer.ctaUrl;
+
+        const closedUntil = localStorage.getItem("typixel_offer_closed_until");
+        if (closedUntil && Date.now() < Number(closedUntil)) {
+            offerBar.remove();
+        } else {
+            offerClose.addEventListener("click", () => {
+                offerBar.style.transition = "transform .35s ease, opacity .35s ease";
+                offerBar.style.transform = "translateY(-100%)";
+                offerBar.style.opacity = "0";
+                localStorage.setItem(
+                    "typixel_offer_closed_until",
+                    String(Date.now() + 24 * 60 * 60 * 1000)
+                );
+                setTimeout(() => offerBar.remove(), 350);
+            });
+
+            if (typixelOffer.autoScroll) {
+                const track = document.getElementById("offer-track");
+                let position = 0;
+                let lastTime = performance.now();
+
+                function animateOffer(now) {
+                    if (!document.body.contains(track)) return;
+                    const delta = Math.min(now - lastTime, 50);
+                    lastTime = now;
+                    position -= delta * 0.025;
+
+                    if (Math.abs(position) > track.scrollWidth / 2) position = 0;
+                    track.style.transform = `translateX(${position}px)`;
+                    requestAnimationFrame(animateOffer);
+                }
+                requestAnimationFrame(animateOffer);
+            }
+        }
+    } else if (offerBar) {
+        offerBar.remove();
+    }
+
+    /* ---------- INSTAGRAM GRID ---------- */
+    const grid = document.getElementById("instagram-grid");
+
+    if (grid) {
+        if (!Array.isArray(instagramPosts) || instagramPosts.length === 0) {
+            grid.innerHTML = `
+                <div class="col-span-full rounded-3xl border border-white/10 bg-white/[0.03] p-10 text-center">
+                    <iconify-icon icon="lucide:instagram" class="text-4xl text-gray-500"></iconify-icon>
+                    <p class="text-gray-400 mt-3">New Instagram posts will appear here.</p>
+                </div>
+            `;
+        } else {
+            grid.innerHTML = instagramPosts.slice(0, 6).map((post, index) => `
+                <a href="${escapeHtml(post.url)}"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   class="group relative aspect-[4/5] overflow-hidden rounded-2xl sm:rounded-3xl border border-white/10 bg-white/[0.03] shadow-2xl">
+                    <img src="${escapeHtml(post.image)}"
+                         alt="${escapeHtml(post.title)} — ${escapeHtml(post.category)}"
+                         loading="${index < 3 ? "eager" : "lazy"}"
+                         class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                         onerror="this.style.opacity='.12';">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent opacity-70 group-hover:opacity-90 transition-opacity"></div>
+                    <div class="absolute top-4 right-4 w-10 h-10 rounded-full bg-black/50 backdrop-blur-md border border-white/20 flex items-center justify-center text-white">
+                        <iconify-icon icon="lucide:instagram"></iconify-icon>
+                    </div>
+                    <div class="absolute left-5 right-5 bottom-5 translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+                        <span class="inline-block text-[10px] font-black uppercase tracking-widest text-white/70 mb-1">
+                            ${escapeHtml(post.category)}
+                        </span>
+                        <h3 class="text-white font-bold text-sm sm:text-base">${escapeHtml(post.title)}</h3>
+                        <span class="inline-flex items-center gap-1 mt-2 text-xs font-semibold text-white/70 opacity-0 group-hover:opacity-100 transition-opacity">
+                            View post <iconify-icon icon="lucide:arrow-up-right"></iconify-icon>
+                        </span>
+                    </div>
+                </a>
+            `).join("");
+        }
+    }
+
+    function escapeHtml(value) {
+        return String(value ?? "")
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll('"', "&quot;")
+            .replaceAll("'", "&#039;");
+    }
+});
+</script>
+
+
         <script>
             // --- 1. LOADER & UI LOGIC ---
 
-            window.addEventListener('load', () => {
-                const loader = document.getElementById('app-loader');
-                const content = document.getElementById('main-content');
-                setTimeout(() => {
-                    loader.style.opacity = '0';
-                    setTimeout(() => {
-                        loader.style.display = 'none';
+            // --- RELIABLE LOADER ---
+            // Do not wait for images, fonts, videos, or other external resources.
+            // This prevents the site from getting stuck on "LOADING TYPIXEL".
+            (() => {
+                let loaderFinished = false;
+
+                function finishLoader() {
+                    if (loaderFinished) return;
+                    loaderFinished = true;
+
+                    const loader = document.getElementById('app-loader');
+                    const content = document.getElementById('main-content');
+
+                    if (content) {
                         content.style.display = 'block';
+                    }
+
+                    if (loader) {
+                        loader.style.opacity = '0';
+                        loader.style.pointerEvents = 'none';
+                        setTimeout(() => {
+                            loader.remove();
+                        }, 550);
+                    }
+
+                    if (content) {
                         content.querySelectorAll('.fade-in').forEach(el => {
                             el.style.animationName = 'fadeIn';
                         });
-                    }, 500);
-                }, 800);
-            });
+                    }
+                }
+
+                // Start as soon as the HTML is ready.
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', () => {
+                        setTimeout(finishLoader, 300);
+                    }, { once: true });
+                } else {
+                    setTimeout(finishLoader, 300);
+                }
+
+                // Absolute fallback: never leave the user stuck on the loader.
+                setTimeout(finishLoader, 2500);
+            })();
 
             function toggleMenu() {
                 const menu = document.getElementById('mobile-menu');
