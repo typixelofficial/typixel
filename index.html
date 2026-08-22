@@ -193,10 +193,6 @@ nav.fixed, nav[class*="fixed"] { top: 40px !important; }
             <iconify-icon icon="lucide:arrow-up-right"></iconify-icon>
         </a>
 
-        <button id="offer-close" type="button" aria-label="Close offer bar"
-                class="shrink-0 w-7 h-7 rounded-full hover:bg-white/15 flex items-center justify-center transition-colors">
-            <iconify-icon icon="lucide:x"></iconify-icon>
-        </button>
     </div>
 </div>
 
@@ -958,58 +954,48 @@ const instagramPosts = [
 
 document.addEventListener("DOMContentLoaded", () => {
 
-    /* ---------- OFFER BAR ---------- */
-    const offerBar = document.getElementById("offer-bar");
-    const offerText = document.getElementById("offer-text");
-    const offerTextCopy = document.getElementById("offer-text-copy");
-    const offerBadge = document.getElementById("offer-badge");
-    const offerCta = document.getElementById("offer-cta");
-    const offerClose = document.getElementById("offer-close");
+/* ---------- OFFER BAR ---------- */
+const offerBar = document.getElementById("offer-bar");
+const offerText = document.getElementById("offer-text");
+const offerTextCopy = document.getElementById("offer-text-copy");
+const offerBadge = document.getElementById("offer-badge");
+const offerCta = document.getElementById("offer-cta");
 
-    if (offerBar && typixelOffer.enabled) {
-        offerBadge.textContent = typixelOffer.badge;
-        offerText.textContent = typixelOffer.text;
-        offerTextCopy.textContent = typixelOffer.text;
-        offerCta.textContent = typixelOffer.ctaText;
-        offerCta.href = typixelOffer.ctaUrl;
+if (offerBar && typixelOffer.enabled) {
+    offerBadge.textContent = typixelOffer.badge;
+    offerText.textContent = typixelOffer.text;
+    offerTextCopy.textContent = typixelOffer.text;
+    offerCta.textContent = typixelOffer.ctaText;
+    offerCta.href = typixelOffer.ctaUrl;
 
-        const closedUntil = localStorage.getItem("typixel_offer_closed_until");
-        if (closedUntil && Date.now() < Number(closedUntil)) {
-            offerBar.remove();
-        } else {
-            offerClose.addEventListener("click", () => {
-                offerBar.style.transition = "transform .35s ease, opacity .35s ease";
-                offerBar.style.transform = "translateY(-100%)";
-                offerBar.style.opacity = "0";
-                localStorage.setItem(
-                    "typixel_offer_closed_until",
-                    String(Date.now() + 24 * 60 * 60 * 1000)
-                );
-                setTimeout(() => offerBar.remove(), 350);
-            });
+    /* Offer bar is permanently visible */
+    offerBar.style.display = "block";
 
-            if (typixelOffer.autoScroll) {
-                const track = document.getElementById("offer-track");
-                let position = 0;
-                let lastTime = performance.now();
+    if (typixelOffer.autoScroll) {
+        const track = document.getElementById("offer-track");
+        let position = 0;
+        let lastTime = performance.now();
 
-                function animateOffer(now) {
-                    if (!document.body.contains(track)) return;
-                    const delta = Math.min(now - lastTime, 50);
-                    lastTime = now;
-                    position -= delta * 0.025;
+        function animateOffer(now) {
+            if (!document.body.contains(track)) return;
 
-                    if (Math.abs(position) > track.scrollWidth / 2) position = 0;
-                    track.style.transform = `translateX(${position}px)`;
-                    requestAnimationFrame(animateOffer);
-                }
-                requestAnimationFrame(animateOffer);
+            const delta = Math.min(now - lastTime, 50);
+            lastTime = now;
+            position -= delta * 0.025;
+
+            if (Math.abs(position) > track.scrollWidth / 2) {
+                position = 0;
             }
-        }
-    } else if (offerBar) {
-        offerBar.remove();
-    }
 
+            track.style.transform = `translateX(${position}px)`;
+            requestAnimationFrame(animateOffer);
+        }
+
+        requestAnimationFrame(animateOffer);
+    }
+} else if (offerBar) {
+    offerBar.remove();
+}
     /* ---------- INSTAGRAM GRID ---------- */
     const grid = document.getElementById("instagram-grid");
 
