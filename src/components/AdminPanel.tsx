@@ -15,18 +15,40 @@ import {
   Save,
   Wrench,
   BookOpen,
-  Pencil
+  Pencil,
+  Globe,
+  MapPin,
+  Target,
+  Users,
+  Compass,
+  Copy,
+  Check,
+  Download,
+  Upload,
+  Database,
+  ShieldCheck,
+  Sparkles,
+  ExternalLink,
+  ArrowLeft
 } from 'lucide-react';
 import {
   ShowcaseItem,
+  SHOWCASE_PRESET_IMAGES,
+  normalizeShowcaseImagePath,
   saveProjectsToStorage,
-  resetProjectsToDefault,
   SHOWCASE_ROW_1,
   SHOWCASE_ROW_2
 } from '../data/showcaseData.ts';
 import { ContactConfig, saveContactConfigToStorage } from '../data/contactConfig.ts';
 import { ExperiencedTool, DEFAULT_TOOLS, saveToolsToStorage, resetToolsToDefault } from '../data/toolsData.ts';
 import { BlogPost, DEFAULT_BLOG_POSTS, saveBlogPostsToStorage, resetBlogPostsToDefault } from '../data/blogData.ts';
+import {
+  SeoStrategyData,
+  DEFAULT_SEO_STRATEGY,
+  getStoredSeoStrategy,
+  saveSeoStrategyToStorage,
+  resetSeoStrategyToDefault
+} from '../data/seoStrategyConfig.ts';
 import { AppLogo } from './AppLogo.tsx';
 
 interface AdminPanelProps {
@@ -93,47 +115,36 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   const [showChangeNewPassword, setShowChangeNewPassword] = useState(false);
   const [changePasswordError, setChangePasswordError] = useState('');
 
-  // Admin Dashboard Tabs & Toast
-  type AdminTab = 'add' | 'manage' | 'tools' | 'blog' | 'settings';
-  const [activeTab, setActiveTab] = useState<AdminTab>('add');
+  // Admin Dashboard Tabs & Toast (includes SEO Control & Backup)
+  type AdminTab = 'seocontrol' | 'add' | 'manage' | 'tools' | 'blog' | 'settings' | 'backup';
+  const [activeTab, setActiveTab] = useState<AdminTab>('seocontrol');
   const [successToast, setSuccessToast] = useState('');
 
-  // Form state for adding new project
+  // SEO Publishing Strategy & Metadata state
+  const [seoStrategy, setSeoStrategy] = useState<SeoStrategyData>(() => getStoredSeoStrategy());
+  const [copiedSeoField, setCopiedSeoField] = useState<string | null>(null);
+  const [backupRestoreError, setBackupRestoreError] = useState('');
+
+  // Form state for adding new project (Only fields showing on website)
   const [newTitle, setNewTitle] = useState('');
   const [newSubtitle, setNewSubtitle] = useState('');
-  const [newClient, setNewClient] = useState('');
   const [newCategory, setNewCategory] = useState('Event Branding & Poster');
   const [customCategoryName, setCustomCategoryName] = useState('');
-  const [newYear, setNewYear] = useState('2026');
+  const [newBadge, setNewBadge] = useState('');
   const [newRow, setNewRow] = useState<1 | 2>(1);
-  const [newMediaType, setNewMediaType] = useState<'image' | 'video'>('image');
-  const [newVideoUrl, setNewVideoUrl] = useState('');
-  const [newDuration, setNewDuration] = useState('');
   const [newImageUrl, setNewImageUrl] = useState('');
-  const [newDimensions, setNewDimensions] = useState('1080 × 1350 px (Digital Poster)');
-  const [newTools, setNewTools] = useState('Adobe Illustrator, Photoshop');
-  const [newLanguages, setNewLanguages] = useState('English, Malayalam');
-  const [newDescription, setNewDescription] = useState('');
-  const [newKeyFeatures, setNewKeyFeatures] = useState('Custom typography, High-contrast visual structure, Multi-format rollout');
+  const [projectMediaMode, setProjectMediaMode] = useState<'preset' | 'upload' | 'link'>('preset');
 
   // Form state for editing existing showcase project
   const [editingProject, setEditingProject] = useState<ShowcaseItem | null>(null);
   const [editTitle, setEditTitle] = useState('');
   const [editSubtitle, setEditSubtitle] = useState('');
-  const [editClient, setEditClient] = useState('');
   const [editCategory, setEditCategory] = useState('Event Branding & Poster');
   const [editCustomCategory, setEditCustomCategory] = useState('');
-  const [editYear, setEditYear] = useState('2026');
+  const [editBadge, setEditBadge] = useState('');
   const [editRow, setEditRow] = useState<1 | 2>(1);
-  const [editMediaType, setEditMediaType] = useState<'image' | 'video'>('image');
-  const [editVideoUrl, setEditVideoUrl] = useState('');
-  const [editDuration, setEditDuration] = useState('');
   const [editImageUrl, setEditImageUrl] = useState('');
-  const [editDimensions, setEditDimensions] = useState('');
-  const [editTools, setEditTools] = useState('');
-  const [editLanguages, setEditLanguages] = useState('');
-  const [editDescription, setEditDescription] = useState('');
-  const [editKeyFeatures, setEditKeyFeatures] = useState('');
+  const [editMediaMode, setEditMediaMode] = useState<'preset' | 'upload' | 'link'>('link');
 
   // Form state for adding/editing Experienced Tools
   const [newToolName, setNewToolName] = useState('');
@@ -258,6 +269,85 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   };
 
   // --- Project Add / Edit / Delete ---
+  // Automatic Canvas Image Compressor: prevents browser 5MB localStorage quota errors
+  const compressImageFile = (file: File, callback: (compressedDataUrl: string) => void) => {
+    if (file.type === 'video/mp4' || file.name.toLowerCase().endsWith('.mp4')) {
+      const reader = new FileReader();
+      reader.onload = (e) => callback(e.target?.result as string);
+      reader.readAsDataURL(file);
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const rawUrl = event.target?.result as string;
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const MAX_WIDTH = 1200;
+        const MAX_HEIGHT = 1500;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > MAX_WIDTH) {
+            height = Math.round((height * MAX_WIDTH) / width);
+            width = MAX_WIDTH;
+          }
+        } else {
+          if (height > MAX_HEIGHT) {
+            width = Math.round((width * MAX_HEIGHT) / height);
+            height = MAX_HEIGHT;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          const compressed = canvas.toDataURL('image/jpeg', 0.82);
+          callback(compressed);
+        } else {
+          callback(rawUrl);
+        }
+      };
+      img.onerror = () => callback(rawUrl);
+      img.src = rawUrl;
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleProjectFileUpload = (e: React.ChangeEvent<HTMLInputElement>, isEdit = false) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    compressImageFile(file, (dataUrl) => {
+      if (isEdit) {
+        setEditImageUrl(dataUrl);
+      } else {
+        setNewImageUrl(dataUrl);
+      }
+    });
+  };
+
+  const handleSelectPreset = (preset: typeof SHOWCASE_PRESET_IMAGES[0], isEdit = false) => {
+    if (isEdit) {
+      setEditImageUrl(preset.path);
+      if (!editTitle || editTitle === 'New Project') setEditTitle(preset.defaultTitle);
+      if (!editSubtitle) setEditSubtitle(preset.defaultSubtitle);
+      setEditCategory(preset.defaultCategory);
+      setEditBadge(preset.defaultBadge);
+      setEditRow(preset.row);
+    } else {
+      setNewImageUrl(preset.path);
+      setNewTitle(preset.defaultTitle);
+      setNewSubtitle(preset.defaultSubtitle);
+      setNewCategory(preset.defaultCategory);
+      setNewBadge(preset.defaultBadge);
+      setNewRow(preset.row);
+    }
+  };
+
   const handleAddProject = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newTitle.trim()) return;
@@ -267,29 +357,30 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
         ? (customCategoryName.trim() || 'Custom Project')
         : newCategory;
 
+    const mediaUrl = normalizeShowcaseImagePath(newImageUrl.trim());
+    const isVideo = mediaUrl.toLowerCase().includes('.mp4');
+
     const newItem: ShowcaseItem = {
       id: `proj-${Date.now()}`,
       title: newTitle.trim(),
-      subtitle: newSubtitle.trim() || 'Visual Branding & Creative Poster Art',
-      client: newClient.trim() || 'Studio Commission',
+      subtitle: newSubtitle.trim() || '',
+      client: '',
       category: resolvedCategory,
-      year: newYear.trim() || '2026',
+      year: '2026',
       githubUrl: 'https://github.com/typixelofficial/portfolio',
-      badge: newMediaType === 'video' ? 'Autoplay Reel' : 'New Work',
-      accentColor: newMediaType === 'video' ? '#8B5CF6' : '#171717',
-      aspect: newMediaType === 'video' ? '9/16' : '4/5',
-      dimensions: newDimensions.trim() || (newMediaType === 'video' ? '1080 × 1920 px (Reel)' : '1080 × 1350 px (Digital)'),
-      tools: newTools.split(',').map((t) => t.trim()).filter(Boolean),
-      description:
-        newDescription.trim() ||
-        'Custom creative work from GitHub repository designed with high-impact typography and distinctive art direction.',
-      keyFeatures: newKeyFeatures.split(',').map((f) => f.trim()).filter(Boolean),
-      languages: newLanguages.split(',').map((l) => l.trim()).filter(Boolean),
-      imageUrl: newImageUrl.trim() || undefined,
-      mediaType: newMediaType,
-      videoUrl: newVideoUrl.trim() || undefined,
-      duration: newDuration.trim() || undefined,
-      type: newMediaType === 'video' ? 'video' : 'custom',
+      badge: newBadge.trim() || (isVideo ? 'Video Reel' : 'Poster Art'),
+      accentColor: isVideo ? '#8B5CF6' : '#171717',
+      aspect: isVideo ? '9/16' : '4/5',
+      dimensions: isVideo ? '1080 × 1920 px (Reel)' : '1080 × 1350 px',
+      tools: [],
+      description: '',
+      keyFeatures: [],
+      languages: [],
+      imageUrl: isVideo ? undefined : (mediaUrl || undefined),
+      mediaType: isVideo ? 'video' : 'image',
+      videoUrl: isVideo ? mediaUrl : undefined,
+      duration: isVideo ? '0:20' : undefined,
+      type: isVideo ? 'video' : 'custom',
       row: newRow
     };
 
@@ -307,11 +398,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
 
     setNewTitle('');
     setNewSubtitle('');
-    setNewClient('');
+    setNewBadge('');
     setNewImageUrl('');
-    setNewVideoUrl('');
-    setNewDuration('');
-    setNewDescription('');
     setCustomCategoryName('');
 
     setSuccessToast(`Project "${newItem.title}" added to Row ${newRow}!`);
@@ -321,8 +409,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   const handleStartEditProject = (item: ShowcaseItem & { assignedRow: number }) => {
     setEditingProject(item);
     setEditTitle(item.title);
-    setEditSubtitle(item.subtitle);
-    setEditClient(item.client);
+    setEditSubtitle(item.subtitle || '');
+    setEditBadge(item.badge || '');
 
     const standardCategories = [
       'Event Branding & Poster',
@@ -343,17 +431,9 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       setEditCustomCategory(item.category);
     }
 
-    setEditYear(item.year);
     setEditRow(item.assignedRow as 1 | 2);
-    setEditMediaType(item.mediaType || (item.videoUrl ? 'video' : 'image'));
-    setEditVideoUrl(item.videoUrl || '');
-    setEditDuration(item.duration || '');
-    setEditImageUrl(item.imageUrl || '');
-    setEditDimensions(item.dimensions);
-    setEditTools(item.tools.join(', '));
-    setEditLanguages(item.languages.join(', '));
-    setEditDescription(item.description);
-    setEditKeyFeatures(item.keyFeatures.join(', '));
+    setEditImageUrl(item.imageUrl || item.videoUrl || '');
+    setEditMediaMode('link');
   };
 
   const handleSaveEditProject = (e: React.FormEvent) => {
@@ -365,22 +445,18 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
         ? (editCustomCategory.trim() || 'Custom Project')
         : editCategory;
 
+    const mediaUrl = normalizeShowcaseImagePath(editImageUrl.trim());
+    const isVideo = mediaUrl.toLowerCase().includes('.mp4');
+
     const updatedItem: ShowcaseItem = {
       ...editingProject,
       title: editTitle.trim() || editingProject.title,
       subtitle: editSubtitle.trim() || editingProject.subtitle,
-      client: editClient.trim() || editingProject.client,
       category: resolvedCategory,
-      year: editYear.trim() || editingProject.year,
-      dimensions: editDimensions.trim() || editingProject.dimensions,
-      tools: editTools.split(',').map((t) => t.trim()).filter(Boolean),
-      languages: editLanguages.split(',').map((l) => l.trim()).filter(Boolean),
-      description: editDescription.trim() || editingProject.description,
-      keyFeatures: editKeyFeatures.split(',').map((f) => f.trim()).filter(Boolean),
-      imageUrl: editImageUrl.trim() || undefined,
-      mediaType: editMediaType,
-      videoUrl: editVideoUrl.trim() || undefined,
-      duration: editDuration.trim() || undefined,
+      badge: editBadge.trim() || editingProject.badge || (isVideo ? 'Video Reel' : 'Poster Art'),
+      imageUrl: isVideo ? undefined : (mediaUrl || undefined),
+      mediaType: isVideo ? 'video' : 'image',
+      videoUrl: isVideo ? mediaUrl : undefined,
       row: editRow
     };
 
@@ -403,6 +479,22 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
     setTimeout(() => setSuccessToast(''), 3000);
   };
 
+  const handleToggleProjectRow = (item: ShowcaseItem, currentRow: number) => {
+    const targetRow = (currentRow === 1 ? 2 : 1) as 1 | 2;
+    const updatedItem = { ...item, row: targetRow };
+    let updatedRow1 = row1Projects.filter((p) => p.id !== item.id);
+    let updatedRow2 = row2Projects.filter((p) => p.id !== item.id);
+    if (targetRow === 1) {
+      updatedRow1 = [updatedItem, ...updatedRow1];
+    } else {
+      updatedRow2 = [updatedItem, ...updatedRow2];
+    }
+    saveProjectsToStorage(updatedRow1, updatedRow2);
+    onProjectsUpdated(updatedRow1, updatedRow2);
+    setSuccessToast(`Moved "${item.title}" to Row ${targetRow}`);
+    setTimeout(() => setSuccessToast(''), 3000);
+  };
+
   const handleDeleteProject = (id: string) => {
     const updatedRow1 = row1Projects.filter((p) => p.id !== id);
     const updatedRow2 = row2Projects.filter((p) => p.id !== id);
@@ -410,15 +502,6 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
     onProjectsUpdated(updatedRow1, updatedRow2);
     setSuccessToast('Project deleted successfully.');
     setTimeout(() => setSuccessToast(''), 3000);
-  };
-
-  const handleResetProjectsToDefault = () => {
-    if (confirm('Reset showcase items to original 12 posters?')) {
-      resetProjectsToDefault();
-      onProjectsUpdated(SHOWCASE_ROW_1, SHOWCASE_ROW_2);
-      setSuccessToast('Showcase reset to 12 original projects.');
-      setTimeout(() => setSuccessToast(''), 3000);
-    }
   };
 
   // --- Experienced Tools Add / Delete ---
@@ -544,78 +627,231 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
     setTimeout(() => setSuccessToast(''), 3000);
   };
 
+  // --- SEO Strategy & Metadata Handlers ---
+  const handleCopySeoText = async (text: string, fieldId: string) => {
+    try {
+      if (navigator.clipboard) {
+        await navigator.clipboard.writeText(text);
+      }
+      setCopiedSeoField(fieldId);
+      setTimeout(() => setCopiedSeoField(null), 2000);
+    } catch {
+      setCopiedSeoField(fieldId);
+      setTimeout(() => setCopiedSeoField(null), 2000);
+    }
+  };
+
+  const handleSaveSeoStrategy = (e: React.FormEvent) => {
+    e.preventDefault();
+    saveSeoStrategyToStorage(seoStrategy);
+    if (seoStrategy.seoTitle) {
+      document.title = seoStrategy.seoTitle;
+    }
+    const metaDescTag = document.querySelector('meta[name="description"]');
+    if (metaDescTag && seoStrategy.metaDescription) {
+      metaDescTag.setAttribute('content', seoStrategy.metaDescription);
+    }
+    setSuccessToast('SEO Strategy & Metadata successfully saved to admincontrol!');
+    setTimeout(() => setSuccessToast(''), 3000);
+  };
+
+  const handleResetSeoStrategy = () => {
+    if (confirm('Reset SEO strategy & metadata to recommended 2026 Kerala & national targets?')) {
+      const def = resetSeoStrategyToDefault();
+      setSeoStrategy(def);
+      setSuccessToast('SEO strategy reset to defaults.');
+      setTimeout(() => setSuccessToast(''), 3000);
+    }
+  };
+
+  // --- admincontrol Backup & Restore Handlers ---
+  const handleExportBackup = () => {
+    const backupData = {
+      backupName: 'admincontrol',
+      version: '2026.1',
+      exportedAt: new Date().toISOString(),
+      showcaseRow1: row1Projects,
+      showcaseRow2: row2Projects,
+      tools,
+      blogPosts,
+      seoStrategy,
+      contactConfig: {
+        email: settingsEmail,
+        whatsappNumber: settingsWhatsApp
+      }
+    };
+
+    const blob = new Blob([JSON.stringify(backupData, null, 2)], {
+      type: 'application/json'
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `typixel_admincontrol_backup_${new Date().toISOString().slice(0, 10)}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    setSuccessToast('Full system backup downloaded (admincontrol backup)!');
+    setTimeout(() => setSuccessToast(''), 3500);
+  };
+
+  const handleImportBackup = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const text = event.target?.result as string;
+        const data = JSON.parse(text);
+
+        if (!data || typeof data !== 'object') {
+          throw new Error('Invalid JSON structure');
+        }
+
+        if (Array.isArray(data.showcaseRow1) && Array.isArray(data.showcaseRow2)) {
+          saveProjectsToStorage(data.showcaseRow1, data.showcaseRow2);
+          onProjectsUpdated(data.showcaseRow1, data.showcaseRow2);
+        }
+
+        if (Array.isArray(data.tools) && onToolsUpdated) {
+          saveToolsToStorage(data.tools);
+          onToolsUpdated(data.tools);
+        }
+
+        if (Array.isArray(data.blogPosts) && onBlogPostsUpdated) {
+          saveBlogPostsToStorage(data.blogPosts);
+          onBlogPostsUpdated(data.blogPosts);
+        }
+
+        if (data.seoStrategy) {
+          saveSeoStrategyToStorage(data.seoStrategy);
+          setSeoStrategy(data.seoStrategy);
+        }
+
+        if (data.contactConfig) {
+          saveContactConfigToStorage(data.contactConfig.email, data.contactConfig.whatsappNumber);
+          onContactConfigUpdated(data.contactConfig);
+          setSettingsEmail(data.contactConfig.email);
+          setSettingsWhatsApp(data.contactConfig.whatsappNumber);
+        }
+
+        setBackupRestoreError('');
+        setSuccessToast('Backup successfully restored into admincontrol!');
+        setTimeout(() => setSuccessToast(''), 4000);
+      } catch (err) {
+        console.error('Backup import error:', err);
+        setBackupRestoreError('Failed to parse backup JSON. Please check file format.');
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  };
+
+  if (!isOpen) return null;
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
-      <div
-        className="bg-white rounded-[28px] sm:rounded-3xl max-w-4xl w-full max-h-[92vh] overflow-hidden flex flex-col shadow-2xl border border-neutral-200 text-neutral-900 animate-in zoom-in-95 duration-200"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Header Bar */}
-        <div className="px-6 sm:px-8 py-5 border-b border-neutral-100 flex items-center justify-between gap-4 bg-white">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-neutral-900 text-white flex items-center justify-center shadow-xs">
-              <Lock className="w-4 h-4" />
-            </div>
-            <div>
-              <h3 className="text-base sm:text-lg font-bold text-neutral-900 leading-tight">
-                Admin Control Room
-              </h3>
-              <p className="text-xs text-neutral-500">
-                Showcase Posters, Software Tools, Blog &amp; Contact
-              </p>
-            </div>
+    <div className="min-h-screen w-full bg-[#EAE8E3] text-neutral-900 flex flex-col selection:bg-neutral-900 selection:text-white">
+      {/* Top Header Bar for Separate Admin Page */}
+      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-neutral-200/90 px-4 sm:px-8 py-3.5 flex items-center justify-between gap-4 shadow-xs">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-neutral-900 text-white flex items-center justify-center shadow-xs">
+            <Lock className="w-4 h-4" />
           </div>
-
-          <div className="flex items-center gap-2">
-            {isAuthenticated && (
-              <>
-                <button
-                  onClick={() => setIsChangePasswordOpen(true)}
-                  className="inline-flex items-center gap-1.5 text-xs text-neutral-800 hover:text-black bg-[#F5F4F0] hover:bg-[#EAE8E2] border border-neutral-200/80 px-3 py-1.5 rounded-xl transition-colors cursor-pointer"
-                >
-                  <KeyRound className="w-3.5 h-3.5 text-neutral-700" />
-                  <span className="hidden sm:inline">Password</span>
-                </button>
-
-                <button
-                  onClick={handleLogout}
-                  className="inline-flex items-center gap-1.5 text-xs text-neutral-800 hover:text-black bg-[#F5F4F0] hover:bg-[#EAE8E2] border border-neutral-200/80 px-3 py-1.5 rounded-xl transition-colors cursor-pointer"
-                >
-                  <LogOut className="w-3.5 h-3.5 text-neutral-700" />
-                  <span className="hidden sm:inline">Logout</span>
-                </button>
-              </>
-            )}
-
-            <button
-              onClick={onClose}
-              className="w-8 h-8 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-700 flex items-center justify-center transition-colors cursor-pointer"
-            >
-              <X className="w-4 h-4" />
-            </button>
+          <div>
+            <div className="flex items-center gap-2">
+              <h1 className="text-base sm:text-lg font-bold text-neutral-900 leading-tight">
+                Typixel Admin Control
+              </h1>
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-neutral-100 text-neutral-700 font-semibold border border-neutral-200">
+                admincontrol
+              </span>
+              {isAuthenticated && (
+                <span className="hidden sm:inline-flex items-center gap-1.5 text-[10px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  Live Studio
+                </span>
+              )}
+            </div>
+            <p className="text-xs text-neutral-500">
+              {isAuthenticated
+                ? 'Showcase, SEO Strategy, Backup & Control Room'
+                : 'Protected Access — Sign in required to view or edit'}
+            </p>
           </div>
         </div>
 
-        {/* Success Toast */}
-        {successToast && (
-          <div className="bg-neutral-900 text-white px-6 py-2.5 flex items-center gap-2 text-xs font-medium">
-            <CheckCircle className="w-4 h-4 text-white shrink-0" />
-            <span>{successToast}</span>
-          </div>
-        )}
+        <div className="flex items-center gap-2">
+          {isAuthenticated && (
+            <>
+              <button
+                onClick={handleExportBackup}
+                className="hidden md:inline-flex items-center gap-1.5 text-xs text-neutral-800 hover:text-black bg-[#F5F4F0] hover:bg-[#EAE8E2] border border-neutral-200/80 px-3 py-1.5 rounded-xl transition-colors cursor-pointer"
+                title="Download admincontrol Backup JSON"
+              >
+                <Download className="w-3.5 h-3.5 text-neutral-700" />
+                <span>Backup</span>
+              </button>
 
-        {/* Auth Barrier if not logged in */}
-        {!isAuthenticated ? (
-          <div className="p-8 sm:p-12 flex-1 flex flex-col items-center justify-center max-w-md mx-auto w-full text-center">
-            <div className="w-12 h-12 rounded-2xl bg-neutral-100 flex items-center justify-center text-neutral-800 mb-4 border border-neutral-200">
-              <Lock className="w-6 h-6" />
+              <button
+                onClick={() => setIsChangePasswordOpen(true)}
+                className="hidden sm:inline-flex items-center gap-1.5 text-xs text-neutral-800 hover:text-black bg-[#F5F4F0] hover:bg-[#EAE8E2] border border-neutral-200/80 px-3 py-1.5 rounded-xl transition-colors cursor-pointer"
+              >
+                <KeyRound className="w-3.5 h-3.5 text-neutral-700" />
+                <span>Password</span>
+              </button>
+
+              <button
+                onClick={handleLogout}
+                className="inline-flex items-center gap-1.5 text-xs text-neutral-800 hover:text-black bg-[#F5F4F0] hover:bg-[#EAE8E2] border border-neutral-200/80 px-3 py-1.5 rounded-xl transition-colors cursor-pointer"
+              >
+                <LogOut className="w-3.5 h-3.5 text-neutral-700" />
+                <span className="hidden sm:inline">Logout</span>
+              </button>
+            </>
+          )}
+
+          <button
+            onClick={onClose}
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-neutral-900 bg-neutral-100 hover:bg-neutral-200 border border-neutral-300/80 px-3.5 py-1.5 rounded-xl transition-colors cursor-pointer"
+            title="Return to Public Portfolio Website"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Back to Portfolio</span>
+            <span className="sm:hidden">Exit</span>
+          </button>
+        </div>
+      </header>
+
+      {/* Success Toast */}
+      {successToast && (
+        <div className="bg-neutral-900 text-white px-6 py-2.5 flex items-center justify-center gap-2 text-xs font-medium shadow-md sticky top-[61px] z-30">
+          <CheckCircle className="w-4 h-4 text-white shrink-0" />
+          <span>{successToast}</span>
+        </div>
+      )}
+
+      {/* Auth Barrier if not logged in - STRICT: can't see or edit anything without login */}
+      {!isAuthenticated ? (
+        <div className="flex-1 flex items-center justify-center p-4 sm:p-8">
+          <div className="bg-white rounded-[28px] sm:rounded-3xl max-w-md w-full p-8 sm:p-10 shadow-xl border border-neutral-200/90 text-center animate-in zoom-in-95 duration-200">
+            <div className="w-14 h-14 rounded-2xl bg-neutral-900 flex items-center justify-center text-white mb-4 mx-auto shadow-md">
+              <Lock className="w-7 h-7" />
             </div>
 
-            <h4 className="text-xl font-bold text-neutral-900 mb-1">
-              Admin Access
-            </h4>
-            <p className="text-xs text-neutral-500 mb-6">
-              Enter your admin credentials to manage portfolio items and settings.
+            <div className="flex items-center justify-center gap-2 mb-1">
+              <h2 className="text-xl sm:text-2xl font-bold text-neutral-900">
+                Typixel Admin Control
+              </h2>
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-neutral-100 text-neutral-700 font-semibold border border-neutral-200">
+                admincontrol
+              </span>
+            </div>
+
+            <p className="text-xs sm:text-[13px] text-neutral-500 mb-6 leading-relaxed">
+              Login is required to view, edit, or configure portfolio showcase, SEO strategy architecture, or backups.
             </p>
 
             {authView === 'login' ? (
@@ -749,12 +985,72 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                 </div>
               </form>
             )}
+
+            <div className="mt-6 pt-4 border-t border-neutral-100">
+              <button
+                type="button"
+                onClick={onClose}
+                className="inline-flex items-center gap-1.5 text-xs font-medium text-neutral-500 hover:text-neutral-900 transition-colors cursor-pointer"
+              >
+                <ArrowLeft className="w-3.5 h-3.5" />
+                <span>Return to Portfolio Website</span>
+              </button>
+            </div>
           </div>
-        ) : (
-          /* Logged In Dashboard with 5 Tabs */
-          <div className="flex flex-col flex-1 overflow-hidden">
+        </div>
+      ) : (
+        /* Logged In Full Page Dashboard */
+        <div className="flex-1 w-full max-w-6xl mx-auto px-4 sm:px-6 md:px-8 py-6 sm:py-8 flex flex-col gap-6">
+          {/* Overview Banner Card */}
+          <div className="bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-neutral-200/90 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2">
+                <h2 className="text-lg sm:text-xl font-bold text-neutral-900">
+                  Control Room &amp; Content Manager
+                </h2>
+                <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  Live
+                </span>
+              </div>
+              <p className="text-xs sm:text-sm text-neutral-500 mt-0.5">
+                Manage showcase posters, software marquee tools, SEO keyword strategy, and system backups.
+              </p>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                onClick={() => setActiveTab('backup')}
+                className="inline-flex items-center gap-1.5 text-xs font-medium bg-[#F5F4F0] hover:bg-[#EAE8E2] border border-neutral-200 text-neutral-800 px-3 py-1.5 rounded-xl transition-colors cursor-pointer"
+              >
+                <Database className="w-3.5 h-3.5 text-neutral-700" />
+                <span>Backup ({row1Projects.length + row2Projects.length} Projects)</span>
+              </button>
+              <button
+                onClick={onClose}
+                className="inline-flex items-center gap-1.5 text-xs font-semibold bg-neutral-900 hover:bg-black text-white px-3.5 py-1.5 rounded-xl shadow-xs transition-colors cursor-pointer"
+              >
+                <ExternalLink className="w-3.5 h-3.5" />
+                <span>View Live Website</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Main Tabbed Workspace in Card */}
+          <div className="bg-white rounded-2xl sm:rounded-3xl border border-neutral-200/90 shadow-sm overflow-hidden flex flex-col">
             {/* Tab Navigation */}
             <div className="px-6 sm:px-8 pt-3 pb-2 flex items-center gap-2 border-b border-neutral-100 bg-white overflow-x-auto scrollbar-none">
+              <button
+                onClick={() => setActiveTab('seocontrol')}
+                className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer shrink-0 ${
+                  activeTab === 'seocontrol'
+                    ? 'bg-neutral-900 text-white shadow-2xs'
+                    : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
+                }`}
+              >
+                <Target className="w-3.5 h-3.5 text-emerald-500" />
+                <span>SEO Strategy Control</span>
+              </button>
+
               <button
                 onClick={() => setActiveTab('add')}
                 className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer shrink-0 ${
@@ -804,269 +1100,779 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                 <Mail className="w-3.5 h-3.5" />
                 <span>Contact &amp; EmailJS</span>
               </button>
+
+              <button
+                onClick={() => setActiveTab('backup')}
+                className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer shrink-0 ${
+                  activeTab === 'backup'
+                    ? 'bg-neutral-900 text-white shadow-2xs'
+                    : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
+                }`}
+              >
+                <Database className="w-3.5 h-3.5 text-purple-500" />
+                <span>admincontrol Backup</span>
+              </button>
             </div>
 
             {/* Tab Body */}
             <div className="p-6 sm:p-8 overflow-y-auto flex-1">
-              {/* TAB 1: ADD NEW SHOWCASE PROJECT */}
-              {activeTab === 'add' && (
-                <form onSubmit={handleAddProject} className="space-y-5 max-w-3xl">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-xs font-bold uppercase tracking-wider text-neutral-600 mb-1">
-                        Project Title *
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        placeholder="e.g. AFC Champions Cup Final"
-                        value={newTitle}
-                        onChange={(e) => setNewTitle(e.target.value)}
-                        className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900/10 focus:border-neutral-900"
-                      />
+              {/* TAB: SEO STRATEGY & METADATA CONTROL */}
+              {activeTab === 'seocontrol' && (
+                <div className="space-y-6 max-w-4xl">
+                  {/* Top Header Card matching the removed banner */}
+                  <div className="bg-[#FAF9F6] border border-neutral-200/90 rounded-2xl p-5 sm:p-6 shadow-xs">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-neutral-200/60">
+                      <div>
+                        <div className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-800 bg-emerald-100/90 px-2.5 py-0.5 rounded-full mb-1.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
+                          <span>SEO Publishing Strategy — 2026 Live Architecture</span>
+                        </div>
+                        <h3 className="text-base sm:text-lg font-bold text-neutral-900">
+                          Organic Visibility &amp; Lead Generation Architecture
+                        </h3>
+                        <p className="text-xs text-neutral-500 mt-0.5">
+                          Configure live search targets for Kerala, Malappuram &amp; national enquiries.
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1.5 text-xs font-mono text-neutral-700 bg-white px-3 py-1.5 rounded-xl border border-neutral-200 shadow-2xs">
+                          <Globe className="w-3.5 h-3.5 text-neutral-800" />
+                          <span>{seoStrategy.domain}</span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={handleResetSeoStrategy}
+                          className="p-2 hover:bg-neutral-200 text-neutral-600 rounded-xl transition-colors cursor-pointer"
+                          title="Reset to 2026 defaults"
+                        >
+                          <RotateCcw className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                     </div>
 
-                    <div>
-                      <label className="block text-xs font-bold uppercase tracking-wider text-neutral-600 mb-1">
-                        Subtitle / Tagline
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="e.g. Official Matchday Event Poster"
-                        value={newSubtitle}
-                        onChange={(e) => setNewSubtitle(e.target.value)}
-                        className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900/10 focus:border-neutral-900"
-                      />
+                    {/* 4 Strategic Pillars Grid */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-4">
+                      {/* Primary Target */}
+                      <div className="bg-white p-3.5 rounded-xl border border-neutral-200/80">
+                        <div className="flex items-center justify-between gap-1 mb-1.5">
+                          <div className="flex items-center gap-1.5 text-[11px] font-bold text-neutral-400 uppercase tracking-wider">
+                            <Target className="w-3 h-3 text-neutral-700" />
+                            <span>Primary Target</span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => handleCopySeoText(seoStrategy.primaryTarget, 'strat-target')}
+                            className="p-1 hover:bg-neutral-100 rounded text-neutral-500 cursor-pointer"
+                            title="Copy target"
+                          >
+                            {copiedSeoField === 'strat-target' ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
+                          </button>
+                        </div>
+                        <p className="text-xs font-semibold text-neutral-800 leading-snug">
+                          {seoStrategy.primaryTarget}
+                        </p>
+                      </div>
+
+                      {/* Location Focus */}
+                      <div className="bg-white p-3.5 rounded-xl border border-neutral-200/80">
+                        <div className="flex items-center justify-between gap-1 mb-1.5">
+                          <div className="flex items-center gap-1.5 text-[11px] font-bold text-neutral-400 uppercase tracking-wider">
+                            <MapPin className="w-3 h-3 text-rose-600" />
+                            <span>Location Focus</span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => handleCopySeoText(seoStrategy.locationFocus, 'strat-loc')}
+                            className="p-1 hover:bg-neutral-100 rounded text-neutral-500 cursor-pointer"
+                            title="Copy location"
+                          >
+                            {copiedSeoField === 'strat-loc' ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
+                          </button>
+                        </div>
+                        <p className="text-xs font-semibold text-neutral-800 leading-snug">
+                          {seoStrategy.locationFocus}
+                        </p>
+                      </div>
+
+                      {/* Audience */}
+                      <div className="bg-white p-3.5 rounded-xl border border-neutral-200/80">
+                        <div className="flex items-center justify-between gap-1 mb-1.5">
+                          <div className="flex items-center gap-1.5 text-[11px] font-bold text-neutral-400 uppercase tracking-wider">
+                            <Users className="w-3 h-3 text-blue-600" />
+                            <span>Audience</span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => handleCopySeoText(seoStrategy.audience, 'strat-aud')}
+                            className="p-1 hover:bg-neutral-100 rounded text-neutral-500 cursor-pointer"
+                            title="Copy audience"
+                          >
+                            {copiedSeoField === 'strat-aud' ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
+                          </button>
+                        </div>
+                        <p className="text-xs font-semibold text-neutral-800 leading-snug">
+                          {seoStrategy.audience}
+                        </p>
+                      </div>
+
+                      {/* Goal */}
+                      <div className="bg-white p-3.5 rounded-xl border border-neutral-200/80">
+                        <div className="flex items-center justify-between gap-1 mb-1.5">
+                          <div className="flex items-center gap-1.5 text-[11px] font-bold text-neutral-400 uppercase tracking-wider">
+                            <Compass className="w-3 h-3 text-purple-600" />
+                            <span>Goal</span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => handleCopySeoText(seoStrategy.goal, 'strat-goal')}
+                            className="p-1 hover:bg-neutral-100 rounded text-neutral-500 cursor-pointer"
+                            title="Copy goal"
+                          >
+                            {copiedSeoField === 'strat-goal' ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
+                          </button>
+                        </div>
+                        <p className="text-xs font-semibold text-neutral-800 leading-snug">
+                          {seoStrategy.goal}
+                        </p>
+                      </div>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div>
-                      <label className="block text-xs font-bold uppercase tracking-wider text-neutral-600 mb-1">
-                        Category / Project Type
-                      </label>
-                      <select
-                        value={newCategory}
-                        onChange={(e) => setNewCategory(e.target.value)}
-                        className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900/10 focus:border-neutral-900"
+                  {/* Editable SEO Settings & Metadata Form */}
+                  <form onSubmit={handleSaveSeoStrategy} className="space-y-4 bg-white border border-neutral-200 rounded-2xl p-6">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-neutral-100">
+                      <div>
+                        <h4 className="text-sm font-bold text-neutral-900">1. Verified SEO Settings &amp; Metadata Control</h4>
+                        <p className="text-xs text-neutral-500">Edit or copy live values used for search engine indexing and social cards.</p>
+                      </div>
+                      <button
+                        type="submit"
+                        className="inline-flex items-center gap-1.5 px-4 py-2 bg-neutral-900 hover:bg-black text-white rounded-xl text-xs font-semibold cursor-pointer shadow-xs transition-colors self-start sm:self-auto"
                       >
-                        <option value="Event Branding & Poster">Event Branding &amp; Poster</option>
-                        <option value="Matchday Sports Poster">Matchday Sports Poster</option>
-                        <option value="Editorial Typography">Editorial Typography</option>
-                        <option value="Digital Artwork & Manipulation">Digital Artwork &amp; Manipulation</option>
-                        <option value="Product & Packaging Mockup">Product &amp; Packaging Mockup</option>
-                        <option value="Social Media Campaign">Social Media Campaign</option>
-                        <option value="Visual Identity & Logo">Visual Identity &amp; Logo</option>
-                        <option value="Motion Graphic Poster">Motion Graphic Poster</option>
-                        <option value="Other">Other (Custom Type)...</option>
-                      </select>
+                        <Save className="w-3.5 h-3.5" />
+                        <span>Save SEO Settings</span>
+                      </button>
                     </div>
 
-                    {newCategory === 'Other' && (
+                    {/* Blog Title / H1 */}
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-600">
+                          BLOG TITLE / H1
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => handleCopySeoText(seoStrategy.blogTitle, 'field-blog-title')}
+                          className="inline-flex items-center gap-1 text-[11px] text-neutral-600 hover:text-black font-semibold cursor-pointer"
+                        >
+                          {copiedSeoField === 'field-blog-title' ? (
+                            <>
+                              <Check className="w-3 h-3 text-emerald-600" />
+                              <span className="text-emerald-700">Copied</span>
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="w-3 h-3" />
+                              <span>Copy Blog Title</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
+                      <input
+                        type="text"
+                        required
+                        value={seoStrategy.blogTitle}
+                        onChange={(e) => setSeoStrategy({ ...seoStrategy, blogTitle: e.target.value })}
+                        className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900/10 focus:border-neutral-900 font-medium"
+                      />
+                    </div>
+
+                    {/* SEO Title & URL Slug */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <div className="flex items-center justify-between mb-1">
+                          <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-600">
+                            SEO TITLE (Browser &amp; SERP)
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => handleCopySeoText(seoStrategy.seoTitle, 'field-seo-title')}
+                            className="inline-flex items-center gap-1 text-[11px] text-neutral-600 hover:text-black font-semibold cursor-pointer"
+                          >
+                            {copiedSeoField === 'field-seo-title' ? (
+                              <>
+                                <Check className="w-3 h-3 text-emerald-600" />
+                                <span className="text-emerald-700">Copied</span>
+                              </>
+                            ) : (
+                              <>
+                                <Copy className="w-3 h-3" />
+                                <span>Copy SEO Title</span>
+                              </>
+                            )}
+                          </button>
+                        </div>
+                        <input
+                          type="text"
+                          required
+                          value={seoStrategy.seoTitle}
+                          onChange={(e) => setSeoStrategy({ ...seoStrategy, seoTitle: e.target.value })}
+                          className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900/10 focus:border-neutral-900"
+                        />
+                      </div>
+
+                      <div>
+                        <div className="flex items-center justify-between mb-1">
+                          <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-600">
+                            URL SLUG
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => handleCopySeoText(seoStrategy.urlSlug, 'field-url-slug')}
+                            className="inline-flex items-center gap-1 text-[11px] text-neutral-600 hover:text-black font-semibold cursor-pointer"
+                          >
+                            {copiedSeoField === 'field-url-slug' ? (
+                              <>
+                                <Check className="w-3 h-3 text-emerald-600" />
+                                <span className="text-emerald-700">Copied</span>
+                              </>
+                            ) : (
+                              <>
+                                <Copy className="w-3 h-3" />
+                                <span>Copy Slug</span>
+                              </>
+                            )}
+                          </button>
+                        </div>
+                        <input
+                          type="text"
+                          required
+                          value={seoStrategy.urlSlug}
+                          onChange={(e) => setSeoStrategy({ ...seoStrategy, urlSlug: e.target.value })}
+                          className="w-full text-xs font-mono bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900/10 focus:border-neutral-900"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Meta Description */}
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-600">
+                          META DESCRIPTION (Search snippets &amp; social previews)
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => handleCopySeoText(seoStrategy.metaDescription, 'field-meta-desc')}
+                          className="inline-flex items-center gap-1 text-[11px] text-neutral-600 hover:text-black font-semibold cursor-pointer"
+                        >
+                          {copiedSeoField === 'field-meta-desc' ? (
+                            <>
+                              <Check className="w-3 h-3 text-emerald-600" />
+                              <span className="text-emerald-700">Copied</span>
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="w-3 h-3" />
+                              <span>Copy Meta Description</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
+                      <textarea
+                        rows={3}
+                        required
+                        value={seoStrategy.metaDescription}
+                        onChange={(e) => setSeoStrategy({ ...seoStrategy, metaDescription: e.target.value })}
+                        className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900/10 focus:border-neutral-900 resize-none"
+                      />
+                    </div>
+
+                    {/* Strategic Pillars Editable Fields */}
+                    <div className="pt-3 border-t border-neutral-100 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-600 mb-1">
+                          Primary Target Category
+                        </label>
+                        <input
+                          type="text"
+                          value={seoStrategy.primaryTarget}
+                          onChange={(e) => setSeoStrategy({ ...seoStrategy, primaryTarget: e.target.value })}
+                          className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3 py-2 text-neutral-900"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-600 mb-1">
+                          Location Focus (Regions)
+                        </label>
+                        <input
+                          type="text"
+                          value={seoStrategy.locationFocus}
+                          onChange={(e) => setSeoStrategy({ ...seoStrategy, locationFocus: e.target.value })}
+                          className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3 py-2 text-neutral-900"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-600 mb-1">
+                          Audience Target
+                        </label>
+                        <input
+                          type="text"
+                          value={seoStrategy.audience}
+                          onChange={(e) => setSeoStrategy({ ...seoStrategy, audience: e.target.value })}
+                          className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3 py-2 text-neutral-900"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-600 mb-1">
+                          Core Growth Goal
+                        </label>
+                        <input
+                          type="text"
+                          value={seoStrategy.goal}
+                          onChange={(e) => setSeoStrategy({ ...seoStrategy, goal: e.target.value })}
+                          className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3 py-2 text-neutral-900"
+                        />
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              )}
+
+              {/* TAB 1: ADD NEW SHOWCASE PROJECT */}
+              {activeTab === 'add' && (
+                <div className="space-y-6 max-w-4xl">
+                  {/* Preset Quick Select Banner */}
+                  <div className="bg-[#FAF9F6] border border-neutral-200/90 rounded-2xl p-5 shadow-xs">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+                      <div>
+                        <h4 className="text-sm font-bold text-neutral-900 flex items-center gap-2">
+                          <Sparkles className="w-4 h-4 text-amber-500" />
+                          <span>10 Preset Showcase Artworks</span>
+                        </h4>
+                        <p className="text-xs text-neutral-500">
+                          Click any asset below to auto-fill its artwork, title, category, and marquee row.
+                        </p>
+                      </div>
+                      <span className="text-[11px] font-mono text-neutral-500 bg-white border border-neutral-200 px-2.5 py-0.5 rounded-full self-start sm:self-auto">
+                        1-Click Fill
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
+                      {SHOWCASE_PRESET_IMAGES.map((preset) => {
+                        const isSelected = newImageUrl === preset.path;
+                        return (
+                          <button
+                            key={preset.filename}
+                            type="button"
+                            onClick={() => handleSelectPreset(preset, false)}
+                            className={`group p-2 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
+                              isSelected
+                                ? 'bg-neutral-900 text-white border-neutral-900 shadow-md ring-2 ring-neutral-900/20'
+                                : 'bg-white hover:bg-neutral-50 border-neutral-200 text-neutral-800 hover:border-neutral-400'
+                            }`}
+                          >
+                            <div className="w-full aspect-[4/5] rounded-lg overflow-hidden bg-neutral-900 mb-1.5 relative border border-black/5">
+                              <img
+                                src={preset.path}
+                                alt={preset.name}
+                                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                onError={(e) => {
+                                  // Fallback in case of load glitch
+                                  (e.target as HTMLElement).style.opacity = '0.7';
+                                }}
+                              />
+                              <span className={`absolute top-1 right-1 text-[8px] font-mono font-bold px-1.5 py-0.5 rounded shadow-xs ${
+                                isSelected ? 'bg-emerald-500 text-white' : 'bg-black/70 text-white'
+                              }`}>
+                                R{preset.row}
+                              </span>
+                            </div>
+                            <span className="text-[11px] font-bold truncate block">{preset.name}</span>
+                            <span className={`text-[9px] truncate block ${isSelected ? 'text-neutral-300' : 'text-neutral-500'}`}>
+                              {preset.defaultCategory}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Add Form */}
+                  <form onSubmit={handleAddProject} className="bg-white rounded-2xl border border-neutral-200/90 p-5 sm:p-6 space-y-5 shadow-xs">
+                    <div className="flex items-center justify-between pb-3 border-b border-neutral-100">
+                      <div>
+                        <h4 className="text-base font-bold text-neutral-900">Add Project Details</h4>
+                        <p className="text-xs text-neutral-500">
+                          Configure title, category, media artwork, and marquee row for the continuous showcase.
+                        </p>
+                      </div>
+                      <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-neutral-100 text-neutral-700">
+                        Row {newRow} Showcase
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-xs font-bold uppercase tracking-wider text-neutral-600 mb-1">
-                          Custom Type Name *
+                          Project Title *
                         </label>
                         <input
                           type="text"
                           required
-                          placeholder="e.g. 3D Architectural Visualization"
-                          value={customCategoryName}
-                          onChange={(e) => setCustomCategoryName(e.target.value)}
+                          placeholder="e.g. Skillovia — Growth Arrow Mark"
+                          value={newTitle}
+                          onChange={(e) => setNewTitle(e.target.value)}
                           className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900/10 focus:border-neutral-900"
                         />
                       </div>
-                    )}
 
-                    <div>
-                      <label className="block text-xs font-bold uppercase tracking-wider text-neutral-600 mb-1">
-                        Client / Commission
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="e.g. AFC Football Confederation"
-                        value={newClient}
-                        onChange={(e) => setNewClient(e.target.value)}
-                        className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900/10 focus:border-neutral-900"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-bold uppercase tracking-wider text-neutral-600 mb-1">
-                        Showcase Marquee Row
-                      </label>
-                      <select
-                        value={newRow}
-                        onChange={(e) => setNewRow(Number(e.target.value) as 1 | 2)}
-                        className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900/10 focus:border-neutral-900"
-                      >
-                        <option value={1}>Row 1 (Slides Left)</option>
-                        <option value={2}>Row 2 (Slides Right)</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-xs font-bold uppercase tracking-wider text-neutral-600 mb-1">
-                        Media Format Type
-                      </label>
-                      <select
-                        value={newMediaType}
-                        onChange={(e) => setNewMediaType(e.target.value as 'image' | 'video')}
-                        className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900/10 focus:border-neutral-900 font-semibold"
-                      >
-                        <option value="image">🎨 Static Image / Poster</option>
-                        <option value="video">🎬 Motion Video (.mp4 Reel)</option>
-                      </select>
-                    </div>
-
-                    {newMediaType === 'video' ? (
                       <div>
                         <label className="block text-xs font-bold uppercase tracking-wider text-neutral-600 mb-1">
-                          Video Duration (e.g. 0:28)
+                          Subtitle / Tagline
                         </label>
                         <input
                           type="text"
-                          placeholder="0:28"
-                          value={newDuration}
-                          onChange={(e) => setNewDuration(e.target.value)}
-                          className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none"
+                          placeholder="e.g. Minimalist Vector Emblem & Geometry"
+                          value={newSubtitle}
+                          onChange={(e) => setNewSubtitle(e.target.value)}
+                          className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900/10 focus:border-neutral-900"
                         />
                       </div>
-                    ) : (
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                       <div>
                         <label className="block text-xs font-bold uppercase tracking-wider text-neutral-600 mb-1">
-                          Cover Thumbnail Image URL
+                          Category / Project Type
+                        </label>
+                        <select
+                          value={newCategory}
+                          onChange={(e) => setNewCategory(e.target.value)}
+                          className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900/10 focus:border-neutral-900"
+                        >
+                          <option value="Event Branding & Poster">Event Branding &amp; Poster</option>
+                          <option value="Commercial Poster Design">Commercial Poster Design</option>
+                          <option value="Festive & Cultural Poster">Festive &amp; Cultural Poster</option>
+                          <option value="Visual Identity & Branding">Visual Identity &amp; Branding</option>
+                          <option value="Logo Design & Identity">Logo Design &amp; Identity</option>
+                          <option value="Product & Packaging Mockup">Product &amp; Packaging Mockup</option>
+                          <option value="Event Branding & Invitation">Event Branding &amp; Invitation</option>
+                          <option value="Cultural Poster & Digital Art">Cultural Poster &amp; Digital Art</option>
+                          <option value="Brand Identity & Logo">Brand Identity &amp; Logo</option>
+                          <option value="Spiritual Typography & Poster">Spiritual Typography &amp; Poster</option>
+                          <option value="Social Media Campaign">Social Media Campaign</option>
+                          <option value="Motion Graphic Poster">Motion Graphic Poster</option>
+                          <option value="Other">Other (Custom Type)...</option>
+                        </select>
+                      </div>
+
+                      {newCategory === 'Other' && (
+                        <div>
+                          <label className="block text-xs font-bold uppercase tracking-wider text-neutral-600 mb-1">
+                            Custom Type Name *
+                          </label>
+                          <input
+                            type="text"
+                            required
+                            placeholder="e.g. 3D Architectural Visualization"
+                            value={customCategoryName}
+                            onChange={(e) => setCustomCategoryName(e.target.value)}
+                            className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900/10 focus:border-neutral-900"
+                          />
+                        </div>
+                      )}
+
+                      <div>
+                        <label className="block text-xs font-bold uppercase tracking-wider text-neutral-600 mb-1">
+                          Top-Right Badge / Tag
                         </label>
                         <input
                           type="text"
-                          placeholder="/Works/posters/... or URL"
-                          value={newImageUrl}
-                          onChange={(e) => setNewImageUrl(e.target.value)}
-                          className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none"
+                          placeholder="e.g. Festival Campaign, Brand Monogram"
+                          value={newBadge}
+                          onChange={(e) => setNewBadge(e.target.value)}
+                          className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900/10 focus:border-neutral-900"
                         />
                       </div>
-                    )}
-                  </div>
 
-                  {newMediaType === 'video' && (
-                    <div className="space-y-2 bg-purple-50/70 p-3.5 rounded-xl border border-purple-200/70">
-                      <label className="block text-xs font-bold uppercase tracking-wider text-purple-900">
-                        Video File URL (.mp4) *
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="/Works/videos/... or external mp4 URL"
-                        value={newVideoUrl}
-                        onChange={(e) => setNewVideoUrl(e.target.value)}
-                        className="w-full text-xs bg-white border border-purple-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:outline-none"
-                      />
-                      <div className="flex flex-wrap items-center gap-1.5 text-[10px] text-neutral-600">
-                        <span className="font-semibold text-purple-800">GitHub Presets:</span>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setNewVideoUrl('/Works/videos/typixelofficial_1760175085_3740939313467748252_75216449649.mp4');
-                            setNewImageUrl('/Works/videos/thumb_1.jpg');
-                            setNewDuration('0:28');
-                          }}
-                          className="px-2 py-0.5 bg-purple-100 hover:bg-purple-200 text-purple-800 rounded font-mono"
+                      <div>
+                        <label className="block text-xs font-bold uppercase tracking-wider text-neutral-600 mb-1">
+                          Showcase Marquee Row
+                        </label>
+                        <select
+                          value={newRow}
+                          onChange={(e) => setNewRow(Number(e.target.value) as 1 | 2)}
+                          className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900/10 focus:border-neutral-900"
                         >
-                          Stage Reel (0:28)
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setNewVideoUrl('/Works/videos/typixelofficial_1779419557_3902376391340334772_75216449649.mp4');
-                            setNewImageUrl('/Works/videos/thumb_2.jpg');
-                            setNewDuration('0:24');
-                          }}
-                          className="px-2 py-0.5 bg-purple-100 hover:bg-purple-200 text-purple-800 rounded font-mono"
-                        >
-                          Press Cut (0:24)
-                        </button>
+                          <option value={1}>Row 1 (Slides Left)</option>
+                          <option value={2}>Row 2 (Slides Right)</option>
+                        </select>
                       </div>
                     </div>
-                  )}
 
-                  <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-neutral-600 mb-1">
-                      Creative Concept &amp; Description
-                    </label>
-                    <textarea
-                      rows={3}
-                      placeholder="Describe the typography choices, inspiration, grid structure, and visual treatment..."
-                      value={newDescription}
-                      onChange={(e) => setNewDescription(e.target.value)}
-                      className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900/10 focus:border-neutral-900 resize-none"
-                    />
-                  </div>
+                    {/* Artwork Image or Video */}
+                    <div className="pt-2 border-t border-neutral-100 space-y-3">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                        <label className="block text-xs font-bold uppercase tracking-wider text-neutral-700">
+                          Cover Image / Artwork Source
+                        </label>
+                        <div className="flex items-center gap-1.5 text-[11px] bg-neutral-100 p-1 rounded-xl">
+                          <button
+                            type="button"
+                            onClick={() => setProjectMediaMode('preset')}
+                            className={`px-3 py-1 rounded-lg cursor-pointer transition-colors font-medium ${
+                              projectMediaMode === 'preset'
+                                ? 'bg-white text-neutral-900 font-bold shadow-xs'
+                                : 'text-neutral-600 hover:text-neutral-900'
+                            }`}
+                          >
+                            ⭐ Showcase Assets (10)
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setProjectMediaMode('upload')}
+                            className={`px-3 py-1 rounded-lg cursor-pointer transition-colors font-medium ${
+                              projectMediaMode === 'upload'
+                                ? 'bg-white text-neutral-900 font-bold shadow-xs'
+                                : 'text-neutral-600 hover:text-neutral-900'
+                            }`}
+                          >
+                            📁 Upload File
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setProjectMediaMode('link')}
+                            className={`px-3 py-1 rounded-lg cursor-pointer transition-colors font-medium ${
+                              projectMediaMode === 'link'
+                                ? 'bg-white text-neutral-900 font-bold shadow-xs'
+                                : 'text-neutral-600 hover:text-neutral-900'
+                            }`}
+                          >
+                            🔗 URL / Path
+                          </button>
+                        </div>
+                      </div>
 
-                  <div className="pt-2 flex items-center justify-end">
-                    <button
-                      type="submit"
-                      className="inline-flex items-center gap-2 bg-neutral-900 hover:bg-black text-white px-6 py-2.5 rounded-full text-xs font-semibold shadow-xs transition-colors cursor-pointer"
-                    >
-                      <Plus className="w-4 h-4" />
-                      <span>Add to Showcase</span>
-                    </button>
-                  </div>
-                </form>
+                      {projectMediaMode === 'preset' && (
+                        <div className="p-3 bg-neutral-50 rounded-xl border border-neutral-200">
+                          <p className="text-xs text-neutral-600 mb-2 font-medium">
+                            Current Selected Asset Path:
+                          </p>
+                          <div className="flex items-center gap-3">
+                            <input
+                              type="text"
+                              value={newImageUrl}
+                              onChange={(e) => setNewImageUrl(e.target.value)}
+                              placeholder="/showcase/Chamayam.jpg"
+                              className="flex-1 text-xs bg-white border border-neutral-300 rounded-xl px-3 py-2 text-neutral-900 font-mono"
+                            />
+                            {newImageUrl && (
+                              <div className="w-12 h-14 rounded-lg overflow-hidden border border-neutral-300 shrink-0 bg-neutral-900 shadow-xs">
+                                <img src={normalizeShowcaseImagePath(newImageUrl)} alt="Preview" className="w-full h-full object-cover" />
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {projectMediaMode === 'upload' && (
+                        <div className="p-4 bg-neutral-50 rounded-xl border border-neutral-200 space-y-2">
+                          <div className="flex items-center gap-3">
+                            <input
+                              type="file"
+                              accept="image/*,video/mp4"
+                              onChange={(e) => handleProjectFileUpload(e, false)}
+                              className="w-full text-xs text-neutral-600 file:mr-3 file:py-2 file:px-3.5 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-neutral-900 file:text-white hover:file:bg-black file:cursor-pointer bg-white border border-neutral-200 rounded-xl p-1"
+                            />
+                            {newImageUrl && (
+                              <div className="w-12 h-14 rounded-lg overflow-hidden border border-neutral-300 shrink-0 bg-neutral-900 shadow-xs">
+                                <img src={newImageUrl} alt="Uploaded Preview" className="w-full h-full object-cover" />
+                              </div>
+                            )}
+                          </div>
+                          <p className="text-[11px] text-neutral-500">
+                            ✓ Automatically resized &amp; compressed to high-res Web JPEG. Never fails or hits browser storage limits.
+                          </p>
+                        </div>
+                      )}
+
+                      {projectMediaMode === 'link' && (
+                        <div className="space-y-2">
+                          <input
+                            type="text"
+                            placeholder="/showcase/Chamayam.jpg or https://images.unsplash.com/..."
+                            value={newImageUrl}
+                            onChange={(e) => setNewImageUrl(e.target.value)}
+                            className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900/10 focus:border-neutral-900 font-mono"
+                          />
+                          <div className="flex flex-wrap gap-1.5 text-[10px] text-neutral-500">
+                            <span>Quick presets:</span>
+                            {SHOWCASE_PRESET_IMAGES.slice(0, 5).map((p) => (
+                              <button
+                                key={p.filename}
+                                type="button"
+                                onClick={() => setNewImageUrl(p.path)}
+                                className="underline hover:text-neutral-900 cursor-pointer"
+                              >
+                                {p.filename}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Card Live Preview Banner */}
+                    {newTitle && (
+                      <div className="pt-3 border-t border-neutral-100 flex items-center gap-4 bg-[#FAF9F6] p-3 rounded-xl border border-neutral-200">
+                        <div className="w-14 h-18 rounded-lg overflow-hidden bg-neutral-900 shrink-0 border border-neutral-300 shadow-xs relative">
+                          {newImageUrl ? (
+                            <img src={normalizeShowcaseImagePath(newImageUrl)} alt="Card preview" className="w-full h-full object-cover" />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-white/50 text-[10px] font-mono">
+                              No Art
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <span className="text-[9px] uppercase font-mono px-1.5 py-0.5 rounded bg-neutral-200 text-neutral-700 font-bold">
+                            Live Marquee Preview — Row {newRow}
+                          </span>
+                          <h5 className="text-sm font-bold text-neutral-900 truncate mt-0.5">{newTitle}</h5>
+                          <p className="text-xs text-neutral-500 truncate">{newSubtitle || 'Typixel Creative Showcase'}</p>
+                          <span className="text-[10px] text-neutral-400 font-mono block mt-0.5">{newCategory}</span>
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="pt-2 flex items-center justify-end">
+                      <button
+                        type="submit"
+                        className="inline-flex items-center gap-2 bg-neutral-900 hover:bg-black text-white px-7 py-3 rounded-full text-xs font-semibold shadow-md transition-all cursor-pointer hover:scale-102"
+                      >
+                        <Plus className="w-4 h-4" />
+                        <span>Add Project to Showcase</span>
+                      </button>
+                    </div>
+                  </form>
+                </div>
               )}
 
               {/* TAB 2: MANAGE SHOWCASE PROJECTS */}
               {activeTab === 'manage' && (
                 <div className="space-y-6">
-                  <div className="flex items-center justify-between">
-                    <p className="text-xs text-neutral-500">
-                      View, edit, delete, or reset all current items in Row 1 &amp; Row 2.
-                    </p>
+                  {/* Top Bar with Add Button and Item Count (NO reset to default) */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-[#FAF9F6] rounded-2xl border border-neutral-200/90">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h4 className="text-sm font-bold text-neutral-900">
+                          Showcase Artworks ({row1Projects.length + row2Projects.length} Items Active)
+                        </h4>
+                        <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-semibold border border-emerald-200">
+                          Live Marquee
+                        </span>
+                      </div>
+                      <p className="text-xs text-neutral-500 mt-0.5">
+                        Row 1 ({row1Projects.length} items) slides Left • Row 2 ({row2Projects.length} items) slides Right.
+                      </p>
+                    </div>
+
                     <button
-                      onClick={handleResetProjectsToDefault}
-                      className="inline-flex items-center gap-1.5 text-xs text-neutral-700 hover:text-black bg-[#F5F4F0] hover:bg-[#EAE8E2] border border-neutral-200/80 px-3 py-1.5 rounded-xl transition-colors cursor-pointer"
+                      type="button"
+                      onClick={() => setActiveTab('add')}
+                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-white bg-neutral-900 hover:bg-black px-4 py-2 rounded-xl shadow-xs transition-colors cursor-pointer self-start sm:self-auto"
                     >
-                      <RotateCcw className="w-3.5 h-3.5 text-neutral-700" />
-                      <span>Reset to 12 Originals</span>
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>Add New Item</span>
                     </button>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {[...row1Projects.map((p) => ({ ...p, assignedRow: 1 })), ...row2Projects.map((p) => ({ ...p, assignedRow: 2 }))].map((item) => (
-                      <div key={item.id} className="bg-[#FAF9F6] p-4 rounded-2xl border border-neutral-200 flex flex-col justify-between">
-                        <div>
-                          <div className="flex items-center justify-between text-[10px] font-mono text-neutral-400 mb-1.5">
-                            <span className="bg-white px-2 py-0.5 rounded border border-neutral-200 text-neutral-700">
-                              Row {item.assignedRow}
+                  {/* Showcase Cards Grid with Visual Image Thumbnails */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">
+                    {[...row1Projects.map((p) => ({ ...p, assignedRow: 1 })), ...row2Projects.map((p) => ({ ...p, assignedRow: 2 }))].map((item) => {
+                      const displayImg = normalizeShowcaseImagePath(item.imageUrl);
+                      return (
+                        <div
+                          key={item.id}
+                          className="bg-[#FAF9F6] p-4 rounded-2xl border border-neutral-200 hover:border-neutral-400 transition-all flex gap-3.5 items-start justify-between shadow-2xs"
+                        >
+                          {/* Visual Thumbnail */}
+                          <div className="w-16 h-20 rounded-xl overflow-hidden bg-neutral-900 shrink-0 border border-neutral-300 relative shadow-xs">
+                            {displayImg ? (
+                              <img
+                                src={displayImg}
+                                alt={item.title}
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  (e.target as HTMLElement).style.display = 'none';
+                                }}
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center text-white/50 text-[10px] font-mono">
+                                No Art
+                              </div>
+                            )}
+                            <span className="absolute bottom-1 right-1 text-[8px] font-mono font-bold px-1.5 py-0.5 rounded bg-black/80 text-white">
+                              R{item.assignedRow}
                             </span>
-                            <span>{item.year}</span>
                           </div>
-                          <h4 className="text-sm font-bold text-neutral-900">{item.title}</h4>
-                          <p className="text-xs text-neutral-500 line-clamp-1">{item.subtitle}</p>
-                          <span className="text-[11px] text-neutral-400 font-mono mt-2 block">{item.category}</span>
-                        </div>
 
-                        <div className="mt-4 pt-3 border-t border-neutral-200 flex items-center justify-end gap-2">
-                          <button
-                            type="button"
-                            onClick={() => handleStartEditProject(item)}
-                            className="p-1.5 hover:bg-neutral-200 text-neutral-600 hover:text-neutral-900 rounded-lg text-xs flex items-center gap-1 cursor-pointer transition-colors"
-                            title="Edit project"
-                          >
-                            <Pencil className="w-3.5 h-3.5" />
-                            <span>Edit</span>
-                          </button>
-                          <button
-                            onClick={() => handleDeleteProject(item.id)}
-                            className="p-1.5 hover:bg-red-50 text-neutral-400 hover:text-red-600 rounded-lg text-xs flex items-center gap-1 cursor-pointer transition-colors"
-                            title="Delete project"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                            <span>Delete</span>
-                          </button>
+                          {/* Info */}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-1.5 text-[10px] font-mono text-neutral-500 mb-1">
+                              <span className="bg-white px-2 py-0.5 rounded border border-neutral-200 text-neutral-800 font-bold">
+                                Row {item.assignedRow}
+                              </span>
+                              {item.badge && (
+                                <span className="bg-white px-2 py-0.5 rounded border border-neutral-200 text-neutral-700 font-medium truncate">
+                                  {item.badge}
+                                </span>
+                              )}
+                            </div>
+                            <h4 className="text-sm font-bold text-neutral-900 truncate leading-snug">{item.title}</h4>
+                            <p className="text-xs text-neutral-500 line-clamp-1 mt-0.5">{item.subtitle || item.client}</p>
+                            <span className="text-[11px] text-neutral-400 font-mono mt-1 block truncate">{item.category}</span>
+
+                            {/* Controls */}
+                            <div className="mt-3 pt-2 border-t border-neutral-200 flex items-center justify-between gap-2">
+                              <button
+                                type="button"
+                                onClick={() => handleToggleProjectRow(item, item.assignedRow)}
+                                className="text-[11px] font-medium text-neutral-600 hover:text-neutral-900 bg-white hover:bg-neutral-100 border border-neutral-200 px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
+                                title={`Move to Row ${item.assignedRow === 1 ? 2 : 1}`}
+                              >
+                                Move to Row {item.assignedRow === 1 ? '2 ➔' : '1 ➔'}
+                              </button>
+
+                              <div className="flex items-center gap-1">
+                                <button
+                                  type="button"
+                                  onClick={() => handleStartEditProject(item)}
+                                  className="p-1.5 hover:bg-white text-neutral-700 hover:text-black rounded-lg text-xs flex items-center gap-1 cursor-pointer transition-colors border border-transparent hover:border-neutral-200"
+                                  title="Edit project"
+                                >
+                                  <Pencil className="w-3.5 h-3.5" />
+                                  <span>Edit</span>
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteProject(item.id)}
+                                  className="p-1.5 hover:bg-red-50 text-neutral-400 hover:text-red-600 rounded-lg text-xs flex items-center gap-1 cursor-pointer transition-colors"
+                                  title="Delete project"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                  <span>Delete</span>
+                                </button>
+                              </div>
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               )}
@@ -1500,11 +2306,122 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                   </div>
                 </form>
               )}
+
+              {/* TAB: ADMINCONTROL BACKUP & SYSTEM RESTORE */}
+              {activeTab === 'backup' && (
+                <div className="space-y-6 max-w-3xl">
+                  <div className="bg-[#FAF9F6] border border-neutral-200 rounded-2xl p-6">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="w-10 h-10 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center">
+                        <Database className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <h4 className="text-base font-bold text-neutral-900">admincontrol System Backup &amp; Archive</h4>
+                        <p className="text-xs text-neutral-500">
+                          Export complete portfolio state, showcase items, tools, SEO architecture, and contact configs to JSON.
+                        </p>
+                      </div>
+                    </div>
+
+                    {backupRestoreError && (
+                      <div className="mt-3 p-3 bg-rose-50 text-rose-800 text-xs rounded-xl border border-rose-200 font-medium">
+                        {backupRestoreError}
+                      </div>
+                    )}
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
+                      {/* Export card */}
+                      <div className="bg-white p-5 rounded-2xl border border-neutral-200 flex flex-col justify-between">
+                        <div>
+                          <div className="flex items-center gap-2 text-neutral-900 font-bold text-sm mb-1.5">
+                            <Download className="w-4 h-4 text-emerald-600" />
+                            <span>Export Full Backup</span>
+                          </div>
+                          <p className="text-xs text-neutral-500 leading-relaxed mb-4">
+                            Creates a downloadable JSON archive of all projects, tools, blog articles, SEO settings, and contact credentials.
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={handleExportBackup}
+                          className="w-full inline-flex items-center justify-center gap-2 bg-neutral-900 hover:bg-black text-white text-xs font-semibold py-2.5 rounded-xl transition-colors cursor-pointer"
+                        >
+                          <Download className="w-3.5 h-3.5" />
+                          <span>Download typixel_admincontrol_backup.json</span>
+                        </button>
+                      </div>
+
+                      {/* Import card */}
+                      <div className="bg-white p-5 rounded-2xl border border-neutral-200 flex flex-col justify-between">
+                        <div>
+                          <div className="flex items-center gap-2 text-neutral-900 font-bold text-sm mb-1.5">
+                            <Upload className="w-4 h-4 text-blue-600" />
+                            <span>Restore from Backup</span>
+                          </div>
+                          <p className="text-xs text-neutral-500 leading-relaxed mb-4">
+                            Upload a previously exported <code className="text-neutral-700 font-mono font-semibold">admincontrol</code> JSON backup file to restore your portfolio instantly.
+                          </p>
+                        </div>
+                        <label className="w-full inline-flex items-center justify-center gap-2 bg-[#F5F4F0] hover:bg-[#EAE8E2] text-neutral-800 text-xs font-semibold py-2.5 rounded-xl border border-neutral-300/80 transition-colors cursor-pointer text-center">
+                          <Upload className="w-3.5 h-3.5 text-neutral-700" />
+                          <span>Select JSON Backup File</span>
+                          <input
+                            type="file"
+                            accept=".json,application/json"
+                            onChange={handleImportBackup}
+                            className="hidden"
+                          />
+                        </label>
+                      </div>
+                    </div>
+
+                    {/* Stats summary */}
+                    <div className="mt-6 pt-5 border-t border-neutral-200/70 grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+                      <div className="bg-white p-3 rounded-xl border border-neutral-100">
+                        <span className="block text-lg font-bold text-neutral-900 font-mono">
+                          {row1Projects.length + row2Projects.length}
+                        </span>
+                        <span className="text-[10px] uppercase font-bold text-neutral-400">Showcase Items</span>
+                      </div>
+                      <div className="bg-white p-3 rounded-xl border border-neutral-100">
+                        <span className="block text-lg font-bold text-neutral-900 font-mono">
+                          {tools.length}
+                        </span>
+                        <span className="text-[10px] uppercase font-bold text-neutral-400">Software Tools</span>
+                      </div>
+                      <div className="bg-white p-3 rounded-xl border border-neutral-100">
+                        <span className="block text-lg font-bold text-neutral-900 font-mono">
+                          {blogPosts.length}
+                        </span>
+                        <span className="text-[10px] uppercase font-bold text-neutral-400">SEO Articles</span>
+                      </div>
+                      <div className="bg-white p-3 rounded-xl border border-neutral-100">
+                        <span className="block text-lg font-bold text-emerald-600 font-mono">
+                          Active
+                        </span>
+                        <span className="text-[10px] uppercase font-bold text-neutral-400">admincontrol</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
-        )}
 
-        {/* ================= EDIT SHOWCASE MODAL ================= */}
+          {/* Bottom Footer Note */}
+          <footer className="text-center py-4 text-xs text-neutral-500 flex items-center justify-center gap-2">
+            <span>Typixel admincontrol</span>
+            <span>•</span>
+            <span>All changes are live in real-time</span>
+            <span>•</span>
+            <button onClick={onClose} className="hover:text-neutral-900 underline cursor-pointer">
+              Return to Portfolio
+            </button>
+          </footer>
+        </div>
+      )}
+
+      {/* ================= EDIT SHOWCASE MODAL ================= */}
         {editingProject && (
           <div className="fixed inset-0 z-60 flex items-center justify-center p-3 sm:p-6 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
             <div
@@ -1570,6 +2487,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                       <option value="Product & Packaging Mockup">Product &amp; Packaging Mockup</option>
                       <option value="Social Media Campaign">Social Media Campaign</option>
                       <option value="Visual Identity & Logo">Visual Identity &amp; Logo</option>
+                      <option value="Logo Design & Identity">Logo Design &amp; Identity</option>
                       <option value="Motion Graphic Poster">Motion Graphic Poster</option>
                       <option value="Other">Other (Custom)...</option>
                     </select>
@@ -1592,12 +2510,13 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
 
                   <div>
                     <label className="block text-xs font-bold uppercase tracking-wider text-neutral-600 mb-1">
-                      Client
+                      Top-Right Badge / Tag
                     </label>
                     <input
                       type="text"
-                      value={editClient}
-                      onChange={(e) => setEditClient(e.target.value)}
+                      placeholder="e.g. Logo Lockup, Artboard Series"
+                      value={editBadge}
+                      onChange={(e) => setEditBadge(e.target.value)}
                       className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none"
                     />
                   </div>
@@ -1617,125 +2536,108 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-neutral-600 mb-1">
-                      Year
+                {/* Media Artwork */}
+                <div className="pt-2 border-t border-neutral-100 space-y-3">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <label className="block text-xs font-bold uppercase tracking-wider text-neutral-600">
+                      Cover Image / Artwork
                     </label>
-                    <input
-                      type="text"
-                      value={editYear}
-                      onChange={(e) => setEditYear(e.target.value)}
-                      className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-neutral-600 mb-1">
-                      Format / Dimensions
-                    </label>
-                    <input
-                      type="text"
-                      value={editDimensions}
-                      onChange={(e) => setEditDimensions(e.target.value)}
-                      className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-neutral-600 mb-1">
-                      Media Format Type
-                    </label>
-                    <select
-                      value={editMediaType}
-                      onChange={(e) => setEditMediaType(e.target.value as 'image' | 'video')}
-                      className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none font-semibold"
-                    >
-                      <option value="image">🎨 Static Image / Poster</option>
-                      <option value="video">🎬 Motion Video (.mp4 Reel)</option>
-                    </select>
-                  </div>
-
-                  {editMediaType === 'video' ? (
-                    <div>
-                      <label className="block text-xs font-bold uppercase tracking-wider text-neutral-600 mb-1">
-                        Video Duration (e.g. 0:28)
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="0:28"
-                        value={editDuration}
-                        onChange={(e) => setEditDuration(e.target.value)}
-                        className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none"
-                      />
+                    <div className="flex items-center gap-1.5 text-[11px] bg-neutral-100 p-1 rounded-xl">
+                      <button
+                        type="button"
+                        onClick={() => setEditMediaMode('preset')}
+                        className={`px-2.5 py-0.5 rounded-lg cursor-pointer transition-colors ${
+                          editMediaMode === 'preset'
+                            ? 'bg-white text-neutral-900 font-bold shadow-xs'
+                            : 'text-neutral-500 hover:text-neutral-900'
+                        }`}
+                      >
+                        ⭐ Preset Assets
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setEditMediaMode('upload')}
+                        className={`px-2.5 py-0.5 rounded-lg cursor-pointer transition-colors ${
+                          editMediaMode === 'upload'
+                            ? 'bg-white text-neutral-900 font-bold shadow-xs'
+                            : 'text-neutral-500 hover:text-neutral-900'
+                        }`}
+                      >
+                        📁 Upload File
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setEditMediaMode('link')}
+                        className={`px-2.5 py-0.5 rounded-lg cursor-pointer transition-colors ${
+                          editMediaMode === 'link'
+                            ? 'bg-white text-neutral-900 font-bold shadow-xs'
+                            : 'text-neutral-500 hover:text-neutral-900'
+                        }`}
+                      >
+                        🔗 Image Link
+                      </button>
                     </div>
-                  ) : (
-                    <div>
-                      <label className="block text-xs font-bold uppercase tracking-wider text-neutral-600 mb-1">
-                        Cover Thumbnail Image URL
-                      </label>
-                      <input
-                        type="text"
-                        value={editImageUrl}
-                        onChange={(e) => setEditImageUrl(e.target.value)}
-                        placeholder="/Works/... or image URL"
-                        className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none"
-                      />
+                  </div>
+
+                  {editMediaMode === 'preset' && (
+                    <div className="space-y-2">
+                      <div className="grid grid-cols-5 gap-2">
+                        {SHOWCASE_PRESET_IMAGES.map((preset) => (
+                          <button
+                            key={preset.filename}
+                            type="button"
+                            onClick={() => handleSelectPreset(preset, true)}
+                            className={`p-1 rounded-lg border text-left cursor-pointer transition-all ${
+                              editImageUrl === preset.path
+                                ? 'border-neutral-900 bg-neutral-900 text-white ring-2 ring-neutral-900/20'
+                                : 'border-neutral-200 bg-neutral-50 hover:bg-white text-neutral-800'
+                            }`}
+                          >
+                            <div className="w-full aspect-[4/5] rounded overflow-hidden bg-neutral-900 mb-1">
+                              <img src={preset.path} alt={preset.name} className="w-full h-full object-cover" />
+                            </div>
+                            <span className="text-[10px] font-bold truncate block">{preset.name}</span>
+                          </button>
+                        ))}
+                      </div>
                     </div>
                   )}
-                </div>
 
-                {editMediaType === 'video' && (
-                  <div className="space-y-1.5 bg-purple-50 p-3 rounded-xl border border-purple-200">
-                    <label className="block text-xs font-bold uppercase tracking-wider text-purple-900">
-                      Video File URL (.mp4)
-                    </label>
-                    <input
-                      type="text"
-                      value={editVideoUrl}
-                      onChange={(e) => setEditVideoUrl(e.target.value)}
-                      placeholder="/Works/videos/... or mp4 URL"
-                      className="w-full text-xs bg-white border border-purple-200 rounded-xl px-3.5 py-2 text-neutral-900 focus:outline-none"
-                    />
-                  </div>
-                )}
+                  {editMediaMode === 'upload' && (
+                    <div className="flex items-center gap-3 bg-neutral-50 p-3 rounded-xl border border-neutral-200">
+                      <input
+                        type="file"
+                        accept="image/*,video/mp4"
+                        onChange={(e) => handleProjectFileUpload(e, true)}
+                        className="w-full text-xs text-neutral-600 file:mr-3 file:py-2 file:px-3.5 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-neutral-900 file:text-white hover:file:bg-black file:cursor-pointer bg-white border border-neutral-200 rounded-xl p-1"
+                      />
+                      {editImageUrl && (
+                        <div className="w-12 h-14 rounded-lg overflow-hidden border border-neutral-200 shrink-0 bg-neutral-900 shadow-xs">
+                          <img src={normalizeShowcaseImagePath(editImageUrl)} alt="Preview" className="w-full h-full object-cover" />
+                        </div>
+                      )}
+                    </div>
+                  )}
 
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-neutral-600 mb-1">
-                    Tools &amp; Software (Comma-separated)
-                  </label>
-                  <input
-                    type="text"
-                    value={editTools}
-                    onChange={(e) => setEditTools(e.target.value)}
-                    className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-neutral-600 mb-1">
-                    Design Highlights (Comma-separated)
-                  </label>
-                  <input
-                    type="text"
-                    value={editKeyFeatures}
-                    onChange={(e) => setEditKeyFeatures(e.target.value)}
-                    className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-neutral-600 mb-1">
-                    Creative Concept &amp; Description
-                  </label>
-                  <textarea
-                    rows={3}
-                    value={editDescription}
-                    onChange={(e) => setEditDescription(e.target.value)}
-                    className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none resize-none"
-                  />
+                  {editMediaMode === 'link' && (
+                    <div className="space-y-2">
+                      <input
+                        type="text"
+                        placeholder="/showcase/Chamayam.jpg or https://..."
+                        value={editImageUrl}
+                        onChange={(e) => setEditImageUrl(e.target.value)}
+                        className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none font-mono"
+                      />
+                      {editImageUrl && (
+                        <div className="flex items-center gap-2">
+                          <div className="w-10 h-12 rounded-lg overflow-hidden border border-neutral-200 shrink-0 bg-neutral-900 shadow-xs">
+                            <img src={normalizeShowcaseImagePath(editImageUrl)} alt="Preview" className="w-full h-full object-cover" />
+                          </div>
+                          <span className="text-[11px] text-neutral-500 font-mono truncate">{normalizeShowcaseImagePath(editImageUrl)}</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 <div className="flex justify-end gap-2 pt-3 border-t border-neutral-100">
@@ -1824,7 +2726,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
             </div>
           </div>
         )}
-      </div>
     </div>
   );
 };
+
+export const AdminPage = AdminPanel;
