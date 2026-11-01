@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import { Play, Sparkles, Film, VolumeX } from 'lucide-react';
-import { ShowcaseItem } from '../data/showcaseData.ts';
+import { ShowcaseItem, normalizeShowcaseImagePath } from '../data/showcaseData.ts';
 
 interface ShowcaseArtworkProps {
   item: ShowcaseItem;
@@ -9,6 +9,7 @@ interface ShowcaseArtworkProps {
 export const ShowcaseArtwork: React.FC<ShowcaseArtworkProps> = ({ item }) => {
   const isVideo = item.mediaType === 'video' || (Boolean(item.videoUrl) && item.videoUrl!.endsWith('.mp4'));
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const normalizedImg = normalizeShowcaseImagePath(item.imageUrl);
 
   // Ensure autoplay muted starts reliably across all mobile & desktop browsers
   useEffect(() => {
@@ -88,11 +89,11 @@ export const ShowcaseArtwork: React.FC<ShowcaseArtworkProps> = ({ item }) => {
   }
 
   // General Image / Poster Card Preview
-  if (item.imageUrl && item.imageUrl.trim().length > 0) {
+  if (normalizedImg && normalizedImg.trim().length > 0) {
     return (
-      <div className="w-full h-full bg-neutral-900 text-white relative overflow-hidden select-none flex flex-col justify-between">
+      <div className="w-full h-full bg-neutral-900 text-white relative overflow-hidden select-none flex flex-col justify-between group">
         <img
-          src={item.imageUrl}
+          src={normalizedImg}
           alt={item.title}
           referrerPolicy="no-referrer"
           className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
