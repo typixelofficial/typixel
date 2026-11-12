@@ -36,6 +36,26 @@ export interface ShowcasePresetImage {
 
 export const SHOWCASE_PRESET_IMAGES: ShowcasePresetImage[] = [
   {
+    name: 'NEIC Motion Reel (Video)',
+    filename: 'neic.mp4',
+    path: '/showcase/neic.mp4',
+    defaultTitle: 'NEIC — Brand Motion Video Reel',
+    defaultSubtitle: 'High-Impact Brand Motion & Cinematic Video Visuals',
+    defaultCategory: 'Motion Graphics & Video',
+    defaultBadge: 'Video Reel',
+    row: 1
+  },
+  {
+    name: 'Save The Date Video',
+    filename: 'savethedatevideo_.mp4',
+    path: '/showcase/savethedatevideo_.mp4',
+    defaultTitle: 'Save The Date — Wedding Motion Video',
+    defaultSubtitle: 'Royal Floral Animation & Cinematic Keepsake Reel',
+    defaultCategory: 'Motion Video & Wedding',
+    defaultBadge: 'Wedding Reel',
+    row: 2
+  },
+  {
     name: 'Chamayam',
     filename: 'Chamayam.jpg',
     path: '/showcase/Chamayam.jpg',
@@ -139,6 +159,33 @@ export const SHOWCASE_PRESET_IMAGES: ShowcasePresetImage[] = [
 
 export const SHOWCASE_ROW_1: ShowcaseItem[] = [
   {
+    id: 'neic-motion-reel',
+    title: 'NEIC — Brand Motion Reel',
+    subtitle: 'High-Impact Brand Motion & Kinetic Typography Reel',
+    client: 'NEIC Media',
+    year: '2026',
+    category: 'Motion Graphics & Video',
+    mediaType: 'video',
+    videoUrl: '/showcase/neic.mp4',
+    imageUrl: '/showcase/neic_poster.jpg',
+    githubUrl: 'https://github.com/typixelofficial/typixel/blob/main/showcase/showcase/neic.mp4',
+    badge: 'Video Reel',
+    accentColor: '#8B5CF6',
+    aspect: '9/16',
+    dimensions: '1080 × 1920 px Motion Reel',
+    tools: ['Adobe Premiere Pro', 'After Effects', 'DaVinci Resolve'],
+    description: 'Dynamic brand motion graphics video with rhythmic beat cuts, synchronized kinetic typography, and punchy visual effects.',
+    keyFeatures: [
+      'Synchronized kinetic typography and transitions',
+      'High-impact audio-visual pacing designed for viral retention',
+      'Full 1080p color grading in Premiere Pro and DaVinci Resolve'
+    ],
+    languages: ['English'],
+    duration: '0:15',
+    row: 1,
+    type: 'custom'
+  },
+  {
     id: 'chamayam-jewellery-poster',
     title: 'Chamayam',
     subtitle: 'Festive Elegance & Cultural Jewellery Campaign',
@@ -147,7 +194,7 @@ export const SHOWCASE_ROW_1: ShowcaseItem[] = [
     category: 'Festive & Cultural Poster',
     mediaType: 'image',
     imageUrl: '/showcase/Chamayam.jpg',
-    githubUrl: 'https://github.com/typixelofficial/portfolio',
+    githubUrl: 'https://github.com/typixelofficial/typixel/blob/main/showcase/showcase/Chamayam.jpg',
     badge: 'Festival Campaign',
     accentColor: '#D97706',
     aspect: '4/5',
@@ -172,7 +219,7 @@ export const SHOWCASE_ROW_1: ShowcaseItem[] = [
     category: 'Commercial Poster Design',
     mediaType: 'image',
     imageUrl: '/showcase/classycoat.jpg',
-    githubUrl: 'https://github.com/typixelofficial/portfolio',
+    githubUrl: 'https://github.com/typixelofficial/typixel/blob/main/showcase/showcase/classycoat.jpg',
     badge: 'Commercial Art',
     accentColor: '#78716C',
     aspect: '4/5',
@@ -197,7 +244,7 @@ export const SHOWCASE_ROW_1: ShowcaseItem[] = [
     category: 'Festive & Social Media',
     mediaType: 'image',
     imageUrl: '/showcase/eidcrystalmart.webp',
-    githubUrl: 'https://github.com/typixelofficial/portfolio',
+    githubUrl: 'https://github.com/typixelofficial/typixel/blob/main/showcase/showcase/eidcrystalmart.webp',
     badge: 'Festive Offer',
     accentColor: '#0284C7',
     aspect: '1/1',
@@ -222,7 +269,7 @@ export const SHOWCASE_ROW_1: ShowcaseItem[] = [
     category: 'Spiritual Typography & Poster',
     mediaType: 'image',
     imageUrl: '/showcase/eidswahwa.jpg',
-    githubUrl: 'https://github.com/typixelofficial/portfolio',
+    githubUrl: 'https://github.com/typixelofficial/typixel/blob/main/showcase/showcase/eidswahwa.jpg',
     badge: 'Calligraphy Art',
     accentColor: '#10B981',
     aspect: '4/5',
@@ -247,7 +294,7 @@ export const SHOWCASE_ROW_1: ShowcaseItem[] = [
     category: 'Visual Identity & Branding',
     mediaType: 'image',
     imageUrl: '/showcase/flow.png',
-    githubUrl: 'https://github.com/typixelofficial/portfolio',
+    githubUrl: 'https://github.com/typixelofficial/typixel/blob/main/showcase/showcase/flow.png',
     badge: 'Brand Monogram',
     accentColor: '#991B1B',
     aspect: '16/9',
@@ -267,6 +314,33 @@ export const SHOWCASE_ROW_1: ShowcaseItem[] = [
 
 export const SHOWCASE_ROW_2: ShowcaseItem[] = [
   {
+    id: 'savethedate-motion-video',
+    title: 'Save The Date — Wedding Motion',
+    subtitle: 'Royal Floral Animation & Keepsake Invitation Video',
+    client: 'Wedding Series',
+    year: '2026',
+    category: 'Motion Video & Wedding',
+    mediaType: 'video',
+    videoUrl: '/showcase/savethedatevideo_.mp4',
+    imageUrl: '/showcase/savethedate_poster.jpg',
+    githubUrl: 'https://github.com/typixelofficial/typixel/blob/main/showcase/showcase/savethedatevideo_.mp4',
+    badge: 'Wedding Reel',
+    accentColor: '#E11D48',
+    aspect: '9/16',
+    dimensions: '1080 × 1920 px Motion Invitation',
+    tools: ['Adobe After Effects', 'Premiere Pro', 'Photoshop'],
+    description: 'Bespoke animated wedding invitation featuring blooming crimson rose dynamics, ornate monogram reveals, and romantic cinematic pacing.',
+    keyFeatures: [
+      'Layered botanical floral bloom motion graphics',
+      'Timeless golden serif calligraphy reveal animation',
+      'Optimized seamless loop for WhatsApp and Instagram stories'
+    ],
+    languages: ['English'],
+    duration: '0:30',
+    row: 2,
+    type: 'custom'
+  },
+  {
     id: 'frost-delicious-desserts',
     title: 'Frost — Delicious Desserts',
     subtitle: 'Gourmet Confectionery Packaging & Sweet Box Branding',
@@ -275,7 +349,7 @@ export const SHOWCASE_ROW_2: ShowcaseItem[] = [
     category: 'Product & Packaging Mockup',
     mediaType: 'image',
     imageUrl: '/showcase/frost.jpg',
-    githubUrl: 'https://github.com/typixelofficial/portfolio',
+    githubUrl: 'https://github.com/typixelofficial/typixel/blob/main/showcase/showcase/frost.jpg',
     badge: 'Packaging Art',
     accentColor: '#2563EB',
     aspect: '4/5',
@@ -300,7 +374,7 @@ export const SHOWCASE_ROW_2: ShowcaseItem[] = [
     category: 'Event Branding & Invitation',
     mediaType: 'image',
     imageUrl: '/showcase/savethedatepost.jpg',
-    githubUrl: 'https://github.com/typixelofficial/portfolio',
+    githubUrl: 'https://github.com/typixelofficial/typixel/blob/main/showcase/showcase/savethedatepost.jpg',
     badge: 'Wedding Series',
     accentColor: '#9F1239',
     aspect: '4/5',
@@ -325,7 +399,7 @@ export const SHOWCASE_ROW_2: ShowcaseItem[] = [
     category: 'Logo Design & Identity',
     mediaType: 'image',
     imageUrl: '/showcase/Skillovia.jpg',
-    githubUrl: 'https://github.com/typixelofficial/portfolio',
+    githubUrl: 'https://github.com/typixelofficial/typixel/blob/main/showcase/showcase/Skillovia.jpg',
     badge: 'Identity System',
     accentColor: '#EA580C',
     aspect: '16/9',
@@ -350,7 +424,7 @@ export const SHOWCASE_ROW_2: ShowcaseItem[] = [
     category: 'Cultural Poster & Digital Art',
     mediaType: 'image',
     imageUrl: '/showcase/vishuchamayam.jpg',
-    githubUrl: 'https://github.com/typixelofficial/portfolio',
+    githubUrl: 'https://github.com/typixelofficial/typixel/blob/main/showcase/showcase/vishuchamayam.jpg',
     badge: 'Festive Special',
     accentColor: '#0284C7',
     aspect: '4/5',
@@ -375,7 +449,7 @@ export const SHOWCASE_ROW_2: ShowcaseItem[] = [
     category: 'Brand Identity & Logo',
     mediaType: 'image',
     imageUrl: '/showcase/Yenza.jpg',
-    githubUrl: 'https://github.com/typixelofficial/portfolio',
+    githubUrl: 'https://github.com/typixelofficial/typixel/blob/main/showcase/showcase/Yenza.jpg',
     badge: 'Logomark',
     accentColor: '#451A03',
     aspect: '16/9',
@@ -393,8 +467,8 @@ export const SHOWCASE_ROW_2: ShowcaseItem[] = [
   }
 ];
 
-const STORAGE_KEY_ROW_1 = 'typixel_portfolio_showcase_r1_v6';
-const STORAGE_KEY_ROW_2 = 'typixel_portfolio_showcase_r2_v6';
+const STORAGE_KEY_ROW_1 = 'typixel_portfolio_showcase_r1_v8';
+const STORAGE_KEY_ROW_2 = 'typixel_portfolio_showcase_r2_v8';
 
 /**
  * Normalizes any relative or loose image path to always resolve properly

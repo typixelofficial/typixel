@@ -13,9 +13,15 @@ export const Avatar: React.FC<AvatarProps> = ({ onBadgeClick }) => {
         <div className="w-full h-full rounded-full overflow-hidden bg-black flex items-center justify-center p-1 sm:p-2">
           {/* Logo scaled up to be bold and clearly visible */}
           <img
-            src="/typixel.jpg"
+            src="/logos/typixel.jpg"
             alt="Typixel"
             className="w-full h-auto object-contain scale-110"
+            onError={(e) => {
+              const target = e.currentTarget;
+              if (!target.src.includes('raw.githubusercontent.com')) {
+                target.src = 'https://raw.githubusercontent.com/typixelofficial/typixel/main/logos/typixel.jpg';
+              }
+            }}
           />
         </div>
       </div>

@@ -1139,14 +1139,6 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                           <Globe className="w-3.5 h-3.5 text-neutral-800" />
                           <span>{seoStrategy.domain}</span>
                         </div>
-                        <button
-                          type="button"
-                          onClick={handleResetSeoStrategy}
-                          className="p-2 hover:bg-neutral-200 text-neutral-600 rounded-xl transition-colors cursor-pointer"
-                          title="Reset to 2026 defaults"
-                        >
-                          <RotateCcw className="w-3.5 h-3.5" />
-                        </button>
                       </div>
                     </div>
 
@@ -1770,14 +1762,14 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                     <div>
                       <div className="flex items-center gap-2">
                         <h4 className="text-sm font-bold text-neutral-900">
-                          Showcase Artworks ({row1Projects.length + row2Projects.length} Items Active)
+                          Showcase Artworks ({row1Projects.length + row2Projects.length} Unlimited Items Active)
                         </h4>
                         <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-semibold border border-emerald-200">
-                          Live Marquee
+                          Unlimited Rows
                         </span>
                       </div>
                       <p className="text-xs text-neutral-500 mt-0.5">
-                        Row 1 ({row1Projects.length} items) slides Left • Row 2 ({row2Projects.length} items) slides Right.
+                        Row 1 ({row1Projects.length} items) slides Left • Row 2 ({row2Projects.length} items) slides Right. Supports unlimited items in each row.
                       </p>
                     </div>
 
@@ -1880,20 +1872,13 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
               {/* TAB 3: EXPERIENCED TOOLS & APPS */}
               {activeTab === 'tools' && (
                 <div className="space-y-6">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-[#FAF9F6] rounded-2xl border border-neutral-200">
+                  <div className="p-4 bg-[#FAF9F6] rounded-2xl border border-neutral-200">
                     <div>
                       <h4 className="text-sm font-bold text-neutral-900">12 Experienced Software &amp; Tools</h4>
                       <p className="text-xs text-neutral-500">
                         Photoshop, Illustrator, InDesign, Premiere Pro, After Effects, DaVinci, Canva, CapCut, HTML, CSS, JS, Figma.
                       </p>
                     </div>
-                    <button
-                      onClick={handleResetTools}
-                      className="inline-flex items-center gap-1.5 text-xs text-neutral-700 hover:text-black bg-white border border-neutral-200 px-3 py-1.5 rounded-xl cursor-pointer"
-                    >
-                      <RotateCcw className="w-3.5 h-3.5 text-neutral-700" />
-                      <span>Reset to 12 Core Tools</span>
-                    </button>
                   </div>
 
                   <form onSubmit={handleAddTool} className="p-5 bg-white rounded-2xl border border-neutral-200 space-y-4">
@@ -2069,20 +2054,13 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
               {/* TAB 4: BLOG & TRENDING SEO ARTICLES */}
               {activeTab === 'blog' && (
                 <div className="space-y-6">
-                  <div className="flex items-center justify-between p-4 bg-[#FAF9F6] rounded-2xl border border-neutral-200">
+                  <div className="p-4 bg-[#FAF9F6] rounded-2xl border border-neutral-200">
                     <div>
                       <h4 className="text-sm font-bold text-neutral-900">Ranked SEO Articles for Google Search Console</h4>
                       <p className="text-xs text-neutral-500">
                         Targeting keywords: Graphic Design Trends, Adobe Photoshop, Figma UI, Premiere Pro, and Front-End.
                       </p>
                     </div>
-                    <button
-                      onClick={handleResetBlog}
-                      className="inline-flex items-center gap-1.5 text-xs text-neutral-700 hover:text-black bg-white border border-neutral-200 px-3 py-1.5 rounded-xl cursor-pointer"
-                    >
-                      <RotateCcw className="w-3.5 h-3.5 text-neutral-700" />
-                      <span>Reset Default Articles</span>
-                    </button>
                   </div>
 
                   <form onSubmit={handleAddBlogPost} className="p-5 bg-white rounded-2xl border border-neutral-200 space-y-4">

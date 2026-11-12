@@ -8,18 +8,26 @@ interface BrandItem {
 }
 
 const BRAND_LOGOS: BrandItem[] = [
-  // Wide horizontal lettermarks - amplified to be clear and prominent
-  { id: '1', name: 'Akbar Trades', src: '/akbar.png', sizeClass: 'h-14 sm:h-16 max-w-[200px] scale-125' },
-  { id: '2', name: 'Chamayam', src: '/Chamayam.png', sizeClass: 'h-14 sm:h-16 max-w-[200px] scale-125' },
-  
-  // Compact / vertical logos - sized up without overwhelming the row
-  { id: '3', name: 'Classy Coat', src: '/classy coat.png', sizeClass: 'h-12 sm:h-14 max-w-[150px]' },
-  { id: '4', name: 'Frost Dessert', src: '/Frost.png', sizeClass: 'h-12 sm:h-14 max-w-[150px]' },
-  
-  // Balanced horizontal logos
-  { id: '5', name: 'Quick Resume', src: '/Quick_resume.png', sizeClass: 'h-13 sm:h-15 max-w-[180px] scale-110' },
-  { id: '6', name: 'Skillovia', src: '/skilllovia.png', sizeClass: 'h-12 sm:h-14 max-w-[170px]' },
-  { id: '7', name: 'Vistora Edu', src: '/Vistora.png', sizeClass: 'h-14 sm:h-16 max-w-[190px] scale-120' },
+  // 1. Akbar Trades (Horizontal Lettermark)
+  { id: '1', name: 'Akbar Trades', src: '/logos/akbar.png', sizeClass: 'h-14 sm:h-16 max-w-[200px] scale-125' },
+
+  // 2. Chamayam (Traditional Heritage Lettermark)
+  { id: '2', name: 'Chamayam', src: '/logos/Chamayam.png', sizeClass: 'h-14 sm:h-16 max-w-[200px] scale-125' },
+
+  // 3. Classy Coat (Architectural Texture Brand)
+  { id: '3', name: 'Classy Coat', src: '/logos/classy coat.png', sizeClass: 'h-12 sm:h-14 max-w-[150px]' },
+
+  // 4. Frost Dessert (Gourmet Confectionery Badge)
+  { id: '4', name: 'Frost Dessert', src: '/logos/Frost.png', sizeClass: 'h-12 sm:h-14 max-w-[150px]' },
+
+  // 5. Quick Resume (Digital Product Platform)
+  { id: '5', name: 'Quick Resume', src: '/logos/Quick_resume.png', sizeClass: 'h-13 sm:h-15 max-w-[180px] scale-110' },
+
+  // 6. Skillovia (EdTech Geometric Mark)
+  { id: '6', name: 'Skillovia', src: '/logos/skilllovia.png', sizeClass: 'h-12 sm:h-14 max-w-[170px]' },
+
+  // 7. Vistora Edu (Educational Brand Logotype)
+  { id: '7', name: 'Vistora Edu', src: '/logos/Vistora.png', sizeClass: 'h-14 sm:h-16 max-w-[190px] scale-120' },
 ];
 
 export const BrandLogos: React.FC = () => {
@@ -50,6 +58,13 @@ export const BrandLogos: React.FC = () => {
               <img
                 src={brand.src}
                 alt={brand.name}
+                onError={(e) => {
+                  const target = e.currentTarget;
+                  const filename = brand.src.split('/').pop();
+                  if (filename && !target.src.includes('raw.githubusercontent.com')) {
+                    target.src = `https://raw.githubusercontent.com/typixelofficial/typixel/main/logos/${encodeURIComponent(filename)}`;
+                  }
+                }}
                 className={`${brand.sizeClass} w-auto object-contain transition-all duration-300 [filter:grayscale(100%)_brightness(0)] opacity-85 group-hover:[filter:none] group-hover:opacity-100`}
               />
             </div>

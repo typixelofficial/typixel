@@ -30,8 +30,33 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <header className="w-full flex items-center justify-between gap-3 pt-1 sm:pt-2 px-1 sm:px-2 select-none flex-wrap">
-      {/* Left zone: Email pill with embedded Copy button */}
-      <div className="flex items-center gap-2 flex-wrap">
+      {/* Left zone: Typixel Brand Logo at the starting + Email pill with embedded Copy button */}
+      <div className="flex items-center gap-3 sm:gap-4 flex-wrap">
+        {/* Typixel Studio Brand Mark at Starting */}
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full overflow-hidden bg-black p-0.5 border border-neutral-300 shadow-2xs shrink-0 flex items-center justify-center">
+            <img
+              src="/logos/typixel.jpg"
+              alt="Typixel"
+              className="w-full h-full object-cover rounded-full"
+              onError={(e) => {
+                const target = e.currentTarget;
+                if (!target.src.includes('raw.githubusercontent.com')) {
+                  target.src = 'https://raw.githubusercontent.com/typixelofficial/typixel/main/logos/typixel.jpg';
+                }
+              }}
+            />
+          </div>
+          <div className="flex flex-col">
+            <span className="text-xs sm:text-sm font-bold text-neutral-900 tracking-tight leading-none">
+              Typixel
+            </span>
+            <span className="text-[10px] text-neutral-500 font-medium leading-none mt-0.5">
+              Design Studio
+            </span>
+          </div>
+        </div>
+
         <div className="bg-[#F3F2EE] hover:bg-[#EFECE6] border border-neutral-300/40 rounded-full px-3.5 py-1.5 flex items-center gap-2.5 transition-colors">
           <span className="text-[11px] sm:text-xs text-neutral-700 font-normal tracking-tight">
             {email}

@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from 'react';
-import { Play, Sparkles, Film, VolumeX } from 'lucide-react';
+import { Sparkles, Film, VolumeX } from 'lucide-react';
 import { ShowcaseItem, normalizeShowcaseImagePath } from '../data/showcaseData.ts';
 
 interface ShowcaseArtworkProps {
@@ -11,7 +11,7 @@ export const ShowcaseArtwork: React.FC<ShowcaseArtworkProps> = ({ item }) => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const normalizedImg = normalizeShowcaseImagePath(item.imageUrl);
 
-  // Ensure autoplay muted starts reliably across all mobile & desktop browsers
+  // Guarantee continuous muted playback across all browsers and devices
   useEffect(() => {
     if (isVideo && videoRef.current) {
       videoRef.current.defaultMuted = true;
@@ -19,17 +19,36 @@ export const ShowcaseArtwork: React.FC<ShowcaseArtworkProps> = ({ item }) => {
       const playPromise = videoRef.current.play();
       if (playPromise !== undefined) {
         playPromise.catch(() => {
-          // Fallback if browser suspended playback
+          // Retry playback automatically
+          setTimeout(() => {
+            if (videoRef.current) {
+              videoRef.current.play().catch(() => {});
+            }
+          }, 300);
         });
       }
     }
   }, [isVideo, item.videoUrl]);
 
-  // Video Showcase Card Preview: Real-time Autoplay Muted Loop
+  // Video Showcase Card: Continuous Muted Loop that Cannot Be Paused
   if (isVideo && item.videoUrl) {
     return (
       <div className="w-full h-full bg-neutral-950 text-white relative overflow-hidden select-none flex flex-col justify-between group/video">
-        {/* Real HTML5 Video Autoplay Muted Loop */}
+        {/* Instant Poster Background so card never shows black */}
+        {item.imageUrl && (
+          <img
+            src={item.imageUrl}
+            alt={item.title}
+            decoding="async"
+            className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+            onError={(e) => {
+              const target = e.currentTarget;
+              target.style.display = 'none';
+            }}
+          />
+        )}
+
+        {/* Real HTML5 Video Autoplay Muted Loop - faststart metadata, preload="metadata" for instant playback */}
         <video
           ref={videoRef}
           src={item.videoUrl}
@@ -38,8 +57,15 @@ export const ShowcaseArtwork: React.FC<ShowcaseArtworkProps> = ({ item }) => {
           muted
           loop
           playsInline
-          preload="auto"
-          className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+          preload="metadata"
+          className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 pointer-events-none z-1"
+          onPause={(e) => {
+            // Cannot be paused - immediately resumes playback
+            e.currentTarget.play().catch(() => {});
+          }}
+          onEnded={(e) => {
+            e.currentTarget.play().catch(() => {});
+          }}
         />
 
         {/* Ambient Video Vignette for text readability */}
@@ -53,7 +79,7 @@ export const ShowcaseArtwork: React.FC<ShowcaseArtworkProps> = ({ item }) => {
           </span>
 
           <div className="flex items-center gap-1.5">
-            <span className="text-[9px] font-mono text-neutral-300 bg-black/60 backdrop-blur-md p-1 rounded-full border border-white/15" title="Autoplay Muted">
+            <span className="text-[9px] font-mono text-neutral-300 bg-black/60 backdrop-blur-md p-1 rounded-full border border-white/15" title="Muted (Can't Pause)">
               <VolumeX className="w-2.5 h-2.5 text-neutral-300" />
             </span>
             {item.duration && (
@@ -64,18 +90,11 @@ export const ShowcaseArtwork: React.FC<ShowcaseArtworkProps> = ({ item }) => {
           </div>
         </div>
 
-        {/* Subtle center play indicator that gently appears on hover */}
-        <div className="relative z-10 flex items-center justify-center my-auto pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-          <div className="w-11 h-11 rounded-full bg-black/50 backdrop-blur-md border border-white/40 flex items-center justify-center text-white shadow-xl">
-            <Play className="w-4 h-4 fill-white text-white translate-x-0.5" />
-          </div>
-        </div>
-
         {/* Bottom Title Bar */}
         <div className="relative z-10 p-3.5 pt-2">
           <div className="flex items-center gap-1.5 text-[9px] text-purple-300 font-medium mb-0.5">
             <Film className="w-2.5 h-2.5 text-purple-400" />
-            <span>Motion Video Edit</span>
+            <span>Motion Video Reel</span>
           </div>
           <h5 className="text-xs sm:text-sm font-bold text-white leading-tight drop-shadow-sm">
             {item.title}
@@ -95,11 +114,16 @@ export const ShowcaseArtwork: React.FC<ShowcaseArtworkProps> = ({ item }) => {
         <img
           src={normalizedImg}
           alt={item.title}
+          loading="lazy"
+          decoding="async"
           referrerPolicy="no-referrer"
-          className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+          className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 pointer-events-none"
           onError={(e) => {
             const target = e.currentTarget;
-            target.style.display = 'none';
+            const filename = normalizedImg.split('/').pop();
+            if (filename && !target.src.includes('raw.githubusercontent.com')) {
+              target.src = `https://raw.githubusercontent.com/typixelofficial/typixel/main/showcase/showcase/${encodeURIComponent(filename)}`;
+            }
           }}
         />
         {/* Soft dark vignette so text is always legible */}
