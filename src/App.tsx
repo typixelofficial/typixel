@@ -158,9 +158,9 @@ export default function App() {
   };
 
   const handleSocial = (platform: string) => {
-    let url = 'https://linkedin.com';
+    let url = 'https://www.linkedin.com';
     if (platform === 'Dribbble') url = 'https://dribbble.com';
-    if (platform === 'Instagram') url = 'https://instagram.com';
+    if (platform === 'Instagram') url = 'https://www.instagram.com/typixelofficial/';
     window.open(url, '_blank', 'noopener,noreferrer');
   };
 

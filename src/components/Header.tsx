@@ -93,15 +93,9 @@ export const Header: React.FC<HeaderProps> = ({
 
         <div className="flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs text-neutral-500 font-medium">
           <a
-            href="https://linkedin.com"
+            href="https://www.linkedin.com"
             target="_blank"
             rel="noopener noreferrer"
-            onClick={(e) => {
-              if (onOpenSocial) {
-                e.preventDefault();
-                onOpenSocial('LinkedIn');
-              }
-            }}
             className="hover:text-neutral-900 transition-colors cursor-pointer"
           >
             Linkedin
@@ -111,27 +105,15 @@ export const Header: React.FC<HeaderProps> = ({
             href="https://dribbble.com"
             target="_blank"
             rel="noopener noreferrer"
-            onClick={(e) => {
-              if (onOpenSocial) {
-                e.preventDefault();
-                onOpenSocial('Dribbble');
-              }
-            }}
             className="hover:text-neutral-900 transition-colors cursor-pointer"
           >
             Dribbble
           </a>
           <span className="text-neutral-300 select-none">/</span>
           <a
-            href="https://instagram.com/typixelofficial"
+            href="https://www.instagram.com/typixelofficial/"
             target="_blank"
             rel="noopener noreferrer"
-            onClick={(e) => {
-              if (onOpenSocial) {
-                e.preventDefault();
-                onOpenSocial('Instagram');
-              }
-            }}
             className="hover:text-neutral-900 transition-colors cursor-pointer"
           >
             Instagram
