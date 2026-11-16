@@ -31,6 +31,12 @@ import {
   BlogPost,
   getStoredBlogPosts
 } from './data/blogData.ts';
+import {
+  subscribeShowcaseItems,
+  subscribeTools,
+  subscribeBlogPosts,
+  subscribePublicSiteSettings
+} from './services/portfolioSyncService.ts';
 
 const SectionDivider: React.FC = () => (
   <div className="w-full flex items-center justify-center px-4 sm:px-8 py-0.5" aria-hidden="true">
@@ -46,18 +52,49 @@ export default function App() {
   const [inquiryTopic, setInquiryTopic] = useState('');
   const [isBlogOpen, setIsBlogOpen] = useState(false);
 
-  // Dynamic projects state persisted across reloads
+  // Dynamic projects state synced globally via Firestore + cached locally
   const [row1Projects, setRow1Projects] = useState<ShowcaseItem[]>(() => getStoredProjectsRow1());
   const [row2Projects, setRow2Projects] = useState<ShowcaseItem[]>(() => getStoredProjectsRow2());
 
   // Dynamic contact configuration (email & whatsapp number)
   const [contactConfig, setContactConfig] = useState<ContactConfig>(() => getStoredContactConfig());
 
-  // Experienced Tools state (Photoshop, Illustrator, InDesign, Premiere Pro, After Effects, DaVinci, Canva, CapCut, HTML, CSS, JS, Figma)
+  // Experienced Tools state
   const [tools, setTools] = useState<ExperiencedTool[]>(() => getStoredTools());
 
-  // Blog Posts state (with high reachable trending SEO keywords)
+  // Blog Posts state
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>(() => getStoredBlogPosts());
+
+  // Real-time cloud subscriptions: ensures every visitor sees changes published by Admin
+  useEffect(() => {
+    const unsubShowcase = subscribeShowcaseItems((r1, r2) => {
+      setRow1Projects(r1);
+      setRow2Projects(r2);
+    });
+    const unsubTools = subscribeTools((cloudTools) => {
+      setTools(cloudTools);
+    });
+    const unsubBlogs = subscribeBlogPosts((cloudPosts) => {
+      setBlogPosts(cloudPosts);
+    });
+    const unsubSettings = subscribePublicSiteSettings((cloudContact, cloudSeo) => {
+      setContactConfig(cloudContact);
+      if (cloudSeo.seoTitle) {
+        document.title = cloudSeo.seoTitle;
+      }
+      const metaDescTag = document.querySelector('meta[name="description"]');
+      if (metaDescTag && cloudSeo.metaDescription) {
+        metaDescTag.setAttribute('content', cloudSeo.metaDescription);
+      }
+    });
+
+    return () => {
+      unsubShowcase();
+      unsubTools();
+      unsubBlogs();
+      unsubSettings();
+    };
+  }, []);
 
   // Listen for hidden keyboard shortcuts (Alt+A or Shift+A) and URL hash (#admin or ?admin=true or #blog)
   useEffect(() => {

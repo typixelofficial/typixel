@@ -35,25 +35,15 @@ export const SlidingShowcase: React.FC<SlidingShowcaseProps> = ({
 
   return (
     <section className="w-full my-6 sm:my-8 bg-white rounded-[32px] sm:rounded-[40px] pt-7 sm:pt-9 pb-10 sm:pb-12 shadow-[0_10px_35px_-10px_rgba(0,0,0,0.04)] border border-white relative overflow-hidden transition-all duration-300">
-      {/* Section Header with Title and Auto-streaming Indicator */}
+      {/* Section Header */}
       <div className="px-6 sm:px-10 md:px-12 mb-6 sm:mb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-neutral-100 text-neutral-700 text-[11px] font-semibold mb-2">
-            <span className="w-2 h-2 rounded-full bg-purple-500 animate-pulse" />
-            <span>Curated Showcase Stream</span>
-          </div>
           <h2 className="text-2xl sm:text-3xl font-bold text-neutral-900 tracking-[-0.03em]">
             Motion Videos &amp; Creative Posters
           </h2>
           <p className="text-xs sm:text-[13px] text-neutral-500 mt-1 max-w-xl">
-            Continuous live showcase stream with unlimited motion reels and creative brand designs.
+            Curated showcase of motion reels, brand identities, and creative poster designs.
           </p>
-        </div>
-
-        {/* Live Auto-Streaming Status Pill */}
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-neutral-100 text-neutral-700 border border-neutral-200/80 shadow-2xs self-start sm:self-auto select-none">
-          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-          <span>Auto-Streaming (Muted Videos)</span>
         </div>
       </div>
 

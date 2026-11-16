@@ -1,0 +1,250 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 1. Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // 2. Global Helpers
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerifiedAdminEmail() {
+      return isSignedIn()
+        && request.auth.token.email_verified == true
+        && request.auth.token.email is string
+        && (
+          request.auth.token.email.lower() == 'hashimtypixel@gmail.com'
+          || request.auth.token.email.lower() == 'typixelofficial@gmail.com'
+        );
+    }
+
+    function isAdmin() {
+      return isVerifiedAdminEmail()
+        || (isSignedIn() && request.auth.token.email_verified == true && exists(/databases/$(database)/documents/admins/$(request.auth.uid)));
+    }
+
+    function isValidBoundedString(val, minLen, maxLen) {
+      return val is string && val.size() >= minLen && val.size() <= maxLen;
+    }
+
+    function isValidStringList(arr, maxItems) {
+      return arr is list
+        && arr.size() <= maxItems
+        && (arr.size() == 0 || (arr[0] is string && arr[0].size() <= 120));
+    }
+
+    // 3. Entity Validators (Strict Keys, Types, Sizes, Identity, Timestamp)
+    function isValidShowcaseItem(data, itemId) {
+      let requiredKeys = [
+        'id', 'title', 'subtitle', 'client', 'year', 'category', 'githubUrl',
+        'badge', 'accentColor', 'aspect', 'dimensions', 'mediaType',
+        'imageUrl', 'videoUrl', 'duration', 'row', 'sortOrder', 'type',
+        'isPublished', 'updatedByUid', 'updatedAt'
+      ];
+      return data.keys().hasAll(requiredKeys)
+        && data.keys().hasOnly(requiredKeys)
+        && isValidId(data.id)
+        && data.id == itemId
+        && isValidBoundedString(data.title, 1, 200)
+        && isValidBoundedString(data.subtitle, 0, 400)
+        && isValidBoundedString(data.client, 0, 150)
+        && isValidBoundedString(data.year, 0, 20)
+        && isValidBoundedString(data.category, 1, 120)
+        && isValidBoundedString(data.githubUrl, 0, 500)
+        && isValidBoundedString(data.badge, 0, 80)
+        && isValidBoundedString(data.accentColor, 0, 40)
+        && isValidBoundedString(data.aspect, 0, 30)
+        && isValidBoundedString(data.dimensions, 0, 120)
+        && (data.mediaType == 'image' || data.mediaType == 'video')
+        && isValidBoundedString(data.imageUrl, 0, 900000)
+        && isValidBoundedString(data.videoUrl, 0, 900000)
+        && isValidBoundedString(data.duration, 0, 20)
+        && data.row is number && (data.row == 1 || data.row == 2)
+        && data.sortOrder is number && data.sortOrder >= 0 && data.sortOrder <= 100000
+        && isValidBoundedString(data.type, 0, 40)
+        && data.isPublished is bool
+        && isValidBoundedString(data.updatedByUid, 1, 128)
+        && data.updatedByUid == request.auth.uid
+        && data.updatedAt == request.time;
+    }
+
+    function isValidTool(data, toolId) {
+      let requiredKeys = [
+        'id', 'name', 'category', 'level', 'proficiencyPercent', 'years',
+        'badge', 'color', 'bgColor', 'description', 'iconUrl',
+        'sortOrder', 'isPublished', 'updatedByUid', 'updatedAt'
+      ];
+      return data.keys().hasAll(requiredKeys)
+        && data.keys().hasOnly(requiredKeys)
+        && isValidId(data.id)
+        && data.id == toolId
+        && isValidBoundedString(data.name, 1, 120)
+        && isValidBoundedString(data.category, 1, 80)
+        && isValidBoundedString(data.level, 1, 40)
+        && data.proficiencyPercent is number && data.proficiencyPercent >= 0 && data.proficiencyPercent <= 100
+        && isValidBoundedString(data.years, 1, 40)
+        && isValidBoundedString(data.badge, 1, 20)
+        && isValidBoundedString(data.color, 1, 30)
+        && isValidBoundedString(data.bgColor, 1, 30)
+        && isValidBoundedString(data.description, 0, 500)
+        && isValidBoundedString(data.iconUrl, 0, 500000)
+        && data.sortOrder is number && data.sortOrder >= 0 && data.sortOrder <= 100000
+        && data.isPublished is bool
+        && isValidBoundedString(data.updatedByUid, 1, 128)
+        && data.updatedByUid == request.auth.uid
+        && data.updatedAt == request.time;
+    }
+
+    function isValidBlogPost(data, postId) {
+      let requiredKeys = [
+        'id', 'slug', 'title', 'seoTitle', 'excerpt', 'content', 'category',
+        'readTime', 'publishedDate', 'authorName', 'authorRole', 'authorAvatar',
+        'tags', 'seoKeywords', 'views', 'featured', 'sortOrder',
+        'isPublished', 'updatedByUid', 'updatedAt'
+      ];
+      return data.keys().hasAll(requiredKeys)
+        && data.keys().hasOnly(requiredKeys)
+        && isValidId(data.id)
+        && data.id == postId
+        && isValidBoundedString(data.slug, 1, 200)
+        && isValidBoundedString(data.title, 1, 250)
+        && isValidBoundedString(data.seoTitle, 0, 200)
+        && isValidBoundedString(data.excerpt, 0, 1000)
+        && isValidBoundedString(data.content, 1, 50000)
+        && isValidBoundedString(data.category, 1, 80)
+        && isValidBoundedString(data.readTime, 1, 40)
+        && isValidBoundedString(data.publishedDate, 1, 60)
+        && isValidBoundedString(data.authorName, 1, 120)
+        && isValidBoundedString(data.authorRole, 1, 120)
+        && isValidBoundedString(data.authorAvatar, 0, 1000)
+        && isValidStringList(data.tags, 20)
+        && isValidStringList(data.seoKeywords, 30)
+        && data.views is number && data.views >= 0 && data.views <= 100000000
+        && data.featured is bool
+        && data.sortOrder is number && data.sortOrder >= 0 && data.sortOrder <= 100000
+        && data.isPublished is bool
+        && isValidBoundedString(data.updatedByUid, 1, 128)
+        && data.updatedByUid == request.auth.uid
+        && data.updatedAt == request.time;
+    }
+
+    function isValidPublicSiteSettings(data) {
+      let requiredKeys = [
+        'contactEmail', 'whatsappNumber', 'primaryTarget', 'locationFocus',
+        'audience', 'goal', 'domain', 'blogTitle', 'seoTitle', 'urlSlug',
+        'metaDescription', 'keywords', 'isPublished', 'updatedByUid', 'updatedAt'
+      ];
+      return data.keys().hasAll(requiredKeys)
+        && data.keys().hasOnly(requiredKeys)
+        && isValidBoundedString(data.contactEmail, 3, 150)
+        && isValidBoundedString(data.whatsappNumber, 5, 30)
+        && isValidBoundedString(data.primaryTarget, 0, 200)
+        && isValidBoundedString(data.locationFocus, 0, 200)
+        && isValidBoundedString(data.audience, 0, 200)
+        && isValidBoundedString(data.goal, 0, 200)
+        && isValidBoundedString(data.domain, 0, 150)
+        && isValidBoundedString(data.blogTitle, 0, 250)
+        && isValidBoundedString(data.seoTitle, 0, 200)
+        && isValidBoundedString(data.urlSlug, 0, 200)
+        && isValidBoundedString(data.metaDescription, 0, 500)
+        && isValidStringList(data.keywords, 50)
+        && data.isPublished is bool
+        && isValidBoundedString(data.updatedByUid, 1, 128)
+        && data.updatedByUid == request.auth.uid
+        && data.updatedAt == request.time;
+    }
+
+    function isValidAdminAccount(data, uid) {
+      let requiredKeys = ['uid', 'email', 'role', 'createdAt'];
+      return data.keys().hasAll(requiredKeys)
+        && data.keys().hasOnly(requiredKeys)
+        && isValidId(data.uid)
+        && data.uid == uid
+        && isValidBoundedString(data.email, 3, 150)
+        && data.role == 'admin'
+        && data.createdAt == request.time;
+    }
+
+    // 4. Collection Rules
+    match /showcaseItems/{itemId} {
+      allow get: if isValidId(itemId) && (resource == null || existing().isPublished == true || isAdmin());
+      allow list: if resource.data.isPublished == true || isVerifiedAdminEmail();
+      allow create: if isAdmin() && isValidId(itemId) && isValidShowcaseItem(incoming(), itemId);
+      allow update: if isAdmin() && isValidId(itemId) && isValidShowcaseItem(incoming(), itemId)
+        && incoming().id == existing().id
+        && incoming().diff(existing()).affectedKeys().hasOnly([
+          'title', 'subtitle', 'client', 'year', 'category', 'githubUrl',
+          'badge', 'accentColor', 'aspect', 'dimensions', 'mediaType',
+          'imageUrl', 'videoUrl', 'duration', 'row', 'sortOrder', 'type',
+          'isPublished', 'updatedByUid', 'updatedAt'
+        ]);
+      allow delete: if isAdmin() && isValidId(itemId);
+    }
+
+    match /tools/{toolId} {
+      allow get: if isValidId(toolId) && (resource == null || existing().isPublished == true || isAdmin());
+      allow list: if resource.data.isPublished == true || isVerifiedAdminEmail();
+      allow create: if isAdmin() && isValidId(toolId) && isValidTool(incoming(), toolId);
+      allow update: if isAdmin() && isValidId(toolId) && isValidTool(incoming(), toolId)
+        && incoming().id == existing().id
+        && incoming().diff(existing()).affectedKeys().hasOnly([
+          'name', 'category', 'level', 'proficiencyPercent', 'years',
+          'badge', 'color', 'bgColor', 'description', 'iconUrl',
+          'sortOrder', 'isPublished', 'updatedByUid', 'updatedAt'
+        ]);
+      allow delete: if isAdmin() && isValidId(toolId);
+    }
+
+    match /blogPosts/{postId} {
+      allow get: if isValidId(postId) && (resource == null || existing().isPublished == true || isAdmin());
+      allow list: if resource.data.isPublished == true || isVerifiedAdminEmail();
+      allow create: if isAdmin() && isValidId(postId) && isValidBlogPost(incoming(), postId);
+      allow update: if isAdmin() && isValidId(postId) && isValidBlogPost(incoming(), postId)
+        && incoming().id == existing().id
+        && incoming().diff(existing()).affectedKeys().hasOnly([
+          'slug', 'title', 'seoTitle', 'excerpt', 'content', 'category',
+          'readTime', 'publishedDate', 'authorName', 'authorRole', 'authorAvatar',
+          'tags', 'seoKeywords', 'views', 'featured', 'sortOrder',
+          'isPublished', 'updatedByUid', 'updatedAt'
+        ]);
+      allow delete: if isAdmin() && isValidId(postId);
+    }
+
+    match /siteConfig/{configId} {
+      allow get: if isValidId(configId) && configId == 'public' && (resource == null || existing().isPublished == true || isAdmin());
+      allow list: if isVerifiedAdminEmail();
+      allow create: if isAdmin() && isValidId(configId) && configId == 'public' && isValidPublicSiteSettings(incoming());
+      allow update: if isAdmin() && isValidId(configId) && configId == 'public' && isValidPublicSiteSettings(incoming())
+        && incoming().diff(existing()).affectedKeys().hasOnly([
+          'contactEmail', 'whatsappNumber', 'primaryTarget', 'locationFocus',
+          'audience', 'goal', 'domain', 'blogTitle', 'seoTitle', 'urlSlug',
+          'metaDescription', 'keywords', 'isPublished', 'updatedByUid', 'updatedAt'
+        ]);
+      allow delete: if false;
+    }
+
+    match /admins/{uid} {
+      allow get: if isValidId(uid) && isSignedIn() && request.auth.uid == uid && isAdmin();
+      allow list: if false;
+      allow create: if isVerifiedAdminEmail() && isValidId(uid) && request.auth.uid == uid && isValidAdminAccount(incoming(), uid);
+      allow update: if false;
+      allow delete: if false;
+    }
+  }
+}

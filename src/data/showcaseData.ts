@@ -467,48 +467,120 @@ export const SHOWCASE_ROW_2: ShowcaseItem[] = [
   }
 ];
 
-const STORAGE_KEY_ROW_1 = 'typixel_portfolio_showcase_r1_v8';
-const STORAGE_KEY_ROW_2 = 'typixel_portfolio_showcase_r2_v8';
+const STORAGE_KEY_ROW_1 = 'typixel_portfolio_showcase_r1_v12';
+const STORAGE_KEY_ROW_2 = 'typixel_portfolio_showcase_r2_v12';
 
 /**
- * Normalizes any relative or loose image path to always resolve properly
+ * Detects whether a URL or mediaType represents a video reel
+ */
+export const isVideoMediaUrl = (url?: string, mediaType?: string): boolean => {
+  if (mediaType === 'video') return true;
+  if (!url) return false;
+  const clean = url.trim().toLowerCase();
+  if (clean.startsWith('data:video/')) return true;
+  const basePath = clean.split('?')[0].split('#')[0];
+  return (
+    basePath.endsWith('.mp4') ||
+    basePath.endsWith('.webm') ||
+    basePath.endsWith('.mov') ||
+    basePath.endsWith('.m4v')
+  );
+};
+
+/**
+ * Normalizes local paths, GitHub blob links, and preserves custom external URLs intact
  */
 export const normalizeShowcaseImagePath = (url?: string): string => {
   if (!url || !url.trim()) return '';
-  const clean = url.trim();
-  // Already absolute or data url
-  if (clean.startsWith('http://') || clean.startsWith('https://') || clean.startsWith('data:')) {
+  let clean = url.trim();
+
+  // Preserve data URLs and blob URLs
+  if (clean.startsWith('data:') || clean.startsWith('blob:')) {
     return clean;
   }
-  // If it's a known showcase name or path like showcase/xxx
-  if (clean.startsWith('showcase/')) {
-    return `/${clean}`;
+
+  // Auto-convert GitHub /blob/ links to playable raw.githubusercontent.com URLs
+  if (clean.startsWith('https://github.com/') && clean.includes('/blob/')) {
+    clean = clean
+      .replace('https://github.com/', 'https://raw.githubusercontent.com/')
+      .replace('/blob/', '/');
   }
-  if (!clean.startsWith('/')) {
-    return `/${clean}`;
+
+  // If external URL: ONLY map to local asset if it points specifically to typixelofficial/typixel repo showcase/logos
+  if (clean.startsWith('http://') || clean.startsWith('https://')) {
+    const isTypixelRepo = clean.includes('typixelofficial/typixel/');
+    if (!isTypixelRepo) {
+      return clean;
+    }
   }
+
+  // Extract base filename for local / typixel repo showcase assets
+  const filename = clean.split('/').pop()?.split('?')[0] || '';
+  const lower = filename.toLowerCase();
+
+  if (lower.includes('chamayam') && !lower.includes('vishu')) return '/showcase/Chamayam.jpg';
+  if (lower.includes('vishuchamayam')) return '/showcase/vishuchamayam.jpg';
+  if (lower.includes('classycoat') || lower.includes('classy-coat') || lower.includes('classy coat')) return '/showcase/classycoat.jpg';
+  if (lower.includes('crystalmart')) return '/showcase/eidcrystalmart.webp';
+  if (lower.includes('swahwa')) return '/showcase/eidswahwa.jpg';
+  if (lower === 'flow.png' || lower === 'flow.jpg') return '/showcase/flow.png';
+  if (lower === 'frost.jpg' || lower === 'frost.png') return '/showcase/frost.jpg';
+  if (lower === 'skillovia.jpg' || lower === 'skilllovia.jpg') return '/showcase/Skillovia.jpg';
+  if (lower === 'yenza.jpg') return '/showcase/Yenza.jpg';
+  if (lower.includes('savethedatevideo') || lower.includes('savethedate_fast')) return '/showcase/savethedatevideo_.mp4';
+  if (lower.includes('savethedate_poster') || lower.includes('savethedateposter')) return '/showcase/savethedate_poster.jpg';
+  if (lower.includes('savethedatepost')) return '/showcase/savethedatepost.jpg';
+  if (lower.includes('neic_poster') || lower.includes('neicposter')) return '/showcase/neic_poster.jpg';
+  if (lower === 'neic.mp4' || lower === 'neic_fast.mp4') return '/showcase/neic.mp4';
+  if (lower === 'typixel.jpg') return '/logos/typixel.jpg';
+
+  if (clean.startsWith('/showcase/') || clean.startsWith('/logos/')) return clean;
+  if (clean.startsWith('showcase/')) return `/${clean}`;
+  if (!clean.startsWith('http://') && !clean.startsWith('https://')) {
+    return clean.startsWith('/') ? clean : `/showcase/${clean}`;
+  }
+
   return clean;
 };
 
+// Clean any legacy showcase storage keys from older turns
+const purgeOldStorageVersions = () => {
+  try {
+    const keysToRemove: string[] = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith('typixel_portfolio_showcase_') && key !== STORAGE_KEY_ROW_1 && key !== STORAGE_KEY_ROW_2) {
+        keysToRemove.push(key);
+      }
+    }
+    keysToRemove.forEach((k) => localStorage.removeItem(k));
+  } catch {}
+};
+
+const sanitizeShowcaseItem = (item: ShowcaseItem): ShowcaseItem => {
+  return {
+    ...item,
+    imageUrl: normalizeShowcaseImagePath(item.imageUrl),
+    videoUrl: item.videoUrl ? normalizeShowcaseImagePath(item.videoUrl) : undefined
+  };
+};
+
 export const getStoredProjectsRow1 = (): ShowcaseItem[] => {
+  purgeOldStorageVersions();
   try {
     const data = localStorage.getItem(STORAGE_KEY_ROW_1);
     if (data) {
       const parsed = JSON.parse(data);
       if (Array.isArray(parsed) && parsed.length > 0) {
-        // Filter out any stale items referencing missing Works folders
-        const hasBrokenWorks = parsed.some((p: ShowcaseItem) => p.imageUrl?.includes('/Works/'));
-        if (!hasBrokenWorks) {
-          return parsed;
-        }
+        return parsed.map(sanitizeShowcaseItem);
       }
     }
   } catch (err) {
     console.error('Failed to read Row 1 projects from storage:', err);
   }
-  // Save new default items into storage
+  // Initialize storage with fresh default items
   saveProjectsToStorage(SHOWCASE_ROW_1, SHOWCASE_ROW_2);
-  return SHOWCASE_ROW_1;
+  return SHOWCASE_ROW_1.map(sanitizeShowcaseItem);
 };
 
 export const getStoredProjectsRow2 = (): ShowcaseItem[] => {
@@ -517,22 +589,21 @@ export const getStoredProjectsRow2 = (): ShowcaseItem[] => {
     if (data) {
       const parsed = JSON.parse(data);
       if (Array.isArray(parsed) && parsed.length > 0) {
-        const hasBrokenWorks = parsed.some((p: ShowcaseItem) => p.imageUrl?.includes('/Works/'));
-        if (!hasBrokenWorks) {
-          return parsed;
-        }
+        return parsed.map(sanitizeShowcaseItem);
       }
     }
   } catch (err) {
     console.error('Failed to read Row 2 projects from storage:', err);
   }
-  return SHOWCASE_ROW_2;
+  return SHOWCASE_ROW_2.map(sanitizeShowcaseItem);
 };
 
 export const saveProjectsToStorage = (row1: ShowcaseItem[], row2: ShowcaseItem[]) => {
   try {
-    localStorage.setItem(STORAGE_KEY_ROW_1, JSON.stringify(row1));
-    localStorage.setItem(STORAGE_KEY_ROW_2, JSON.stringify(row2));
+    const sanitizedRow1 = row1.map(sanitizeShowcaseItem);
+    const sanitizedRow2 = row2.map(sanitizeShowcaseItem);
+    localStorage.setItem(STORAGE_KEY_ROW_1, JSON.stringify(sanitizedRow1));
+    localStorage.setItem(STORAGE_KEY_ROW_2, JSON.stringify(sanitizedRow2));
   } catch (err) {
     console.error('Failed to save projects to storage:', err);
   }

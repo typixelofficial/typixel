@@ -1,0 +1,458 @@
+{
+  "entities": {
+    "ShowcaseItem": {
+      "title": "ShowcaseItem",
+      "description": "A graphic design poster, brand identity, or motion video reel displayed in the Typixel portfolio marquee.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "subtitle": {
+          "type": "string",
+          "maxLength": 400
+        },
+        "client": {
+          "type": "string",
+          "maxLength": 150
+        },
+        "year": {
+          "type": "string",
+          "maxLength": 20
+        },
+        "category": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "githubUrl": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "badge": {
+          "type": "string",
+          "maxLength": 80
+        },
+        "accentColor": {
+          "type": "string",
+          "maxLength": 40
+        },
+        "aspect": {
+          "type": "string",
+          "maxLength": 30
+        },
+        "dimensions": {
+          "type": "string",
+          "maxLength": 120
+        },
+        "mediaType": {
+          "type": "string",
+          "enum": ["image", "video"]
+        },
+        "imageUrl": {
+          "type": "string",
+          "maxLength": 900000
+        },
+        "videoUrl": {
+          "type": "string",
+          "maxLength": 900000
+        },
+        "duration": {
+          "type": "string",
+          "maxLength": 20
+        },
+        "row": {
+          "type": "number"
+        },
+        "sortOrder": {
+          "type": "number"
+        },
+        "type": {
+          "type": "string",
+          "maxLength": 40
+        },
+        "isPublished": {
+          "type": "boolean"
+        },
+        "updatedByUid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "subtitle",
+        "client",
+        "year",
+        "category",
+        "githubUrl",
+        "badge",
+        "accentColor",
+        "aspect",
+        "dimensions",
+        "mediaType",
+        "imageUrl",
+        "videoUrl",
+        "duration",
+        "row",
+        "sortOrder",
+        "type",
+        "isPublished",
+        "updatedByUid",
+        "updatedAt"
+      ]
+    },
+    "ExperiencedTool": {
+      "title": "ExperiencedTool",
+      "description": "A design, motion, or web engineering software tool listed in the Typixel skills marquee.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "category": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "level": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 40
+        },
+        "proficiencyPercent": {
+          "type": "number"
+        },
+        "years": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 40
+        },
+        "badge": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 20
+        },
+        "color": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 30
+        },
+        "bgColor": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 30
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "iconUrl": {
+          "type": "string",
+          "maxLength": 500000
+        },
+        "sortOrder": {
+          "type": "number"
+        },
+        "isPublished": {
+          "type": "boolean"
+        },
+        "updatedByUid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "category",
+        "level",
+        "proficiencyPercent",
+        "years",
+        "badge",
+        "color",
+        "bgColor",
+        "description",
+        "iconUrl",
+        "sortOrder",
+        "isPublished",
+        "updatedByUid",
+        "updatedAt"
+      ]
+    },
+    "BlogPost": {
+      "title": "BlogPost",
+      "description": "An SEO article published in the Typixel studio blog.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "slug": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 250
+        },
+        "seoTitle": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "excerpt": {
+          "type": "string",
+          "maxLength": 1000
+        },
+        "content": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 50000
+        },
+        "category": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "readTime": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 40
+        },
+        "publishedDate": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 60
+        },
+        "authorName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "authorRole": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "authorAvatar": {
+          "type": "string",
+          "maxLength": 1000
+        },
+        "tags": {
+          "type": "array"
+        },
+        "seoKeywords": {
+          "type": "array"
+        },
+        "views": {
+          "type": "number"
+        },
+        "featured": {
+          "type": "boolean"
+        },
+        "sortOrder": {
+          "type": "number"
+        },
+        "isPublished": {
+          "type": "boolean"
+        },
+        "updatedByUid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "slug",
+        "title",
+        "seoTitle",
+        "excerpt",
+        "content",
+        "category",
+        "readTime",
+        "publishedDate",
+        "authorName",
+        "authorRole",
+        "authorAvatar",
+        "tags",
+        "seoKeywords",
+        "views",
+        "featured",
+        "sortOrder",
+        "isPublished",
+        "updatedByUid",
+        "updatedAt"
+      ]
+    },
+    "PublicSiteSettings": {
+      "title": "PublicSiteSettings",
+      "description": "Publicly displayed Typixel business contact channels and SEO metadata configuration.",
+      "type": "object",
+      "properties": {
+        "contactEmail": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 150
+        },
+        "whatsappNumber": {
+          "type": "string",
+          "minLength": 5,
+          "maxLength": 30
+        },
+        "primaryTarget": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "locationFocus": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "audience": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "goal": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "domain": {
+          "type": "string",
+          "maxLength": 150
+        },
+        "blogTitle": {
+          "type": "string",
+          "maxLength": 250
+        },
+        "seoTitle": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "urlSlug": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "metaDescription": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "keywords": {
+          "type": "array"
+        },
+        "isPublished": {
+          "type": "boolean"
+        },
+        "updatedByUid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "contactEmail",
+        "whatsappNumber",
+        "primaryTarget",
+        "locationFocus",
+        "audience",
+        "goal",
+        "domain",
+        "blogTitle",
+        "seoTitle",
+        "urlSlug",
+        "metaDescription",
+        "keywords",
+        "isPublished",
+        "updatedByUid",
+        "updatedAt"
+      ]
+    },
+    "AdminAccount": {
+      "title": "AdminAccount",
+      "description": "Authorized admin record granting write access to portfolio collections.",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "email": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 150
+        },
+        "role": {
+          "type": "string",
+          "enum": ["admin"]
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["uid", "email", "role", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/showcaseItems/{itemId}": {
+      "schema": { "$ref": "#/entities/ShowcaseItem" },
+      "description": "Public showcase posters and motion video reels synced globally across all visitors."
+    },
+    "/tools/{toolId}": {
+      "schema": { "$ref": "#/entities/ExperiencedTool" },
+      "description": "Experienced creative software and engineering tools marquee items."
+    },
+    "/blogPosts/{postId}": {
+      "schema": { "$ref": "#/entities/BlogPost" },
+      "description": "SEO blog posts published in the Typixel studio blog."
+    },
+    "/siteConfig/{configId}": {
+      "schema": { "$ref": "#/entities/PublicSiteSettings" },
+      "description": "Public business contact settings and SEO metadata."
+    },
+    "/admins/{uid}": {
+      "schema": { "$ref": "#/entities/AdminAccount" },
+      "description": "Registered administrator documents."
+    }
+  }
+}

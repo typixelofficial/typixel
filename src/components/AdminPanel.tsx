@@ -4,13 +4,9 @@ import {
   Lock,
   Plus,
   Trash2,
-  RotateCcw,
   Layers,
   CheckCircle,
-  Eye,
-  EyeOff,
   LogOut,
-  KeyRound,
   Mail,
   Save,
   Wrench,
@@ -36,20 +32,30 @@ import {
   SHOWCASE_PRESET_IMAGES,
   normalizeShowcaseImagePath,
   saveProjectsToStorage,
-  SHOWCASE_ROW_1,
-  SHOWCASE_ROW_2
+  isVideoMediaUrl
 } from '../data/showcaseData.ts';
 import { ContactConfig, saveContactConfigToStorage } from '../data/contactConfig.ts';
-import { ExperiencedTool, DEFAULT_TOOLS, saveToolsToStorage, resetToolsToDefault } from '../data/toolsData.ts';
-import { BlogPost, DEFAULT_BLOG_POSTS, saveBlogPostsToStorage, resetBlogPostsToDefault } from '../data/blogData.ts';
+import { ExperiencedTool, DEFAULT_TOOLS, saveToolsToStorage } from '../data/toolsData.ts';
+import { BlogPost, DEFAULT_BLOG_POSTS, saveBlogPostsToStorage } from '../data/blogData.ts';
 import {
   SeoStrategyData,
-  DEFAULT_SEO_STRATEGY,
   getStoredSeoStrategy,
-  saveSeoStrategyToStorage,
-  resetSeoStrategyToDefault
+  saveSeoStrategyToStorage
 } from '../data/seoStrategyConfig.ts';
 import { AppLogo } from './AppLogo.tsx';
+import { onAuthStateChanged, signInWithPopup, signOut, User } from 'firebase/auth';
+import { auth, googleProvider, isAuthorizedAdminEmail } from '../firebase.ts';
+import {
+  ensureAdminRecordAndSeed,
+  upsertShowcaseItemToCloud,
+  deleteShowcaseItemFromCloud,
+  saveShowcaseOrderToCloud,
+  upsertToolToCloud,
+  deleteToolFromCloud,
+  upsertBlogPostToCloud,
+  deleteBlogPostFromCloud,
+  saveSiteSettingsToCloud
+} from '../services/portfolioSyncService.ts';
 
 interface AdminPanelProps {
   isOpen: boolean;
@@ -78,47 +84,52 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   blogPosts = DEFAULT_BLOG_POSTS,
   onBlogPostsUpdated
 }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [authUser, setAuthUser] = useState<User | null>(() => auth.currentUser);
+  const [isAuthLoading, setIsAuthLoading] = useState<boolean>(false);
+  const [isCloudSyncing, setIsCloudSyncing] = useState<boolean>(false);
+  const [hasSeededCloud, setHasSeededCloud] = useState<boolean>(false);
 
-  // Always require login when opening the admin panel: never jump directly to interface
-  useEffect(() => {
-    if (isOpen) {
-      setIsAuthenticated(false);
-      setUsername('');
-      setPassword('');
-      setLoginError('');
-      setAuthView('login');
-      try {
-        localStorage.removeItem('kawsar_admin_auth');
-      } catch {}
-    }
-  }, [isOpen]);
+  const isAuthenticated = Boolean(authUser && isAuthorizedAdminEmail(authUser.email));
 
-  // Auth & Password states
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState('');
-  const [authView, setAuthView] = useState<'login' | 'forgot'>('login');
-
-  // Forgot Password state
-  const [recoveryInput, setRecoveryInput] = useState('');
-  const [forgotNewPassword, setForgotNewPassword] = useState('');
-  const [showForgotNewPassword, setShowForgotNewPassword] = useState(false);
-  const [forgotError, setForgotError] = useState('');
-
-  // Change Password Modal inside Admin
-  const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
-  const [currentPasswordInput, setCurrentPasswordInput] = useState('');
-  const [changeNewPassword, setChangeNewPassword] = useState('');
-  const [changeConfirmPassword, setChangeConfirmPassword] = useState('');
-  const [showChangeNewPassword, setShowChangeNewPassword] = useState(false);
-  const [changePasswordError, setChangePasswordError] = useState('');
 
   // Admin Dashboard Tabs & Toast (includes SEO Control & Backup)
   type AdminTab = 'seocontrol' | 'add' | 'manage' | 'tools' | 'blog' | 'settings' | 'backup';
   const [activeTab, setActiveTab] = useState<AdminTab>('seocontrol');
   const [successToast, setSuccessToast] = useState('');
+  const [cloudErrorToast, setCloudErrorToast] = useState('');
+
+  // Subscribe to Firebase Google Auth state
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, async (user) => {
+      setAuthUser(user);
+      if (user && !isAuthorizedAdminEmail(user.email)) {
+        setLoginError(
+          `Signed in as ${user.email || 'unknown account'}, which is not authorized for typixel admincontrol. Please sign in with hashimtypixel@gmail.com.`
+        );
+      } else {
+        setLoginError('');
+      }
+    });
+    return () => unsub();
+  }, []);
+
+  // Ensure Firestore collections are seeded when authorized Admin enters Control Room
+  useEffect(() => {
+    if (isOpen && isAuthenticated && !hasSeededCloud) {
+      setHasSeededCloud(true);
+      ensureAdminRecordAndSeed(
+        row1Projects,
+        row2Projects,
+        tools,
+        blogPosts,
+        contactConfig,
+        getStoredSeoStrategy()
+      ).catch((err) => {
+        console.error('Initial cloud seed notice:', err);
+      });
+    }
+  }, [isOpen, isAuthenticated, hasSeededCloud]);
 
   // SEO Publishing Strategy & Metadata state
   const [seoStrategy, setSeoStrategy] = useState<SeoStrategyData>(() => getStoredSeoStrategy());
@@ -133,6 +144,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   const [newBadge, setNewBadge] = useState('');
   const [newRow, setNewRow] = useState<1 | 2>(1);
   const [newImageUrl, setNewImageUrl] = useState('');
+  const [newVideoPosterUrl, setNewVideoPosterUrl] = useState('');
+  const [newUploadError, setNewUploadError] = useState('');
   const [projectMediaMode, setProjectMediaMode] = useState<'preset' | 'upload' | 'link'>('preset');
 
   // Form state for editing existing showcase project
@@ -144,6 +157,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   const [editBadge, setEditBadge] = useState('');
   const [editRow, setEditRow] = useState<1 | 2>(1);
   const [editImageUrl, setEditImageUrl] = useState('');
+  const [editVideoPosterUrl, setEditVideoPosterUrl] = useState('');
+  const [editUploadError, setEditUploadError] = useState('');
   const [editMediaMode, setEditMediaMode] = useState<'preset' | 'upload' | 'link'>('link');
 
   // Form state for adding/editing Experienced Tools
@@ -173,118 +188,81 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   const [emailJsTemplateId, setEmailJsTemplateId] = useState(() => localStorage.getItem('kawsar_emailjs_template_id') || 'template_inquiry');
   const [emailJsPublicKey, setEmailJsPublicKey] = useState(() => localStorage.getItem('kawsar_emailjs_public_key') || '');
 
+  useEffect(() => {
+    setSettingsEmail(contactConfig.email);
+    setSettingsWhatsApp(contactConfig.whatsappNumber);
+  }, [contactConfig.email, contactConfig.whatsappNumber]);
+
   if (!isOpen) return null;
 
-  const getStoredPassword = (): string => {
-    return localStorage.getItem('kawsar_admin_custom_pwd') || 'admin123';
+  const showToast = (msg: string) => {
+    setCloudErrorToast('');
+    setSuccessToast(msg);
+    setTimeout(() => setSuccessToast(''), 3500);
   };
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    const storedPwd = getStoredPassword();
-
-    const validUser =
-      username.trim().toLowerCase() === 'admin' ||
-      username.trim().toLowerCase() === 'typixel' ||
-      username.trim().toLowerCase() === 'typixwl' ||
-      username.trim().toLowerCase() === 'kawsar';
-    const validPwd =
-      password === storedPwd ||
-      (password === 'design2026' && (username.trim().toLowerCase() === 'typixel' || username.trim().toLowerCase() === 'typixwl' || username.trim().toLowerCase() === 'kawsar'));
-
-    if (validUser && validPwd) {
-      setIsAuthenticated(true);
-      localStorage.setItem('kawsar_admin_auth', 'true');
-      setLoginError('');
-      setUsername('');
-      setPassword('');
-    } else {
-      setLoginError('Invalid credentials. Please verify username and password.');
-    }
+  const showError = (msg: string) => {
+    setCloudErrorToast(msg);
+    setTimeout(() => setCloudErrorToast(''), 5500);
   };
 
-  const handleForgotPassword = (e: React.FormEvent) => {
-    e.preventDefault();
-    const cleanRecovery = recoveryInput.trim().toLowerCase();
-
-    if (
-      cleanRecovery === 'typixelofficial@gmail.com' ||
-      cleanRecovery === 'hashimtypixel@gmail.com' ||
-      cleanRecovery === 'kawsarv.design@gmail.com' ||
-      cleanRecovery === contactConfig.email.toLowerCase() ||
-      cleanRecovery === 'admin' ||
-      cleanRecovery === 'typixel' ||
-      cleanRecovery === 'typixwl' ||
-      cleanRecovery === 'kawsar' ||
-      cleanRecovery === '2026'
-    ) {
-      if (forgotNewPassword.length < 4) {
-        setForgotError('New password must be at least 4 characters long.');
-        return;
+  const handleGoogleSignIn = async () => {
+    setIsAuthLoading(true);
+    setLoginError('');
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      if (!isAuthorizedAdminEmail(result.user.email)) {
+        setLoginError(
+          `Signed in as ${result.user.email || 'unknown account'}, which is not authorized. Please sign in with hashimtypixel@gmail.com.`
+        );
       }
-      localStorage.setItem('kawsar_admin_custom_pwd', forgotNewPassword);
-      setSuccessToast('Password successfully reset! You can now log in.');
-      setAuthView('login');
-      setPassword(forgotNewPassword);
-      setForgotError('');
-      setRecoveryInput('');
-      setForgotNewPassword('');
-    } else {
-      setForgotError('Recovery identifier does not match your registered email or admin username.');
+    } catch (err: any) {
+      if (err?.code === 'auth/popup-closed-by-user') {
+        setLoginError('Google sign-in popup was closed. Please try again.');
+      } else {
+        setLoginError(err?.message || 'Google sign-in failed. Please try again.');
+      }
+    } finally {
+      setIsAuthLoading(false);
     }
   };
 
-  const handleChangePassword = (e: React.FormEvent) => {
-    e.preventDefault();
-    const currentStored = getStoredPassword();
-
-    if (currentPasswordInput !== currentStored) {
-      setChangePasswordError('Current password is incorrect.');
-      return;
-    }
-
-    if (changeNewPassword.length < 4) {
-      setChangePasswordError('New password must be at least 4 characters long.');
-      return;
-    }
-
-    if (changeNewPassword !== changeConfirmPassword) {
-      setChangePasswordError('New passwords do not match.');
-      return;
-    }
-
-    localStorage.setItem('kawsar_admin_custom_pwd', changeNewPassword);
-    setIsChangePasswordOpen(false);
-    setCurrentPasswordInput('');
-    setChangeNewPassword('');
-    setChangeConfirmPassword('');
-    setChangePasswordError('');
-    setSuccessToast('Admin password changed successfully!');
-    setTimeout(() => setSuccessToast(''), 3000);
-  };
-
-  const handleLogout = () => {
-    setIsAuthenticated(false);
-    localStorage.removeItem('kawsar_admin_auth');
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      setHasSeededCloud(false);
+    } catch {}
   };
 
   // --- Project Add / Edit / Delete ---
-  // Automatic Canvas Image Compressor: prevents browser 5MB localStorage quota errors
-  const compressImageFile = (file: File, callback: (compressedDataUrl: string) => void) => {
-    if (file.type === 'video/mp4' || file.name.toLowerCase().endsWith('.mp4')) {
+  // Adaptive Compressor: guarantees images fit comfortably under Firestore's 1MB document ceiling
+  const compressImageFile = (
+    file: File,
+    callback: (compressedDataUrl: string) => void,
+    onSizeError: (msg: string) => void
+  ) => {
+    const isVideoFile = file.type.startsWith('video/') || /\.(mp4|webm|mov|m4v)$/i.test(file.name);
+    if (isVideoFile) {
+      if (file.size > 600 * 1024) {
+        onSizeError(
+          `Video "${file.name}" is ${(file.size / (1024 * 1024)).toFixed(1)} MB. For global visitor playback, upload videos to GitHub/Cloudinary and paste the direct .mp4 URL in the "URL / Path" tab (direct file uploads support videos up to 600 KB).`
+        );
+        return;
+      }
       const reader = new FileReader();
       reader.onload = (e) => callback(e.target?.result as string);
       reader.readAsDataURL(file);
       return;
     }
+
     const reader = new FileReader();
     reader.onload = (event) => {
       const rawUrl = event.target?.result as string;
       const img = new Image();
       img.onload = () => {
         const canvas = document.createElement('canvas');
-        const MAX_WIDTH = 1200;
-        const MAX_HEIGHT = 1500;
+        const MAX_WIDTH = 1000;
+        const MAX_HEIGHT = 1250;
         let width = img.width;
         let height = img.height;
 
@@ -305,7 +283,17 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
         const ctx = canvas.getContext('2d');
         if (ctx) {
           ctx.drawImage(img, 0, 0, width, height);
-          const compressed = canvas.toDataURL('image/jpeg', 0.82);
+          let compressed = canvas.toDataURL('image/jpeg', 0.8);
+          if (compressed.length > 650000) {
+            compressed = canvas.toDataURL('image/jpeg', 0.65);
+          }
+          if (compressed.length > 650000) {
+            compressed = canvas.toDataURL('image/jpeg', 0.48);
+          }
+          if (compressed.length > 850000) {
+            onSizeError('Compressed image is still too large for cloud sync. Please choose a smaller image or paste an image URL.');
+            return;
+          }
           callback(compressed);
         } else {
           callback(rawUrl);
@@ -321,13 +309,23 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
     const file = e.target.files?.[0];
     if (!file) return;
 
-    compressImageFile(file, (dataUrl) => {
-      if (isEdit) {
-        setEditImageUrl(dataUrl);
-      } else {
-        setNewImageUrl(dataUrl);
+    if (isEdit) setEditUploadError('');
+    else setNewUploadError('');
+
+    compressImageFile(
+      file,
+      (dataUrl) => {
+        if (isEdit) {
+          setEditImageUrl(dataUrl);
+        } else {
+          setNewImageUrl(dataUrl);
+        }
+      },
+      (errMsg) => {
+        if (isEdit) setEditUploadError(errMsg);
+        else setNewUploadError(errMsg);
       }
-    });
+    );
   };
 
   const handleSelectPreset = (preset: typeof SHOWCASE_PRESET_IMAGES[0], isEdit = false) => {
@@ -348,7 +346,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
     }
   };
 
-  const handleAddProject = (e: React.FormEvent) => {
+  const handleAddProject = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newTitle.trim()) return;
 
@@ -358,7 +356,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
         : newCategory;
 
     const mediaUrl = normalizeShowcaseImagePath(newImageUrl.trim());
-    const isVideo = mediaUrl.toLowerCase().includes('.mp4');
+    const posterUrl = normalizeShowcaseImagePath(newVideoPosterUrl.trim());
+    const isVideo = isVideoMediaUrl(mediaUrl);
 
     const newItem: ShowcaseItem = {
       id: `proj-${Date.now()}`,
@@ -367,7 +366,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       client: '',
       category: resolvedCategory,
       year: '2026',
-      githubUrl: 'https://github.com/typixelofficial/portfolio',
+      githubUrl: '',
       badge: newBadge.trim() || (isVideo ? 'Video Reel' : 'Poster Art'),
       accentColor: isVideo ? '#8B5CF6' : '#171717',
       aspect: isVideo ? '9/16' : '4/5',
@@ -376,7 +375,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       description: '',
       keyFeatures: [],
       languages: [],
-      imageUrl: isVideo ? undefined : (mediaUrl || undefined),
+      imageUrl: isVideo ? (posterUrl || undefined) : (mediaUrl || undefined),
       mediaType: isVideo ? 'video' : 'image',
       videoUrl: isVideo ? mediaUrl : undefined,
       duration: isVideo ? '0:20' : undefined,
@@ -393,17 +392,26 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       updatedRow2 = [newItem, ...updatedRow2];
     }
 
-    saveProjectsToStorage(updatedRow1, updatedRow2);
-    onProjectsUpdated(updatedRow1, updatedRow2);
+    setIsCloudSyncing(true);
+    try {
+      await saveShowcaseOrderToCloud(updatedRow1, updatedRow2);
+      saveProjectsToStorage(updatedRow1, updatedRow2);
+      onProjectsUpdated(updatedRow1, updatedRow2);
 
-    setNewTitle('');
-    setNewSubtitle('');
-    setNewBadge('');
-    setNewImageUrl('');
-    setCustomCategoryName('');
+      setNewTitle('');
+      setNewSubtitle('');
+      setNewBadge('');
+      setNewImageUrl('');
+      setNewVideoPosterUrl('');
+      setNewUploadError('');
+      setCustomCategoryName('');
 
-    setSuccessToast(`Project "${newItem.title}" added to Row ${newRow}!`);
-    setTimeout(() => setSuccessToast(''), 3000);
+      showToast(`"${newItem.title}" published live to Row ${newRow} for all visitors!`);
+    } catch (err: any) {
+      showError(err?.message || 'Failed to save project to cloud database.');
+    } finally {
+      setIsCloudSyncing(false);
+    }
   };
 
   const handleStartEditProject = (item: ShowcaseItem & { assignedRow: number }) => {
@@ -411,15 +419,25 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
     setEditTitle(item.title);
     setEditSubtitle(item.subtitle || '');
     setEditBadge(item.badge || '');
+    setEditUploadError('');
 
     const standardCategories = [
       'Event Branding & Poster',
+      'Commercial Poster Design',
+      'Festive & Cultural Poster',
+      'Visual Identity & Branding',
+      'Logo Design & Identity',
+      'Product & Packaging Mockup',
+      'Event Branding & Invitation',
+      'Cultural Poster & Digital Art',
+      'Brand Identity & Logo',
+      'Spiritual Typography & Poster',
       'Matchday Sports Poster',
       'Editorial Typography',
       'Digital Artwork & Manipulation',
-      'Product & Packaging Mockup',
       'Social Media Campaign',
-      'Visual Identity & Logo',
+      'Motion Graphics & Video',
+      'Motion Video & Wedding',
       'Motion Graphic Poster'
     ];
 
@@ -432,11 +450,13 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
     }
 
     setEditRow(item.assignedRow as 1 | 2);
-    setEditImageUrl(item.imageUrl || item.videoUrl || '');
+    const isVid = isVideoMediaUrl(item.videoUrl || item.imageUrl, item.mediaType);
+    setEditImageUrl(isVid ? (item.videoUrl || item.imageUrl || '') : (item.imageUrl || ''));
+    setEditVideoPosterUrl(isVid && item.imageUrl && !isVideoMediaUrl(item.imageUrl) ? item.imageUrl : '');
     setEditMediaMode('link');
   };
 
-  const handleSaveEditProject = (e: React.FormEvent) => {
+  const handleSaveEditProject = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingProject) return;
 
@@ -446,40 +466,58 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
         : editCategory;
 
     const mediaUrl = normalizeShowcaseImagePath(editImageUrl.trim());
-    const isVideo = mediaUrl.toLowerCase().includes('.mp4');
+    const posterUrl = normalizeShowcaseImagePath(editVideoPosterUrl.trim());
+    const isVideo = isVideoMediaUrl(mediaUrl);
 
     const updatedItem: ShowcaseItem = {
       ...editingProject,
       title: editTitle.trim() || editingProject.title,
-      subtitle: editSubtitle.trim() || editingProject.subtitle,
+      subtitle: editSubtitle.trim() ?? editingProject.subtitle,
       category: resolvedCategory,
       badge: editBadge.trim() || editingProject.badge || (isVideo ? 'Video Reel' : 'Poster Art'),
-      imageUrl: isVideo ? undefined : (mediaUrl || undefined),
+      imageUrl: isVideo ? (posterUrl || undefined) : (mediaUrl || undefined),
       mediaType: isVideo ? 'video' : 'image',
       videoUrl: isVideo ? mediaUrl : undefined,
       row: editRow
     };
 
-    // Remove old item from both rows
     let updatedRow1 = row1Projects.filter((p) => p.id !== editingProject.id);
     let updatedRow2 = row2Projects.filter((p) => p.id !== editingProject.id);
 
-    // Place into target row
     if (editRow === 1) {
-      updatedRow1 = [updatedItem, ...updatedRow1];
+      const idx = row1Projects.findIndex((p) => p.id === editingProject.id);
+      if (idx !== -1) {
+        updatedRow1.splice(idx, 0, updatedItem);
+      } else {
+        updatedRow1 = [updatedItem, ...updatedRow1];
+      }
     } else {
-      updatedRow2 = [updatedItem, ...updatedRow2];
+      const idx = row2Projects.findIndex((p) => p.id === editingProject.id);
+      if (idx !== -1) {
+        updatedRow2.splice(idx, 0, updatedItem);
+      } else {
+        updatedRow2 = [updatedItem, ...updatedRow2];
+      }
     }
 
-    saveProjectsToStorage(updatedRow1, updatedRow2);
-    onProjectsUpdated(updatedRow1, updatedRow2);
+    setIsCloudSyncing(true);
+    try {
+      const targetList = editRow === 1 ? updatedRow1 : updatedRow2;
+      const sortIdx = targetList.findIndex((p) => p.id === updatedItem.id);
+      await upsertShowcaseItemToCloud(updatedItem, editRow, sortIdx >= 0 ? sortIdx : 0);
+      saveProjectsToStorage(updatedRow1, updatedRow2);
+      onProjectsUpdated(updatedRow1, updatedRow2);
 
-    setEditingProject(null);
-    setSuccessToast(`Project "${updatedItem.title}" updated successfully!`);
-    setTimeout(() => setSuccessToast(''), 3000);
+      setEditingProject(null);
+      showToast(`"${updatedItem.title}" saved globally for all visitors!`);
+    } catch (err: any) {
+      showError(err?.message || 'Failed to update showcase item in cloud.');
+    } finally {
+      setIsCloudSyncing(false);
+    }
   };
 
-  const handleToggleProjectRow = (item: ShowcaseItem, currentRow: number) => {
+  const handleToggleProjectRow = async (item: ShowcaseItem, currentRow: number) => {
     const targetRow = (currentRow === 1 ? 2 : 1) as 1 | 2;
     const updatedItem = { ...item, row: targetRow };
     let updatedRow1 = row1Projects.filter((p) => p.id !== item.id);
@@ -489,23 +527,39 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
     } else {
       updatedRow2 = [updatedItem, ...updatedRow2];
     }
-    saveProjectsToStorage(updatedRow1, updatedRow2);
-    onProjectsUpdated(updatedRow1, updatedRow2);
-    setSuccessToast(`Moved "${item.title}" to Row ${targetRow}`);
-    setTimeout(() => setSuccessToast(''), 3000);
+
+    setIsCloudSyncing(true);
+    try {
+      await saveShowcaseOrderToCloud(updatedRow1, updatedRow2);
+      saveProjectsToStorage(updatedRow1, updatedRow2);
+      onProjectsUpdated(updatedRow1, updatedRow2);
+      showToast(`Moved "${item.title}" to Row ${targetRow} globally!`);
+    } catch (err: any) {
+      showError(err?.message || 'Failed to move project row.');
+    } finally {
+      setIsCloudSyncing(false);
+    }
   };
 
-  const handleDeleteProject = (id: string) => {
+  const handleDeleteProject = async (id: string) => {
     const updatedRow1 = row1Projects.filter((p) => p.id !== id);
     const updatedRow2 = row2Projects.filter((p) => p.id !== id);
-    saveProjectsToStorage(updatedRow1, updatedRow2);
-    onProjectsUpdated(updatedRow1, updatedRow2);
-    setSuccessToast('Project deleted successfully.');
-    setTimeout(() => setSuccessToast(''), 3000);
+
+    setIsCloudSyncing(true);
+    try {
+      await deleteShowcaseItemFromCloud(id);
+      saveProjectsToStorage(updatedRow1, updatedRow2);
+      onProjectsUpdated(updatedRow1, updatedRow2);
+      showToast('Project deleted globally.');
+    } catch (err: any) {
+      showError(err?.message || 'Failed to delete project from cloud.');
+    } finally {
+      setIsCloudSyncing(false);
+    }
   };
 
   // --- Experienced Tools Add / Delete ---
-  const handleAddTool = (e: React.FormEvent) => {
+  const handleAddTool = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newToolName.trim()) return;
 
@@ -524,36 +578,41 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
     };
 
     const updated = [...tools, newTool];
-    saveToolsToStorage(updated);
-    if (onToolsUpdated) onToolsUpdated(updated);
+    setIsCloudSyncing(true);
+    try {
+      await upsertToolToCloud(newTool, updated.length - 1);
+      saveToolsToStorage(updated);
+      if (onToolsUpdated) onToolsUpdated(updated);
 
-    setNewToolName('');
-    setNewToolBadge('');
-    setNewToolDescription('');
-    setNewToolIconUrl('');
-    setSuccessToast(`Software "${newTool.name}" added successfully.`);
-    setTimeout(() => setSuccessToast(''), 3000);
+      setNewToolName('');
+      setNewToolBadge('');
+      setNewToolDescription('');
+      setNewToolIconUrl('');
+      showToast(`Software "${newTool.name}" published globally.`);
+    } catch (err: any) {
+      showError(err?.message || 'Failed to save tool to cloud.');
+    } finally {
+      setIsCloudSyncing(false);
+    }
   };
 
-  const handleDeleteTool = (id: string) => {
+  const handleDeleteTool = async (id: string) => {
     const updated = tools.filter((t) => t.id !== id);
-    saveToolsToStorage(updated);
-    if (onToolsUpdated) onToolsUpdated(updated);
-    setSuccessToast('Software removed.');
-    setTimeout(() => setSuccessToast(''), 3000);
-  };
-
-  const handleResetTools = () => {
-    if (confirm('Reset to 12 standard core software tools?')) {
-      const reset = resetToolsToDefault();
-      if (onToolsUpdated) onToolsUpdated(reset);
-      setSuccessToast('Reset to 12 default tools.');
-      setTimeout(() => setSuccessToast(''), 3000);
+    setIsCloudSyncing(true);
+    try {
+      await deleteToolFromCloud(id);
+      saveToolsToStorage(updated);
+      if (onToolsUpdated) onToolsUpdated(updated);
+      showToast('Software removed globally.');
+    } catch (err: any) {
+      showError(err?.message || 'Failed to remove tool from cloud.');
+    } finally {
+      setIsCloudSyncing(false);
     }
   };
 
   // --- Blog Posts Add / Delete ---
-  const handleAddBlogPost = (e: React.FormEvent) => {
+  const handleAddBlogPost = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newBlogTitle.trim()) return;
 
@@ -564,67 +623,80 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
 
     const newPost: BlogPost = {
       id: `blog-${Date.now()}`,
-      slug,
+      slug: slug || `article-${Date.now()}`,
       title: newBlogTitle.trim(),
       excerpt: newBlogExcerpt.trim() || 'In-depth industry tutorial and workflow breakdown.',
       content: newBlogContent.trim() || '## Overview\n\nFull article breakdown and high-impact design strategies.',
       category: newBlogCategory,
       readTime: newBlogReadTime || '5 min read',
-      publishedDate: 'Feb 2026',
+      publishedDate: '2026',
       tags: newBlogTags.split(',').map((t) => t.trim()).filter(Boolean),
       seoKeywords: newBlogKeywords.split(',').map((k) => k.trim()).filter(Boolean),
       author: {
-        name: 'Kawsar Ahmed',
-        role: 'Brand & Digital Product Designer',
-        avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=160&q=80'
+        name: 'Typixel',
+        role: 'Creative Design Studio & Marketing Agency',
+        avatar: '/logos/typixel.jpg'
       },
       views: 120
     };
 
     const updated = [newPost, ...blogPosts];
-    saveBlogPostsToStorage(updated);
-    if (onBlogPostsUpdated) onBlogPostsUpdated(updated);
+    setIsCloudSyncing(true);
+    try {
+      await upsertBlogPostToCloud(newPost, 0);
+      saveBlogPostsToStorage(updated);
+      if (onBlogPostsUpdated) onBlogPostsUpdated(updated);
 
-    setNewBlogTitle('');
-    setNewBlogExcerpt('');
-    setNewBlogContent('');
-    setSuccessToast(`Article "${newPost.title}" published!`);
-    setTimeout(() => setSuccessToast(''), 3000);
+      setNewBlogTitle('');
+      setNewBlogExcerpt('');
+      setNewBlogContent('');
+      showToast(`Article "${newPost.title}" published globally!`);
+    } catch (err: any) {
+      showError(err?.message || 'Failed to publish blog article to cloud.');
+    } finally {
+      setIsCloudSyncing(false);
+    }
   };
 
-  const handleDeleteBlogPost = (id: string) => {
+  const handleDeleteBlogPost = async (id: string) => {
     const updated = blogPosts.filter((p) => p.id !== id);
-    saveBlogPostsToStorage(updated);
-    if (onBlogPostsUpdated) onBlogPostsUpdated(updated);
-    setSuccessToast('Article removed.');
-    setTimeout(() => setSuccessToast(''), 3000);
-  };
-
-  const handleResetBlog = () => {
-    if (confirm('Reset articles to default SEO ranking guides?')) {
-      const reset = resetBlogPostsToDefault();
-      if (onBlogPostsUpdated) onBlogPostsUpdated(reset);
-      setSuccessToast('Reset to default SEO articles.');
-      setTimeout(() => setSuccessToast(''), 3000);
+    setIsCloudSyncing(true);
+    try {
+      await deleteBlogPostFromCloud(id);
+      saveBlogPostsToStorage(updated);
+      if (onBlogPostsUpdated) onBlogPostsUpdated(updated);
+      showToast('Article removed globally.');
+    } catch (err: any) {
+      showError(err?.message || 'Failed to delete article from cloud.');
+    } finally {
+      setIsCloudSyncing(false);
     }
   };
 
   // --- Contact & EmailJS Settings ---
-  const handleSaveContactSettings = (e: React.FormEvent) => {
+  const handleSaveContactSettings = async (e: React.FormEvent) => {
     e.preventDefault();
     const updatedConfig: ContactConfig = {
       email: settingsEmail.trim(),
-      whatsappNumber: settingsWhatsApp.trim()
+      whatsappNumber: settingsWhatsApp.trim().replace(/[^0-9]/g, '')
     };
-    saveContactConfigToStorage(updatedConfig.email, updatedConfig.whatsappNumber);
-    onContactConfigUpdated(updatedConfig);
 
-    localStorage.setItem('kawsar_emailjs_service_id', emailJsServiceId.trim());
-    localStorage.setItem('kawsar_emailjs_template_id', emailJsTemplateId.trim());
-    localStorage.setItem('kawsar_emailjs_public_key', emailJsPublicKey.trim());
+    setIsCloudSyncing(true);
+    try {
+      await saveSiteSettingsToCloud(updatedConfig, seoStrategy);
+      saveContactConfigToStorage(updatedConfig.email, updatedConfig.whatsappNumber);
+      onContactConfigUpdated(updatedConfig);
 
-    setSuccessToast('Contact channels & EmailJS settings saved.');
-    setTimeout(() => setSuccessToast(''), 3000);
+      localStorage.setItem('kawsar_emailjs_service_id', emailJsServiceId.trim());
+      localStorage.setItem('kawsar_emailjs_template_id', emailJsTemplateId.trim());
+      localStorage.setItem('kawsar_emailjs_public_key', emailJsPublicKey.trim());
+
+      showToast('Contact channels & settings published globally!');
+    } catch (err: any) {
+      showError(err?.message || 'Failed to save settings to cloud.');
+    } finally {
+      setIsCloudSyncing(false);
+    }
   };
 
   // --- SEO Strategy & Metadata Handlers ---
@@ -641,26 +713,27 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
     }
   };
 
-  const handleSaveSeoStrategy = (e: React.FormEvent) => {
+  const handleSaveSeoStrategy = async (e: React.FormEvent) => {
     e.preventDefault();
-    saveSeoStrategyToStorage(seoStrategy);
-    if (seoStrategy.seoTitle) {
-      document.title = seoStrategy.seoTitle;
-    }
-    const metaDescTag = document.querySelector('meta[name="description"]');
-    if (metaDescTag && seoStrategy.metaDescription) {
-      metaDescTag.setAttribute('content', seoStrategy.metaDescription);
-    }
-    setSuccessToast('SEO Strategy & Metadata successfully saved to admincontrol!');
-    setTimeout(() => setSuccessToast(''), 3000);
-  };
-
-  const handleResetSeoStrategy = () => {
-    if (confirm('Reset SEO strategy & metadata to recommended 2026 Kerala & national targets?')) {
-      const def = resetSeoStrategyToDefault();
-      setSeoStrategy(def);
-      setSuccessToast('SEO strategy reset to defaults.');
-      setTimeout(() => setSuccessToast(''), 3000);
+    setIsCloudSyncing(true);
+    try {
+      await saveSiteSettingsToCloud(
+        { email: settingsEmail.trim(), whatsappNumber: settingsWhatsApp.trim() },
+        seoStrategy
+      );
+      saveSeoStrategyToStorage(seoStrategy);
+      if (seoStrategy.seoTitle) {
+        document.title = seoStrategy.seoTitle;
+      }
+      const metaDescTag = document.querySelector('meta[name="description"]');
+      if (metaDescTag && seoStrategy.metaDescription) {
+        metaDescTag.setAttribute('content', seoStrategy.metaDescription);
+      }
+      showToast('SEO Strategy & Metadata saved globally!');
+    } catch (err: any) {
+      showError(err?.message || 'Failed to save SEO strategy to cloud.');
+    } finally {
+      setIsCloudSyncing(false);
     }
   };
 
@@ -693,8 +766,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 
-    setSuccessToast('Full system backup downloaded (admincontrol backup)!');
-    setTimeout(() => setSuccessToast(''), 3500);
+    showToast('Full system backup downloaded (admincontrol backup)!');
   };
 
   const handleImportBackup = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -702,7 +774,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onload = (event) => {
+    reader.onload = async (event) => {
       try {
         const text = event.target?.result as string;
         const data = JSON.parse(text);
@@ -711,20 +783,32 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
           throw new Error('Invalid JSON structure');
         }
 
+        setIsCloudSyncing(true);
         if (Array.isArray(data.showcaseRow1) && Array.isArray(data.showcaseRow2)) {
+          await saveShowcaseOrderToCloud(data.showcaseRow1, data.showcaseRow2);
           saveProjectsToStorage(data.showcaseRow1, data.showcaseRow2);
           onProjectsUpdated(data.showcaseRow1, data.showcaseRow2);
         }
 
         if (Array.isArray(data.tools) && onToolsUpdated) {
+          for (let i = 0; i < data.tools.length; i++) {
+            await upsertToolToCloud(data.tools[i], i);
+          }
           saveToolsToStorage(data.tools);
           onToolsUpdated(data.tools);
         }
 
         if (Array.isArray(data.blogPosts) && onBlogPostsUpdated) {
+          for (let i = 0; i < data.blogPosts.length; i++) {
+            await upsertBlogPostToCloud(data.blogPosts[i], i);
+          }
           saveBlogPostsToStorage(data.blogPosts);
           onBlogPostsUpdated(data.blogPosts);
         }
+
+        const nextContact = data.contactConfig || contactConfig;
+        const nextSeo = data.seoStrategy || seoStrategy;
+        await saveSiteSettingsToCloud(nextContact, nextSeo);
 
         if (data.seoStrategy) {
           saveSeoStrategyToStorage(data.seoStrategy);
@@ -739,11 +823,12 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
         }
 
         setBackupRestoreError('');
-        setSuccessToast('Backup successfully restored into admincontrol!');
-        setTimeout(() => setSuccessToast(''), 4000);
+        showToast('Backup successfully restored & synced globally!');
       } catch (err) {
         console.error('Backup import error:', err);
-        setBackupRestoreError('Failed to parse backup JSON. Please check file format.');
+        setBackupRestoreError('Failed to parse or sync backup JSON. Please check file format.');
+      } finally {
+        setIsCloudSyncing(false);
       }
     };
     reader.readAsText(file);
@@ -770,15 +855,15 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
               </span>
               {isAuthenticated && (
                 <span className="hidden sm:inline-flex items-center gap-1.5 text-[10px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  Live Studio
+                  <span className={`w-1.5 h-1.5 rounded-full ${isCloudSyncing ? 'bg-amber-500' : 'bg-emerald-500'} animate-pulse`} />
+                  {isCloudSyncing ? 'Syncing to Cloud...' : 'Cloud Synced (Live for Everyone)'}
                 </span>
               )}
             </div>
             <p className="text-xs text-neutral-500">
               {isAuthenticated
-                ? 'Showcase, SEO Strategy, Backup & Control Room'
-                : 'Protected Access — Sign in required to view or edit'}
+                ? `Signed in as ${authUser?.email || 'Admin'} — Changes update live for all visitors`
+                : 'Google Admin Sign-In required to publish showcase updates globally'}
             </p>
           </div>
         </div>
@@ -796,19 +881,11 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
               </button>
 
               <button
-                onClick={() => setIsChangePasswordOpen(true)}
-                className="hidden sm:inline-flex items-center gap-1.5 text-xs text-neutral-800 hover:text-black bg-[#F5F4F0] hover:bg-[#EAE8E2] border border-neutral-200/80 px-3 py-1.5 rounded-xl transition-colors cursor-pointer"
-              >
-                <KeyRound className="w-3.5 h-3.5 text-neutral-700" />
-                <span>Password</span>
-              </button>
-
-              <button
                 onClick={handleLogout}
                 className="inline-flex items-center gap-1.5 text-xs text-neutral-800 hover:text-black bg-[#F5F4F0] hover:bg-[#EAE8E2] border border-neutral-200/80 px-3 py-1.5 rounded-xl transition-colors cursor-pointer"
               >
                 <LogOut className="w-3.5 h-3.5 text-neutral-700" />
-                <span className="hidden sm:inline">Logout</span>
+                <span className="hidden sm:inline">Sign Out</span>
               </button>
             </>
           )}
@@ -828,17 +905,24 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       {/* Success Toast */}
       {successToast && (
         <div className="bg-neutral-900 text-white px-6 py-2.5 flex items-center justify-center gap-2 text-xs font-medium shadow-md sticky top-[61px] z-30">
-          <CheckCircle className="w-4 h-4 text-white shrink-0" />
+          <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" />
           <span>{successToast}</span>
         </div>
       )}
 
-      {/* Auth Barrier if not logged in - STRICT: can't see or edit anything without login */}
+      {/* Error Toast */}
+      {cloudErrorToast && (
+        <div className="bg-rose-700 text-white px-6 py-2.5 flex items-center justify-center gap-2 text-xs font-medium shadow-md sticky top-[61px] z-30">
+          <span>{cloudErrorToast}</span>
+        </div>
+      )}
+
+      {/* Auth Barrier if not logged in via authorized Google account */}
       {!isAuthenticated ? (
         <div className="flex-1 flex items-center justify-center p-4 sm:p-8">
           <div className="bg-white rounded-[28px] sm:rounded-3xl max-w-md w-full p-8 sm:p-10 shadow-xl border border-neutral-200/90 text-center animate-in zoom-in-95 duration-200">
             <div className="w-14 h-14 rounded-2xl bg-neutral-900 flex items-center justify-center text-white mb-4 mx-auto shadow-md">
-              <Lock className="w-7 h-7" />
+              <ShieldCheck className="w-7 h-7" />
             </div>
 
             <div className="flex items-center justify-center gap-2 mb-1">
@@ -851,139 +935,38 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
             </div>
 
             <p className="text-xs sm:text-[13px] text-neutral-500 mb-6 leading-relaxed">
-              Login is required to view, edit, or configure portfolio showcase, SEO strategy architecture, or backups.
+              Sign in with your authorized Typixel Google account (<span className="font-mono text-neutral-700">hashimtypixel@gmail.com</span>) so showcase images, videos, and site changes sync globally for all visitors.
             </p>
 
-            {authView === 'login' ? (
-              <form onSubmit={handleLogin} className="w-full space-y-4">
-                {loginError && (
-                  <div className="p-3 bg-neutral-100 text-neutral-800 text-xs rounded-xl border border-neutral-300 text-left font-medium">
-                    {loginError}
-                  </div>
-                )}
+            {loginError && (
+              <div className="p-3 mb-4 bg-rose-50 text-rose-800 text-xs rounded-xl border border-rose-200 text-left font-medium">
+                {loginError}
+              </div>
+            )}
 
-                <div className="text-left space-y-3">
-                  <div>
-                    <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-500 mb-1">
-                      Username
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="admin or typixel"
-                      value={username}
-                      onChange={(e) => setUsername(e.target.value)}
-                      className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900/10 focus:border-neutral-900"
-                    />
-                  </div>
+            <button
+              type="button"
+              disabled={isAuthLoading}
+              onClick={handleGoogleSignIn}
+              className="w-full bg-neutral-900 hover:bg-black disabled:opacity-60 text-white text-xs font-semibold py-3 px-4 rounded-xl shadow-xs transition-all cursor-pointer flex items-center justify-center gap-2.5"
+            >
+              <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
+                <path fill="#EA4335" d="M12 5c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 1.45 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.91 6.16-4.91z" />
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+              </svg>
+              <span>{isAuthLoading ? 'Signing in...' : authUser ? 'Switch Google Account' : 'Continue with Google'}</span>
+            </button>
 
-                  <div>
-                    <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-500 mb-1">
-                      Password
-                    </label>
-                    <div className="relative">
-                      <input
-                        type={showPassword ? 'text' : 'password'}
-                        required
-                        placeholder="••••••••"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 pr-10 text-neutral-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900/10 focus:border-neutral-900"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword((prev) => !prev)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-700 cursor-pointer"
-                      >
-                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                <button
-                  type="submit"
-                  className="w-full bg-neutral-900 hover:bg-black text-white text-xs font-semibold py-2.5 rounded-xl shadow-xs transition-colors cursor-pointer mt-2"
-                >
-                  Log In
-                </button>
-
-                <div className="pt-2 text-xs text-neutral-400 text-center">
-                  <button
-                    type="button"
-                    onClick={() => setAuthView('forgot')}
-                    className="hover:text-neutral-700 underline cursor-pointer"
-                  >
-                    Forgot password?
-                  </button>
-                </div>
-              </form>
-            ) : (
-              <form onSubmit={handleForgotPassword} className="w-full space-y-4 text-left">
-                <h4 className="text-lg font-bold text-neutral-900">Reset Admin Password</h4>
-                <p className="text-xs text-neutral-500">
-                  Enter your registered portfolio email ({contactConfig.email}) or admin username.
-                </p>
-
-                {forgotError && (
-                  <div className="p-3 bg-neutral-100 text-neutral-800 text-xs rounded-xl border border-neutral-300">
-                    {forgotError}
-                  </div>
-                )}
-
-                <div>
-                  <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-500 mb-1">
-                    Recovery Email or Username
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    placeholder={contactConfig.email}
-                    value={recoveryInput}
-                    onChange={(e) => setRecoveryInput(e.target.value)}
-                    className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900/10"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-500 mb-1">
-                    New Password
-                  </label>
-                  <div className="relative">
-                    <input
-                      type={showForgotNewPassword ? 'text' : 'password'}
-                      required
-                      placeholder="Enter at least 4 characters"
-                      value={forgotNewPassword}
-                      onChange={(e) => setForgotNewPassword(e.target.value)}
-                      className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 pr-10 text-neutral-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900/10"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowForgotNewPassword((prev) => !prev)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-700 cursor-pointer"
-                    >
-                      {showForgotNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                    </button>
-                  </div>
-                </div>
-
-                <div className="flex gap-2 pt-2">
-                  <button
-                    type="button"
-                    onClick={() => setAuthView('login')}
-                    className="flex-1 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 text-xs font-semibold py-2.5 rounded-xl cursor-pointer"
-                  >
-                    Back to Login
-                  </button>
-                  <button
-                    type="submit"
-                    className="flex-1 bg-neutral-900 hover:bg-black text-white text-xs font-semibold py-2.5 rounded-xl cursor-pointer"
-                  >
-                    Reset &amp; Login
-                  </button>
-                </div>
-              </form>
+            {authUser && !isAuthorizedAdminEmail(authUser.email) && (
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="w-full mt-2.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 text-xs font-semibold py-2 rounded-xl cursor-pointer"
+              >
+                Sign out ({authUser.email})
+              </button>
             )}
 
             <div className="mt-6 pt-4 border-t border-neutral-100">
@@ -1658,13 +1641,27 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                             <input
                               type="text"
                               value={newImageUrl}
-                              onChange={(e) => setNewImageUrl(e.target.value)}
+                              onChange={(e) => {
+                                setNewImageUrl(e.target.value);
+                                setNewUploadError('');
+                              }}
                               placeholder="/showcase/Chamayam.jpg"
                               className="flex-1 text-xs bg-white border border-neutral-300 rounded-xl px-3 py-2 text-neutral-900 font-mono"
                             />
                             {newImageUrl && (
                               <div className="w-12 h-14 rounded-lg overflow-hidden border border-neutral-300 shrink-0 bg-neutral-900 shadow-xs">
-                                <img src={normalizeShowcaseImagePath(newImageUrl)} alt="Preview" className="w-full h-full object-cover" />
+                                {isVideoMediaUrl(newImageUrl) ? (
+                                  <video
+                                    src={normalizeShowcaseImagePath(newImageUrl)}
+                                    muted
+                                    autoPlay
+                                    loop
+                                    playsInline
+                                    className="w-full h-full object-cover"
+                                  />
+                                ) : (
+                                  <img src={normalizeShowcaseImagePath(newImageUrl)} alt="Preview" className="w-full h-full object-cover" />
+                                )}
                               </div>
                             )}
                           </div>
@@ -1676,18 +1673,34 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                           <div className="flex items-center gap-3">
                             <input
                               type="file"
-                              accept="image/*,video/mp4"
+                              accept="image/*,video/mp4,video/webm,video/quicktime"
                               onChange={(e) => handleProjectFileUpload(e, false)}
                               className="w-full text-xs text-neutral-600 file:mr-3 file:py-2 file:px-3.5 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-neutral-900 file:text-white hover:file:bg-black file:cursor-pointer bg-white border border-neutral-200 rounded-xl p-1"
                             />
                             {newImageUrl && (
                               <div className="w-12 h-14 rounded-lg overflow-hidden border border-neutral-300 shrink-0 bg-neutral-900 shadow-xs">
-                                <img src={newImageUrl} alt="Uploaded Preview" className="w-full h-full object-cover" />
+                                {isVideoMediaUrl(newImageUrl) ? (
+                                  <video
+                                    src={newImageUrl}
+                                    muted
+                                    autoPlay
+                                    loop
+                                    playsInline
+                                    className="w-full h-full object-cover"
+                                  />
+                                ) : (
+                                  <img src={newImageUrl} alt="Uploaded Preview" className="w-full h-full object-cover" />
+                                )}
                               </div>
                             )}
                           </div>
+                          {newUploadError && (
+                            <p className="text-[11px] text-rose-700 bg-rose-50 border border-rose-200 rounded-lg px-2.5 py-1.5 font-medium">
+                              {newUploadError}
+                            </p>
+                          )}
                           <p className="text-[11px] text-neutral-500">
-                            ✓ Automatically resized &amp; compressed to high-res Web JPEG. Never fails or hits browser storage limits.
+                            ✓ Images auto-compress &amp; sync live to all visitors. For large HD videos (&gt;600 KB), paste an external .mp4 URL in the URL tab.
                           </p>
                         </div>
                       )}
@@ -1696,9 +1709,12 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                         <div className="space-y-2">
                           <input
                             type="text"
-                            placeholder="/showcase/Chamayam.jpg or https://images.unsplash.com/..."
+                            placeholder="https://... (.jpg, .png, .webp, .mp4 or GitHub raw link)"
                             value={newImageUrl}
-                            onChange={(e) => setNewImageUrl(e.target.value)}
+                            onChange={(e) => {
+                              setNewImageUrl(e.target.value);
+                              setNewUploadError('');
+                            }}
                             className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900/10 focus:border-neutral-900 font-mono"
                           />
                           <div className="flex flex-wrap gap-1.5 text-[10px] text-neutral-500">
@@ -1716,6 +1732,21 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                           </div>
                         </div>
                       )}
+
+                      {isVideoMediaUrl(newImageUrl) && (
+                        <div className="pt-2">
+                          <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-600 mb-1">
+                            Optional Video Poster / Cover Image URL
+                          </label>
+                          <input
+                            type="text"
+                            placeholder="https://... (optional poster image while video loads)"
+                            value={newVideoPosterUrl}
+                            onChange={(e) => setNewVideoPosterUrl(e.target.value)}
+                            className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2 text-neutral-900 font-mono"
+                          />
+                        </div>
+                      )}
                     </div>
 
                     {/* Card Live Preview Banner */}
@@ -1723,7 +1754,19 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                       <div className="pt-3 border-t border-neutral-100 flex items-center gap-4 bg-[#FAF9F6] p-3 rounded-xl border border-neutral-200">
                         <div className="w-14 h-18 rounded-lg overflow-hidden bg-neutral-900 shrink-0 border border-neutral-300 shadow-xs relative">
                           {newImageUrl ? (
-                            <img src={normalizeShowcaseImagePath(newImageUrl)} alt="Card preview" className="w-full h-full object-cover" />
+                            isVideoMediaUrl(newImageUrl) ? (
+                              <video
+                                src={normalizeShowcaseImagePath(newImageUrl)}
+                                poster={newVideoPosterUrl ? normalizeShowcaseImagePath(newVideoPosterUrl) : undefined}
+                                muted
+                                autoPlay
+                                loop
+                                playsInline
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <img src={normalizeShowcaseImagePath(newImageUrl)} alt="Card preview" className="w-full h-full object-cover" />
+                            )
                           ) : (
                             <div className="w-full h-full flex items-center justify-center text-white/50 text-[10px] font-mono">
                               No Art
@@ -1744,10 +1787,11 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                     <div className="pt-2 flex items-center justify-end">
                       <button
                         type="submit"
-                        className="inline-flex items-center gap-2 bg-neutral-900 hover:bg-black text-white px-7 py-3 rounded-full text-xs font-semibold shadow-md transition-all cursor-pointer hover:scale-102"
+                        disabled={isCloudSyncing}
+                        className="inline-flex items-center gap-2 bg-neutral-900 hover:bg-black disabled:opacity-60 text-white px-7 py-3 rounded-full text-xs font-semibold shadow-md transition-all cursor-pointer hover:scale-102"
                       >
                         <Plus className="w-4 h-4" />
-                        <span>Add Project to Showcase</span>
+                        <span>{isCloudSyncing ? 'Publishing to Cloud...' : 'Add Project to Showcase'}</span>
                       </button>
                     </div>
                   </form>
@@ -1786,7 +1830,9 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                   {/* Showcase Cards Grid with Visual Image Thumbnails */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">
                     {[...row1Projects.map((p) => ({ ...p, assignedRow: 1 })), ...row2Projects.map((p) => ({ ...p, assignedRow: 2 }))].map((item) => {
-                      const displayImg = normalizeShowcaseImagePath(item.imageUrl);
+                      const isVid = isVideoMediaUrl(item.videoUrl || item.imageUrl, item.mediaType);
+                      const displayVideo = isVid ? normalizeShowcaseImagePath(item.videoUrl || item.imageUrl || '') : '';
+                      const displayImg = item.imageUrl && !isVideoMediaUrl(item.imageUrl) ? normalizeShowcaseImagePath(item.imageUrl) : '';
                       return (
                         <div
                           key={item.id}
@@ -1794,7 +1840,17 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                         >
                           {/* Visual Thumbnail */}
                           <div className="w-16 h-20 rounded-xl overflow-hidden bg-neutral-900 shrink-0 border border-neutral-300 relative shadow-xs">
-                            {displayImg ? (
+                            {isVid && displayVideo ? (
+                              <video
+                                src={displayVideo}
+                                poster={displayImg || undefined}
+                                muted
+                                autoPlay
+                                loop
+                                playsInline
+                                className="w-full h-full object-cover"
+                              />
+                            ) : displayImg ? (
                               <img
                                 src={displayImg}
                                 alt={item.title}
@@ -1807,6 +1863,11 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                               <div className="w-full h-full flex items-center justify-center text-white/50 text-[10px] font-mono">
                                 No Art
                               </div>
+                            )}
+                            {isVid && (
+                              <span className="absolute top-1 left-1 text-[7px] font-mono font-bold px-1 py-0.5 rounded bg-purple-600 text-white">
+                                VID
+                              </span>
                             )}
                             <span className="absolute bottom-1 right-1 text-[8px] font-mono font-bold px-1.5 py-0.5 rounded bg-black/80 text-white">
                               R{item.assignedRow}
@@ -2552,7 +2613,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                             : 'text-neutral-500 hover:text-neutral-900'
                         }`}
                       >
-                        🔗 Image Link
+                        🔗 Image / Video Link
                       </button>
                     </div>
                   </div>
@@ -2582,18 +2643,39 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                   )}
 
                   {editMediaMode === 'upload' && (
-                    <div className="flex items-center gap-3 bg-neutral-50 p-3 rounded-xl border border-neutral-200">
-                      <input
-                        type="file"
-                        accept="image/*,video/mp4"
-                        onChange={(e) => handleProjectFileUpload(e, true)}
-                        className="w-full text-xs text-neutral-600 file:mr-3 file:py-2 file:px-3.5 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-neutral-900 file:text-white hover:file:bg-black file:cursor-pointer bg-white border border-neutral-200 rounded-xl p-1"
-                      />
-                      {editImageUrl && (
-                        <div className="w-12 h-14 rounded-lg overflow-hidden border border-neutral-200 shrink-0 bg-neutral-900 shadow-xs">
-                          <img src={normalizeShowcaseImagePath(editImageUrl)} alt="Preview" className="w-full h-full object-cover" />
-                        </div>
+                    <div className="bg-neutral-50 p-3 rounded-xl border border-neutral-200 space-y-2">
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="file"
+                          accept="image/*,video/mp4,video/webm,video/quicktime"
+                          onChange={(e) => handleProjectFileUpload(e, true)}
+                          className="w-full text-xs text-neutral-600 file:mr-3 file:py-2 file:px-3.5 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-neutral-900 file:text-white hover:file:bg-black file:cursor-pointer bg-white border border-neutral-200 rounded-xl p-1"
+                        />
+                        {editImageUrl && (
+                          <div className="w-12 h-14 rounded-lg overflow-hidden border border-neutral-200 shrink-0 bg-neutral-900 shadow-xs">
+                            {isVideoMediaUrl(editImageUrl) ? (
+                              <video
+                                src={normalizeShowcaseImagePath(editImageUrl)}
+                                muted
+                                autoPlay
+                                loop
+                                playsInline
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <img src={normalizeShowcaseImagePath(editImageUrl)} alt="Preview" className="w-full h-full object-cover" />
+                            )}
+                          </div>
+                        )}
+                      </div>
+                      {editUploadError && (
+                        <p className="text-[11px] text-rose-700 bg-rose-50 border border-rose-200 rounded-lg px-2.5 py-1.5 font-medium">
+                          {editUploadError}
+                        </p>
                       )}
+                      <p className="text-[11px] text-neutral-500">
+                        ✓ Images auto-compress &amp; publish live to all visitors. For HD videos (&gt;600 KB), use the Image / Video Link tab.
+                      </p>
                     </div>
                   )}
 
@@ -2601,19 +2683,49 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                     <div className="space-y-2">
                       <input
                         type="text"
-                        placeholder="/showcase/Chamayam.jpg or https://..."
+                        placeholder="https://... (.jpg, .png, .webp, .mp4 or GitHub raw link)"
                         value={editImageUrl}
-                        onChange={(e) => setEditImageUrl(e.target.value)}
+                        onChange={(e) => {
+                          setEditImageUrl(e.target.value);
+                          setEditUploadError('');
+                        }}
                         className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none font-mono"
                       />
                       {editImageUrl && (
                         <div className="flex items-center gap-2">
                           <div className="w-10 h-12 rounded-lg overflow-hidden border border-neutral-200 shrink-0 bg-neutral-900 shadow-xs">
-                            <img src={normalizeShowcaseImagePath(editImageUrl)} alt="Preview" className="w-full h-full object-cover" />
+                            {isVideoMediaUrl(editImageUrl) ? (
+                              <video
+                                src={normalizeShowcaseImagePath(editImageUrl)}
+                                poster={editVideoPosterUrl ? normalizeShowcaseImagePath(editVideoPosterUrl) : undefined}
+                                muted
+                                autoPlay
+                                loop
+                                playsInline
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <img src={normalizeShowcaseImagePath(editImageUrl)} alt="Preview" className="w-full h-full object-cover" />
+                            )}
                           </div>
                           <span className="text-[11px] text-neutral-500 font-mono truncate">{normalizeShowcaseImagePath(editImageUrl)}</span>
                         </div>
                       )}
+                    </div>
+                  )}
+
+                  {isVideoMediaUrl(editImageUrl) && (
+                    <div className="pt-1">
+                      <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-600 mb-1">
+                        Optional Video Poster / Cover Image URL
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="https://... (optional poster image while video loads)"
+                        value={editVideoPosterUrl}
+                        onChange={(e) => setEditVideoPosterUrl(e.target.value)}
+                        className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2 text-neutral-900 font-mono"
+                      />
                     </div>
                   )}
                 </div>
@@ -2628,76 +2740,11 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                   </button>
                   <button
                     type="submit"
-                    className="inline-flex items-center gap-1.5 px-5 py-2 text-xs font-semibold bg-neutral-900 hover:bg-black text-white rounded-full transition-all cursor-pointer shadow-xs"
+                    disabled={isCloudSyncing}
+                    className="inline-flex items-center gap-1.5 px-5 py-2 text-xs font-semibold bg-neutral-900 hover:bg-black disabled:opacity-60 text-white rounded-full transition-all cursor-pointer shadow-xs"
                   >
                     <Save className="w-3.5 h-3.5" />
-                    <span>Save Changes</span>
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
-
-        {/* Change Password Modal */}
-        {isChangePasswordOpen && (
-          <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-            <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-neutral-200">
-              <h4 className="text-base font-bold text-neutral-900 mb-3">Change Admin Password</h4>
-
-              {changePasswordError && (
-                <div className="p-2.5 bg-neutral-100 text-neutral-800 text-xs rounded-lg mb-3 border border-neutral-300 font-medium">
-                  {changePasswordError}
-                </div>
-              )}
-
-              <form onSubmit={handleChangePassword} className="space-y-3">
-                <div>
-                  <label className="block text-[11px] font-bold text-neutral-600 mb-1">Current Password</label>
-                  <input
-                    type="password"
-                    required
-                    value={currentPasswordInput}
-                    onChange={(e) => setCurrentPasswordInput(e.target.value)}
-                    className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3 py-2 text-neutral-900"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-[11px] font-bold text-neutral-600 mb-1">New Password</label>
-                  <input
-                    type={showChangeNewPassword ? 'text' : 'password'}
-                    required
-                    value={changeNewPassword}
-                    onChange={(e) => setChangeNewPassword(e.target.value)}
-                    className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3 py-2 text-neutral-900"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-[11px] font-bold text-neutral-600 mb-1">Confirm New Password</label>
-                  <input
-                    type={showChangeNewPassword ? 'text' : 'password'}
-                    required
-                    value={changeConfirmPassword}
-                    onChange={(e) => setChangeConfirmPassword(e.target.value)}
-                    className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3 py-2 text-neutral-900"
-                  />
-                </div>
-
-                <div className="flex gap-2 pt-2">
-                  <button
-                    type="button"
-                    onClick={() => setIsChangePasswordOpen(false)}
-                    className="flex-1 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 text-xs font-semibold py-2 rounded-xl cursor-pointer"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="flex-1 bg-neutral-900 hover:bg-black text-white text-xs font-semibold py-2 rounded-xl cursor-pointer"
-                  >
-                    Save
+                    <span>{isCloudSyncing ? 'Saving...' : 'Save Changes'}</span>
                   </button>
                 </div>
               </form>

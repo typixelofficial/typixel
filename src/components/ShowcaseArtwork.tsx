@@ -1,15 +1,17 @@
 import React, { useRef, useEffect } from 'react';
-import { Sparkles, Film, VolumeX } from 'lucide-react';
-import { ShowcaseItem, normalizeShowcaseImagePath } from '../data/showcaseData.ts';
+import { Film } from 'lucide-react';
+import { ShowcaseItem, normalizeShowcaseImagePath, isVideoMediaUrl } from '../data/showcaseData.ts';
 
 interface ShowcaseArtworkProps {
   item: ShowcaseItem;
 }
 
 export const ShowcaseArtwork: React.FC<ShowcaseArtworkProps> = ({ item }) => {
-  const isVideo = item.mediaType === 'video' || (Boolean(item.videoUrl) && item.videoUrl!.endsWith('.mp4'));
+  const isVideo = isVideoMediaUrl(item.videoUrl || item.imageUrl, item.mediaType);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const normalizedImg = normalizeShowcaseImagePath(item.imageUrl);
+  const rawVideoUrl = item.videoUrl || (isVideo ? item.imageUrl : '');
+  const videoSrc = normalizeShowcaseImagePath(rawVideoUrl);
 
   // Guarantee continuous muted playback across all browsers and devices
   useEffect(() => {
@@ -28,37 +30,48 @@ export const ShowcaseArtwork: React.FC<ShowcaseArtworkProps> = ({ item }) => {
         });
       }
     }
-  }, [isVideo, item.videoUrl]);
+  }, [isVideo, videoSrc]);
 
   // Video Showcase Card: Continuous Muted Loop that Cannot Be Paused
-  if (isVideo && item.videoUrl) {
+  if (isVideo && videoSrc) {
+    const posterSrc = item.imageUrl && !isVideoMediaUrl(item.imageUrl)
+      ? normalizeShowcaseImagePath(item.imageUrl)
+      : '';
+
     return (
-      <div className="w-full h-full bg-neutral-950 text-white relative overflow-hidden select-none flex flex-col justify-between group/video">
+      <div
+        className="w-full h-full bg-neutral-950 text-white relative overflow-hidden select-none flex flex-col justify-end group/video"
+        style={{ backgroundColor: item.accentColor ? `${item.accentColor}30` : '#0a0a0a' }}
+      >
         {/* Instant Poster Background so card never shows black */}
-        {item.imageUrl && (
+        {posterSrc && (
           <img
-            src={item.imageUrl}
+            src={posterSrc}
             alt={item.title}
+            loading="eager"
             decoding="async"
             className="absolute inset-0 w-full h-full object-cover pointer-events-none"
             onError={(e) => {
               const target = e.currentTarget;
-              target.style.display = 'none';
+              const filename = posterSrc.split('/').pop() || '';
+              if (filename && !target.src.includes('raw.githubusercontent.com')) {
+                target.src = `https://raw.githubusercontent.com/typixelofficial/typixel/main/showcase/showcase/${encodeURIComponent(filename)}`;
+              }
             }}
           />
         )}
 
-        {/* Real HTML5 Video Autoplay Muted Loop - faststart metadata, preload="metadata" for instant playback */}
+        {/* Real HTML5 Video Autoplay Muted Loop - faststart metadata for instant playback */}
         <video
           ref={videoRef}
-          src={item.videoUrl}
-          poster={item.imageUrl}
+          src={videoSrc}
+          poster={posterSrc}
           autoPlay
           muted
           loop
           playsInline
           preload="metadata"
-          className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 pointer-events-none z-1"
+          className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 pointer-events-none"
           onPause={(e) => {
             // Cannot be paused - immediately resumes playback
             e.currentTarget.play().catch(() => {});
@@ -68,27 +81,8 @@ export const ShowcaseArtwork: React.FC<ShowcaseArtworkProps> = ({ item }) => {
           }}
         />
 
-        {/* Ambient Video Vignette for text readability */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-black/45 pointer-events-none" />
-
-        {/* Top Badges */}
-        <div className="relative z-10 p-3 sm:p-3.5 flex items-center justify-between">
-          <span className="inline-flex items-center gap-1.5 text-[9px] uppercase font-mono tracking-wider text-purple-200 bg-purple-950/80 backdrop-blur-md px-2 py-0.5 rounded border border-purple-500/30 shadow-xs">
-            <span className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-pulse" />
-            <span>Video Reel</span>
-          </span>
-
-          <div className="flex items-center gap-1.5">
-            <span className="text-[9px] font-mono text-neutral-300 bg-black/60 backdrop-blur-md p-1 rounded-full border border-white/15" title="Muted (Can't Pause)">
-              <VolumeX className="w-2.5 h-2.5 text-neutral-300" />
-            </span>
-            {item.duration && (
-              <span className="text-[9px] font-mono font-bold text-white bg-black/60 backdrop-blur-md px-1.5 py-0.5 rounded border border-white/20">
-                {item.duration}
-              </span>
-            )}
-          </div>
-        </div>
+        {/* Ambient bottom gradient for title readability */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent pointer-events-none" />
 
         {/* Bottom Title Bar */}
         <div className="relative z-10 p-3.5 pt-2">
@@ -110,36 +104,33 @@ export const ShowcaseArtwork: React.FC<ShowcaseArtworkProps> = ({ item }) => {
   // General Image / Poster Card Preview
   if (normalizedImg && normalizedImg.trim().length > 0) {
     return (
-      <div className="w-full h-full bg-neutral-900 text-white relative overflow-hidden select-none flex flex-col justify-between group">
+      <div
+        className="w-full h-full bg-neutral-900 text-white relative overflow-hidden select-none flex flex-col justify-end group"
+        style={{ backgroundColor: item.accentColor ? `${item.accentColor}30` : '#171717' }}
+      >
         <img
           src={normalizedImg}
           alt={item.title}
-          loading="lazy"
+          loading="eager"
           decoding="async"
           referrerPolicy="no-referrer"
           className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 pointer-events-none"
           onError={(e) => {
             const target = e.currentTarget;
-            const filename = normalizedImg.split('/').pop();
-            if (filename && !target.src.includes('raw.githubusercontent.com')) {
-              target.src = `https://raw.githubusercontent.com/typixelofficial/typixel/main/showcase/showcase/${encodeURIComponent(filename)}`;
+            const filename = normalizedImg.split('/').pop() || '';
+            if (filename) {
+              if (target.src.includes('/showcase/')) {
+                // Try root public directory
+                target.src = `/${filename}`;
+              } else if (!target.src.includes('raw.githubusercontent.com')) {
+                // Fallback to raw GitHub repository asset
+                target.src = `https://raw.githubusercontent.com/typixelofficial/typixel/main/showcase/showcase/${encodeURIComponent(filename)}`;
+              }
             }
           }}
         />
-        {/* Soft dark vignette so text is always legible */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-black/45 pointer-events-none" />
-
-        {/* Top badge */}
-        <div className="relative z-10 p-3.5 flex items-center justify-between">
-          <span className="text-[9px] uppercase font-mono tracking-wider text-white bg-black/60 backdrop-blur-md px-2 py-0.5 rounded border border-white/20">
-            {item.category}
-          </span>
-          {item.badge && (
-            <span className="text-[8px] font-mono text-white/80 bg-white/20 backdrop-blur-md px-1.5 py-0.5 rounded">
-              {item.badge}
-            </span>
-          )}
-        </div>
+        {/* Soft bottom gradient so title text is always legible without darkening top artwork */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent pointer-events-none" />
 
         {/* Bottom Title bar */}
         <div className="relative z-10 p-3.5 pt-2">
@@ -156,13 +147,7 @@ export const ShowcaseArtwork: React.FC<ShowcaseArtworkProps> = ({ item }) => {
 
   // Fallback typography card
   return (
-    <div className="w-full h-full bg-gradient-to-br from-neutral-900 to-black text-white p-4 flex flex-col justify-between select-none">
-      <div className="flex items-center justify-between">
-        <span className="text-[9px] uppercase font-mono tracking-wider text-neutral-400 bg-neutral-800 px-2 py-0.5 rounded">
-          {item.category}
-        </span>
-        <Sparkles className="w-3.5 h-3.5 text-neutral-400" />
-      </div>
+    <div className="w-full h-full bg-gradient-to-br from-neutral-900 to-black text-white p-4 flex flex-col justify-end select-none">
       <div>
         <h5 className="text-sm font-bold text-white leading-snug">{item.title}</h5>
         <p className="text-[11px] text-neutral-400 mt-1">{item.subtitle}</p>

@@ -110,13 +110,15 @@ export const ShotsModal: React.FC<ShotsModalProps> = ({ isOpen, onClose, onInqui
                       muted
                       loop
                       playsInline
-                      preload="auto"
+                      preload="metadata"
                       className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
                   ) : shot.imageUrl ? (
                     <img
                       src={shot.imageUrl}
                       alt={shot.title}
+                      loading="lazy"
+                      decoding="async"
                       className="absolute inset-0 w-full h-full object-cover opacity-75 group-hover:scale-105 group-hover:opacity-85 transition-all duration-500"
                     />
                   ) : null}
