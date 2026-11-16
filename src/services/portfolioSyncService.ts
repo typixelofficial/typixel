@@ -422,7 +422,7 @@ export const ensureAdminRecordAndSeed = async (
 
 export const saveShowcaseOrderToCloud = async (row1: ShowcaseItem[], row2: ShowcaseItem[]): Promise<void> => {
   const uid = auth.currentUser?.uid;
-  if (!uid) throw new Error('Admin Google authentication required to save changes globally.');
+  if (!uid) throw new Error('Admin authentication required to save changes globally.');
 
   try {
     const batch = writeBatch(db);
@@ -446,7 +446,7 @@ export const upsertShowcaseItemToCloud = async (
   sortOrder: number
 ): Promise<void> => {
   const uid = auth.currentUser?.uid;
-  if (!uid) throw new Error('Admin Google authentication required to save changes globally.');
+  if (!uid) throw new Error('Admin authentication required to save changes globally.');
 
   const payload = toShowcaseDoc(item, row, sortOrder, uid);
   const path = `showcaseItems/${payload.id}`;
@@ -459,7 +459,7 @@ export const upsertShowcaseItemToCloud = async (
 
 export const deleteShowcaseItemFromCloud = async (id: string): Promise<void> => {
   const uid = auth.currentUser?.uid;
-  if (!uid) throw new Error('Admin Google authentication required to delete items globally.');
+  if (!uid) throw new Error('Admin authentication required to delete items globally.');
   const safeId = sanitizeId(id);
   const path = `showcaseItems/${safeId}`;
   try {
@@ -471,7 +471,7 @@ export const deleteShowcaseItemFromCloud = async (id: string): Promise<void> => 
 
 export const upsertToolToCloud = async (tool: ExperiencedTool, sortOrder: number): Promise<void> => {
   const uid = auth.currentUser?.uid;
-  if (!uid) throw new Error('Admin Google authentication required to save changes globally.');
+  if (!uid) throw new Error('Admin authentication required to save changes globally.');
   const payload = toToolDoc(tool, sortOrder, uid);
   try {
     await setDoc(doc(db, 'tools', payload.id), payload);
@@ -482,7 +482,7 @@ export const upsertToolToCloud = async (tool: ExperiencedTool, sortOrder: number
 
 export const deleteToolFromCloud = async (id: string): Promise<void> => {
   const uid = auth.currentUser?.uid;
-  if (!uid) throw new Error('Admin Google authentication required to delete tools globally.');
+  if (!uid) throw new Error('Admin authentication required to delete tools globally.');
   const safeId = sanitizeId(id);
   try {
     await deleteDoc(doc(db, 'tools', safeId));
@@ -493,7 +493,7 @@ export const deleteToolFromCloud = async (id: string): Promise<void> => {
 
 export const upsertBlogPostToCloud = async (post: BlogPost, sortOrder: number): Promise<void> => {
   const uid = auth.currentUser?.uid;
-  if (!uid) throw new Error('Admin Google authentication required to publish blog posts globally.');
+  if (!uid) throw new Error('Admin authentication required to publish blog posts globally.');
   const payload = toBlogDoc(post, sortOrder, uid);
   try {
     await setDoc(doc(db, 'blogPosts', payload.id), payload);
@@ -504,7 +504,7 @@ export const upsertBlogPostToCloud = async (post: BlogPost, sortOrder: number): 
 
 export const deleteBlogPostFromCloud = async (id: string): Promise<void> => {
   const uid = auth.currentUser?.uid;
-  if (!uid) throw new Error('Admin Google authentication required to delete blog posts globally.');
+  if (!uid) throw new Error('Admin authentication required to delete blog posts globally.');
   const safeId = sanitizeId(id);
   try {
     await deleteDoc(doc(db, 'blogPosts', safeId));
@@ -518,7 +518,7 @@ export const saveSiteSettingsToCloud = async (
   seo: SeoStrategyData
 ): Promise<void> => {
   const uid = auth.currentUser?.uid;
-  if (!uid) throw new Error('Admin Google authentication required to update site settings globally.');
+  if (!uid) throw new Error('Admin authentication required to update site settings globally.');
   const payload = toSiteSettingsDoc(contact, seo, uid);
   try {
     await setDoc(doc(db, 'siteConfig', 'public'), payload);

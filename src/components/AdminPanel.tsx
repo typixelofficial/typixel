@@ -25,7 +25,11 @@ import {
   ShieldCheck,
   Sparkles,
   ExternalLink,
-  ArrowLeft
+  ArrowLeft,
+  Eye,
+  EyeOff,
+  KeyRound,
+  RefreshCw
 } from 'lucide-react';
 import {
   ShowcaseItem,
@@ -43,8 +47,22 @@ import {
   saveSeoStrategyToStorage
 } from '../data/seoStrategyConfig.ts';
 import { AppLogo } from './AppLogo.tsx';
-import { onAuthStateChanged, signInWithPopup, signOut, User } from 'firebase/auth';
-import { auth, googleProvider, isAuthorizedAdminEmail } from '../firebase.ts';
+import {
+  onIdTokenChanged,
+  signInWithEmailAndPassword,
+  sendEmailVerification,
+  sendPasswordResetEmail,
+  updatePassword,
+  EmailAuthProvider,
+  reauthenticateWithCredential,
+  signOut,
+  User
+} from 'firebase/auth';
+import {
+  auth,
+  isAuthorizedAdminEmail,
+  resolveAdminLoginIdentifier
+} from '../firebase.ts';
 import {
   ensureAdminRecordAndSeed,
   upsertShowcaseItemToCloud,
@@ -85,13 +103,34 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   onBlogPostsUpdated
 }) => {
   const [authUser, setAuthUser] = useState<User | null>(() => auth.currentUser);
+  const [authRefreshTick, setAuthRefreshTick] = useState(0);
   const [isAuthLoading, setIsAuthLoading] = useState<boolean>(false);
   const [isCloudSyncing, setIsCloudSyncing] = useState<boolean>(false);
   const [hasSeededCloud, setHasSeededCloud] = useState<boolean>(false);
 
-  const isAuthenticated = Boolean(authUser && isAuthorizedAdminEmail(authUser.email));
-
+  // Username & Password Login states
+  const [usernameInput, setUsernameInput] = useState('typixel');
+  const [passwordInput, setPasswordInput] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [loginInfo, setLoginInfo] = useState('');
   const [loginError, setLoginError] = useState('');
+  const [showProviderSetupGuide, setShowProviderSetupGuide] = useState(false);
+
+  // Change / Forgot Password Modal states (inside Admin Page)
+  const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
+  const [currentPasswordInput, setCurrentPasswordInput] = useState('');
+  const [changeNewPassword, setChangeNewPassword] = useState('');
+  const [changeConfirmPassword, setChangeConfirmPassword] = useState('');
+  const [showChangePasswordText, setShowChangePasswordText] = useState(false);
+  const [changePasswordError, setChangePasswordError] = useState('');
+  const [changePasswordInfo, setChangePasswordInfo] = useState('');
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [isSendingResetFromAdmin, setIsSendingResetFromAdmin] = useState(false);
+
+  void authRefreshTick;
+  const isAuthorizedAccount = Boolean(authUser && isAuthorizedAdminEmail(authUser.email));
+  const needsEmailVerification = Boolean(authUser && isAuthorizedAccount && !authUser.emailVerified);
+  const isAuthenticated = Boolean(authUser && isAuthorizedAccount && authUser.emailVerified);
 
   // Admin Dashboard Tabs & Toast (includes SEO Control & Backup)
   type AdminTab = 'seocontrol' | 'add' | 'manage' | 'tools' | 'blog' | 'settings' | 'backup';
@@ -99,9 +138,9 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   const [successToast, setSuccessToast] = useState('');
   const [cloudErrorToast, setCloudErrorToast] = useState('');
 
-  // Subscribe to Firebase Google Auth state
+  // Subscribe to Firebase Auth & ID token refreshes
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, async (user) => {
+    const unsub = onIdTokenChanged(auth, (user) => {
       setAuthUser(user);
       if (user && !isAuthorizedAdminEmail(user.email)) {
         setLoginError(
@@ -145,6 +184,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   const [newRow, setNewRow] = useState<1 | 2>(1);
   const [newImageUrl, setNewImageUrl] = useState('');
   const [newVideoPosterUrl, setNewVideoPosterUrl] = useState('');
+  const [newMediaKind, setNewMediaKind] = useState<'auto' | 'image' | 'video'>('auto');
   const [newUploadError, setNewUploadError] = useState('');
   const [projectMediaMode, setProjectMediaMode] = useState<'preset' | 'upload' | 'link'>('preset');
 
@@ -158,6 +198,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   const [editRow, setEditRow] = useState<1 | 2>(1);
   const [editImageUrl, setEditImageUrl] = useState('');
   const [editVideoPosterUrl, setEditVideoPosterUrl] = useState('');
+  const [editMediaKind, setEditMediaKind] = useState<'auto' | 'image' | 'video'>('auto');
   const [editUploadError, setEditUploadError] = useState('');
   const [editMediaMode, setEditMediaMode] = useState<'preset' | 'upload' | 'link'>('link');
 
@@ -206,24 +247,173 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
     setTimeout(() => setCloudErrorToast(''), 5500);
   };
 
-  const handleGoogleSignIn = async () => {
-    setIsAuthLoading(true);
+  const handleUsernamePasswordSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     setLoginError('');
+    setLoginInfo('');
+    setShowProviderSetupGuide(false);
+
+    const resolvedEmail = resolveAdminLoginIdentifier(usernameInput);
+    if (!resolvedEmail || !isAuthorizedAdminEmail(resolvedEmail)) {
+      setLoginError(
+        'Invalid admin username or email. Use "typixel" (or "hashimtypixel@gmail.com").'
+      );
+      return;
+    }
+
+    if (passwordInput.length < 6) {
+      setLoginError('Password must be at least 6 characters.');
+      return;
+    }
+
+    setIsAuthLoading(true);
     try {
-      const result = await signInWithPopup(auth, googleProvider);
-      if (!isAuthorizedAdminEmail(result.user.email)) {
-        setLoginError(
-          `Signed in as ${result.user.email || 'unknown account'}, which is not authorized. Please sign in with hashimtypixel@gmail.com.`
+      const cred = await signInWithEmailAndPassword(auth, resolvedEmail, passwordInput);
+      if (!cred.user.emailVerified) {
+        setLoginInfo(
+          `Signed in as ${resolvedEmail}. Please verify your email inbox link so global cloud publishing is authorized.`
         );
       }
+      setPasswordInput('');
     } catch (err: any) {
-      if (err?.code === 'auth/popup-closed-by-user') {
-        setLoginError('Google sign-in popup was closed. Please try again.');
+      const code = err?.code || '';
+      if (code === 'auth/operation-not-allowed') {
+        setShowProviderSetupGuide(true);
+        setLoginError(
+          'Email/Password login is not enabled yet in Firebase Authentication. Follow the 1-minute setup steps below.'
+        );
+      } else if (code === 'auth/user-not-found' || code === 'auth/invalid-credential' || code === 'auth/wrong-password') {
+        setLoginError(
+          `Incorrect username or password for ${resolvedEmail}. Check your password or click "Forgot password?" below.`
+        );
+      } else if (code === 'auth/too-many-requests') {
+        setLoginError('Too many attempts. Please wait a minute and try again.');
       } else {
-        setLoginError(err?.message || 'Google sign-in failed. Please try again.');
+        setLoginError(err?.message || 'Sign in failed. Please try again.');
       }
     } finally {
       setIsAuthLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    setLoginError('');
+    setLoginInfo('');
+    const resolvedEmail = resolveAdminLoginIdentifier(usernameInput || 'typixel');
+    if (!isAuthorizedAdminEmail(resolvedEmail)) {
+      setLoginError('Enter your admin username ("typixel") or email first.');
+      return;
+    }
+    setIsAuthLoading(true);
+    try {
+      await sendPasswordResetEmail(auth, resolvedEmail);
+      setLoginInfo(`Password reset link sent to ${resolvedEmail}. Check your inbox/spam folder.`);
+    } catch (err: any) {
+      if (err?.code === 'auth/operation-not-allowed') {
+        setShowProviderSetupGuide(true);
+        setLoginError('Enable Email/Password in Firebase Console first before resetting password.');
+      } else {
+        setLoginError(err?.message || 'Could not send reset email.');
+      }
+    } finally {
+      setIsAuthLoading(false);
+    }
+  };
+
+  const handleSendResetFromAdmin = async () => {
+    const targetEmail = auth.currentUser?.email || 'hashimtypixel@gmail.com';
+    setChangePasswordError('');
+    setChangePasswordInfo('');
+    setIsSendingResetFromAdmin(true);
+    try {
+      await sendPasswordResetEmail(auth, targetEmail);
+      const msg = `Password reset link sent to ${targetEmail}. Check your inbox or spam folder.`;
+      setChangePasswordInfo(msg);
+      showToast(msg);
+    } catch (err: any) {
+      const errMsg = err?.message || 'Could not send password reset email.';
+      setChangePasswordError(errMsg);
+      showError(errMsg);
+    } finally {
+      setIsSendingResetFromAdmin(false);
+    }
+  };
+
+  const handleResendVerification = async () => {
+    if (!auth.currentUser) return;
+    setIsAuthLoading(true);
+    setLoginError('');
+    try {
+      await sendEmailVerification(auth.currentUser);
+      setLoginInfo(`Verification link re-sent to ${auth.currentUser.email}. Check your inbox and spam folder.`);
+    } catch (err: any) {
+      setLoginError(err?.message || 'Could not resend verification email right now.');
+    } finally {
+      setIsAuthLoading(false);
+    }
+  };
+
+  const handleRefreshVerification = async () => {
+    if (!auth.currentUser) return;
+    setIsAuthLoading(true);
+    setLoginError('');
+    try {
+      await auth.currentUser.reload();
+      await auth.currentUser.getIdToken(true);
+      setAuthUser(auth.currentUser);
+      setAuthRefreshTick((t) => t + 1);
+      if (!auth.currentUser.emailVerified) {
+        setLoginError(
+          `Email ${auth.currentUser.email} is still not verified yet. Please open the verification link in your email inbox first.`
+        );
+      }
+    } catch (err: any) {
+      setLoginError(err?.message || 'Could not refresh verification status.');
+    } finally {
+      setIsAuthLoading(false);
+    }
+  };
+
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setChangePasswordError('');
+    if (changeNewPassword.length < 6) {
+      setChangePasswordError('New password must be at least 6 characters.');
+      return;
+    }
+    if (changeNewPassword !== changeConfirmPassword) {
+      setChangePasswordError('New passwords do not match.');
+      return;
+    }
+    const user = auth.currentUser;
+    if (!user || !user.email) {
+      setChangePasswordError('Please sign in again before changing your password.');
+      return;
+    }
+
+    setIsChangingPassword(true);
+    try {
+      const hasPasswordProvider = user.providerData.some((p) => p.providerId === 'password');
+      if (hasPasswordProvider && currentPasswordInput) {
+        const cred = EmailAuthProvider.credential(user.email, currentPasswordInput);
+        await reauthenticateWithCredential(user, cred);
+      }
+      await updatePassword(user, changeNewPassword);
+      setIsChangePasswordOpen(false);
+      setCurrentPasswordInput('');
+      setChangeNewPassword('');
+      setChangeConfirmPassword('');
+      showToast('Admin password updated successfully!');
+    } catch (err: any) {
+      if (err?.code === 'auth/wrong-password' || err?.code === 'auth/invalid-credential') {
+        setChangePasswordError('Current password is incorrect.');
+      } else if (err?.code === 'auth/requires-recent-login') {
+        setChangePasswordError('For security, please sign out and sign back in, then update your password.');
+      } else {
+        setChangePasswordError(err?.message || 'Failed to update password.');
+      }
+    } finally {
+      setIsChangingPassword(false);
     }
   };
 
@@ -231,6 +421,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
     try {
       await signOut(auth);
       setHasSeededCloud(false);
+      setLoginInfo('');
+      setLoginError('');
     } catch {}
   };
 
@@ -357,7 +549,12 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
 
     const mediaUrl = normalizeShowcaseImagePath(newImageUrl.trim());
     const posterUrl = normalizeShowcaseImagePath(newVideoPosterUrl.trim());
-    const isVideo = isVideoMediaUrl(mediaUrl);
+    const isVideo =
+      newMediaKind === 'video'
+        ? true
+        : newMediaKind === 'image'
+          ? false
+          : isVideoMediaUrl(mediaUrl);
 
     const newItem: ShowcaseItem = {
       id: `proj-${Date.now()}`,
@@ -403,6 +600,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       setNewBadge('');
       setNewImageUrl('');
       setNewVideoPosterUrl('');
+      setNewMediaKind('auto');
       setNewUploadError('');
       setCustomCategoryName('');
 
@@ -425,6 +623,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       'Event Branding & Poster',
       'Commercial Poster Design',
       'Festive & Cultural Poster',
+      'Festive & Social Media',
       'Visual Identity & Branding',
       'Logo Design & Identity',
       'Product & Packaging Mockup',
@@ -453,6 +652,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
     const isVid = isVideoMediaUrl(item.videoUrl || item.imageUrl, item.mediaType);
     setEditImageUrl(isVid ? (item.videoUrl || item.imageUrl || '') : (item.imageUrl || ''));
     setEditVideoPosterUrl(isVid && item.imageUrl && !isVideoMediaUrl(item.imageUrl) ? item.imageUrl : '');
+    setEditMediaKind(item.mediaType === 'video' ? 'video' : item.mediaType === 'image' ? 'image' : 'auto');
     setEditMediaMode('link');
   };
 
@@ -467,7 +667,12 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
 
     const mediaUrl = normalizeShowcaseImagePath(editImageUrl.trim());
     const posterUrl = normalizeShowcaseImagePath(editVideoPosterUrl.trim());
-    const isVideo = isVideoMediaUrl(mediaUrl);
+    const isVideo =
+      editMediaKind === 'video'
+        ? true
+        : editMediaKind === 'image'
+          ? false
+          : isVideoMediaUrl(mediaUrl);
 
     const updatedItem: ShowcaseItem = {
       ...editingProject,
@@ -863,7 +1068,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
             <p className="text-xs text-neutral-500">
               {isAuthenticated
                 ? `Signed in as ${authUser?.email || 'Admin'} — Changes update live for all visitors`
-                : 'Google Admin Sign-In required to publish showcase updates globally'}
+                : 'Sign in with your admin username & password to publish showcase updates globally'}
             </p>
           </div>
         </div>
@@ -878,6 +1083,19 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
               >
                 <Download className="w-3.5 h-3.5 text-neutral-700" />
                 <span>Backup</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  setChangePasswordError('');
+                  setChangePasswordInfo('');
+                  setIsChangePasswordOpen(true);
+                }}
+                className="inline-flex items-center gap-1.5 text-xs text-neutral-800 hover:text-black bg-[#F5F4F0] hover:bg-[#EAE8E2] border border-neutral-200/80 px-3 py-1.5 rounded-xl transition-colors cursor-pointer"
+                title="Change or Reset Admin Password"
+              >
+                <KeyRound className="w-3.5 h-3.5 text-neutral-700" />
+                <span className="hidden sm:inline">Password</span>
               </button>
 
               <button
@@ -917,10 +1135,10 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
         </div>
       )}
 
-      {/* Auth Barrier if not logged in via authorized Google account */}
+      {/* Auth Barrier if not signed in / verified */}
       {!isAuthenticated ? (
         <div className="flex-1 flex items-center justify-center p-4 sm:p-8">
-          <div className="bg-white rounded-[28px] sm:rounded-3xl max-w-md w-full p-8 sm:p-10 shadow-xl border border-neutral-200/90 text-center animate-in zoom-in-95 duration-200">
+          <div className="bg-white rounded-[28px] sm:rounded-3xl max-w-md w-full p-7 sm:p-9 shadow-xl border border-neutral-200/90 animate-in zoom-in-95 duration-200">
             <div className="w-14 h-14 rounded-2xl bg-neutral-900 flex items-center justify-center text-white mb-4 mx-auto shadow-md">
               <ShieldCheck className="w-7 h-7" />
             </div>
@@ -934,42 +1152,157 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
               </span>
             </div>
 
-            <p className="text-xs sm:text-[13px] text-neutral-500 mb-6 leading-relaxed">
-              Sign in with your authorized Typixel Google account (<span className="font-mono text-neutral-700">hashimtypixel@gmail.com</span>) so showcase images, videos, and site changes sync globally for all visitors.
-            </p>
+            {needsEmailVerification ? (
+              <div className="mt-4 text-center space-y-4">
+                <p className="text-xs sm:text-[13px] text-neutral-600 leading-relaxed">
+                  Signed in as <span className="font-mono font-semibold text-neutral-900">{authUser?.email}</span>. Click the verification link sent to your email inbox so your image &amp; video edits sync globally.
+                </p>
 
-            {loginError && (
-              <div className="p-3 mb-4 bg-rose-50 text-rose-800 text-xs rounded-xl border border-rose-200 text-left font-medium">
-                {loginError}
+                {loginInfo && (
+                  <div className="p-3 bg-emerald-50 text-emerald-800 text-xs rounded-xl border border-emerald-200 text-left font-medium">
+                    {loginInfo}
+                  </div>
+                )}
+
+                {loginError && (
+                  <div className="p-3 bg-rose-50 text-rose-800 text-xs rounded-xl border border-rose-200 text-left font-medium">
+                    {loginError}
+                  </div>
+                )}
+
+                <div className="space-y-2.5 pt-1">
+                  <button
+                    type="button"
+                    disabled={isAuthLoading}
+                    onClick={handleRefreshVerification}
+                    className="w-full bg-neutral-900 hover:bg-black disabled:opacity-60 text-white text-xs font-semibold py-3 px-4 rounded-xl shadow-xs transition-all cursor-pointer flex items-center justify-center gap-2"
+                  >
+                    <RefreshCw className={`w-3.5 h-3.5 ${isAuthLoading ? 'animate-spin' : ''}`} />
+                    <span>I&apos;ve Verified — Continue to Dashboard</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    disabled={isAuthLoading}
+                    onClick={handleResendVerification}
+                    className="w-full bg-[#F5F4F0] hover:bg-[#EAE8E2] text-neutral-800 text-xs font-semibold py-2.5 px-4 rounded-xl border border-neutral-200 transition-colors cursor-pointer"
+                  >
+                    Resend Verification Email
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="w-full text-xs font-medium text-neutral-500 hover:text-neutral-900 py-1.5 cursor-pointer"
+                  >
+                    Sign Out / Use Another Account
+                  </button>
+                </div>
               </div>
+            ) : (
+              <>
+                <p className="text-xs sm:text-[13px] text-neutral-500 mb-5 text-center leading-relaxed">
+                  Sign in with your admin username &amp; password so showcase images, videos, and site changes sync globally for everyone.
+                </p>
+
+                {loginInfo && (
+                  <div className="p-3 mb-4 bg-emerald-50 text-emerald-800 text-xs rounded-xl border border-emerald-200 text-left font-medium">
+                    {loginInfo}
+                  </div>
+                )}
+
+                {loginError && (
+                  <div className="p-3 mb-4 bg-rose-50 text-rose-800 text-xs rounded-xl border border-rose-200 text-left font-medium space-y-2">
+                    <p>{loginError}</p>
+
+                    {showProviderSetupGuide && (
+                      <div className="pt-2 border-t border-rose-200/80 text-[11px] text-rose-900 space-y-1.5">
+                        <p className="font-bold">How to enable Username &amp; Password (1 time):</p>
+                        <ol className="list-decimal pl-4 space-y-1">
+                          <li>Open Firebase Console → Authentication → Sign-in method</li>
+                          <li>Click <strong>Add new provider</strong> → choose <strong>Email/Password</strong> → <strong>Enable</strong> → <strong>Save</strong></li>
+                          <li>In <strong>Authentication → Users</strong>, add or set password for <strong>hashimtypixel@gmail.com</strong>, then sign in here.</li>
+                        </ol>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                <form onSubmit={handleUsernamePasswordSubmit} className="space-y-3.5 text-left">
+                  <div>
+                    <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-600 mb-1">
+                      Admin Username or Email
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      autoComplete="username"
+                      placeholder="typixel or hashimtypixel@gmail.com"
+                      value={usernameInput}
+                      onChange={(e) => setUsernameInput(e.target.value)}
+                      className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900/10 focus:border-neutral-900"
+                    />
+                  </div>
+
+                  <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-600">
+                        Password
+                      </label>
+                      <button
+                        type="button"
+                        onClick={handleForgotPassword}
+                        disabled={isAuthLoading}
+                        className="text-[11px] text-neutral-500 hover:text-neutral-900 underline cursor-pointer disabled:opacity-60"
+                      >
+                        Forgot password?
+                      </button>
+                    </div>
+                    <div className="relative">
+                      <input
+                        type={showPassword ? 'text' : 'password'}
+                        required
+                        minLength={6}
+                        autoComplete="current-password"
+                        placeholder="Enter password (min. 6 chars)"
+                        value={passwordInput}
+                        onChange={(e) => setPasswordInput(e.target.value)}
+                        className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl pl-3.5 pr-10 py-2.5 text-neutral-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900/10 focus:border-neutral-900"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-neutral-400 hover:text-neutral-700 cursor-pointer"
+                        aria-label={showPassword ? 'Hide password' : 'Show password'}
+                      >
+                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={isAuthLoading}
+                    className="w-full bg-neutral-900 hover:bg-black disabled:opacity-60 text-white text-xs font-semibold py-3 px-4 rounded-xl shadow-xs transition-all cursor-pointer flex items-center justify-center gap-2"
+                  >
+                    <Lock className="w-3.5 h-3.5" />
+                    <span>{isAuthLoading ? 'Signing in...' : 'Login to Admin Control'}</span>
+                  </button>
+                </form>
+
+                {authUser && !isAuthorizedAdminEmail(authUser.email) && (
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="w-full mt-2.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 text-xs font-semibold py-2 rounded-xl cursor-pointer"
+                  >
+                    Sign out ({authUser.email})
+                  </button>
+                )}
+              </>
             )}
 
-            <button
-              type="button"
-              disabled={isAuthLoading}
-              onClick={handleGoogleSignIn}
-              className="w-full bg-neutral-900 hover:bg-black disabled:opacity-60 text-white text-xs font-semibold py-3 px-4 rounded-xl shadow-xs transition-all cursor-pointer flex items-center justify-center gap-2.5"
-            >
-              <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
-                <path fill="#EA4335" d="M12 5c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 1.45 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.91 6.16-4.91z" />
-                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
-                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-              </svg>
-              <span>{isAuthLoading ? 'Signing in...' : authUser ? 'Switch Google Account' : 'Continue with Google'}</span>
-            </button>
-
-            {authUser && !isAuthorizedAdminEmail(authUser.email) && (
-              <button
-                type="button"
-                onClick={handleLogout}
-                className="w-full mt-2.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 text-xs font-semibold py-2 rounded-xl cursor-pointer"
-              >
-                Sign out ({authUser.email})
-              </button>
-            )}
-
-            <div className="mt-6 pt-4 border-t border-neutral-100">
+            <div className="mt-6 pt-4 border-t border-neutral-100 text-center">
               <button
                 type="button"
                 onClick={onClose}
@@ -1001,6 +1334,16 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                onClick={handleSendResetFromAdmin}
+                disabled={isSendingResetFromAdmin}
+                className="inline-flex items-center gap-1.5 text-xs font-medium bg-[#F5F4F0] hover:bg-[#EAE8E2] disabled:opacity-60 border border-neutral-200 text-neutral-800 px-3 py-1.5 rounded-xl transition-colors cursor-pointer"
+                title="Send password reset link to your admin email"
+              >
+                <KeyRound className="w-3.5 h-3.5 text-neutral-700" />
+                <span>{isSendingResetFromAdmin ? 'Sending...' : 'Forgot Password'}</span>
+              </button>
               <button
                 onClick={() => setActiveTab('backup')}
                 className="inline-flex items-center gap-1.5 text-xs font-medium bg-[#F5F4F0] hover:bg-[#EAE8E2] border border-neutral-200 text-neutral-800 px-3 py-1.5 rounded-xl transition-colors cursor-pointer"
@@ -1425,10 +1768,10 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                       <div>
                         <h4 className="text-sm font-bold text-neutral-900 flex items-center gap-2">
                           <Sparkles className="w-4 h-4 text-amber-500" />
-                          <span>10 Preset Showcase Artworks</span>
+                          <span>{SHOWCASE_PRESET_IMAGES.length} Preset Showcase Artworks &amp; Videos</span>
                         </h4>
                         <p className="text-xs text-neutral-500">
-                          Click any asset below to auto-fill its artwork, title, category, and marquee row.
+                          Click any asset below to auto-fill its artwork or video, title, category, and marquee row.
                         </p>
                       </div>
                       <span className="text-[11px] font-mono text-neutral-500 bg-white border border-neutral-200 px-2.5 py-0.5 rounded-full self-start sm:self-auto">
@@ -1436,9 +1779,10 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                       </span>
                     </div>
 
-                    <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
+                    <div className="grid grid-cols-2 sm:grid-cols-6 gap-2.5">
                       {SHOWCASE_PRESET_IMAGES.map((preset) => {
                         const isSelected = newImageUrl === preset.path;
+                        const isPresetVid = isVideoMediaUrl(preset.path);
                         return (
                           <button
                             key={preset.filename}
@@ -1451,15 +1795,25 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                             }`}
                           >
                             <div className="w-full aspect-[4/5] rounded-lg overflow-hidden bg-neutral-900 mb-1.5 relative border border-black/5">
-                              <img
-                                src={preset.path}
-                                alt={preset.name}
-                                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                                onError={(e) => {
-                                  // Fallback in case of load glitch
-                                  (e.target as HTMLElement).style.opacity = '0.7';
-                                }}
-                              />
+                              {isPresetVid ? (
+                                <video
+                                  src={preset.path}
+                                  muted
+                                  autoPlay
+                                  loop
+                                  playsInline
+                                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                />
+                              ) : (
+                                <img
+                                  src={preset.path}
+                                  alt={preset.name}
+                                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                  onError={(e) => {
+                                    (e.target as HTMLElement).style.opacity = '0.7';
+                                  }}
+                                />
+                              )}
                               <span className={`absolute top-1 right-1 text-[8px] font-mono font-bold px-1.5 py-0.5 rounded shadow-xs ${
                                 isSelected ? 'bg-emerald-500 text-white' : 'bg-black/70 text-white'
                               }`}>
@@ -1605,7 +1959,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                                 : 'text-neutral-600 hover:text-neutral-900'
                             }`}
                           >
-                            ⭐ Showcase Assets (10)
+                            ⭐ Showcase Assets ({SHOWCASE_PRESET_IMAGES.length})
                           </button>
                           <button
                             type="button"
@@ -1679,7 +2033,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                             />
                             {newImageUrl && (
                               <div className="w-12 h-14 rounded-lg overflow-hidden border border-neutral-300 shrink-0 bg-neutral-900 shadow-xs">
-                                {isVideoMediaUrl(newImageUrl) ? (
+                                {(newMediaKind === 'video' || (newMediaKind === 'auto' && isVideoMediaUrl(newImageUrl))) ? (
                                   <video
                                     src={newImageUrl}
                                     muted
@@ -1733,7 +2087,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                         </div>
                       )}
 
-                      {isVideoMediaUrl(newImageUrl) && (
+                      {(newMediaKind === 'video' || (newMediaKind === 'auto' && isVideoMediaUrl(newImageUrl))) && (
                         <div className="pt-2">
                           <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-600 mb-1">
                             Optional Video Poster / Cover Image URL
@@ -1747,6 +2101,24 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                           />
                         </div>
                       )}
+
+                      <div className="flex items-center gap-2 pt-1 text-[11px] text-neutral-600">
+                        <span className="font-semibold">Media Type:</span>
+                        {(['auto', 'image', 'video'] as const).map((kind) => (
+                          <button
+                            key={kind}
+                            type="button"
+                            onClick={() => setNewMediaKind(kind)}
+                            className={`px-2.5 py-0.5 rounded-lg border cursor-pointer transition-colors ${
+                              newMediaKind === kind
+                                ? 'bg-neutral-900 text-white border-neutral-900 font-semibold'
+                                : 'bg-neutral-50 text-neutral-600 border-neutral-200 hover:bg-neutral-100'
+                            }`}
+                          >
+                            {kind === 'auto' ? 'Auto-Detect' : kind === 'image' ? 'Image' : 'Video'}
+                          </button>
+                        ))}
+                      </div>
                     </div>
 
                     {/* Card Live Preview Banner */}
@@ -1754,7 +2126,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                       <div className="pt-3 border-t border-neutral-100 flex items-center gap-4 bg-[#FAF9F6] p-3 rounded-xl border border-neutral-200">
                         <div className="w-14 h-18 rounded-lg overflow-hidden bg-neutral-900 shrink-0 border border-neutral-300 shadow-xs relative">
                           {newImageUrl ? (
-                            isVideoMediaUrl(newImageUrl) ? (
+                            (newMediaKind === 'video' || (newMediaKind === 'auto' && isVideoMediaUrl(newImageUrl))) ? (
                               <video
                                 src={normalizeShowcaseImagePath(newImageUrl)}
                                 poster={newVideoPosterUrl ? normalizeShowcaseImagePath(newVideoPosterUrl) : undefined}
@@ -2343,6 +2715,42 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                       <span>Save Settings</span>
                     </button>
                   </div>
+
+                  {/* Admin Password & Forgot Password Card inside Admin Page */}
+                  <div className="pt-5 border-t border-neutral-200">
+                    <div className="p-4 bg-[#FAF9F6] rounded-2xl border border-neutral-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                      <div>
+                        <h4 className="text-sm font-bold text-neutral-900 flex items-center gap-1.5">
+                          <KeyRound className="w-4 h-4 text-neutral-700" />
+                          <span>Admin Account Password</span>
+                        </h4>
+                        <p className="text-xs text-neutral-500 mt-0.5">
+                          Signed in as <span className="font-mono font-medium text-neutral-700">{authUser?.email}</span>. Change your password or send a reset link.
+                        </p>
+                      </div>
+                      <div className="flex flex-wrap items-center gap-2 shrink-0">
+                        <button
+                          type="button"
+                          onClick={handleSendResetFromAdmin}
+                          disabled={isSendingResetFromAdmin}
+                          className="px-3.5 py-2 text-xs font-semibold bg-white hover:bg-neutral-100 text-neutral-800 border border-neutral-300 rounded-xl transition-colors cursor-pointer disabled:opacity-60"
+                        >
+                          {isSendingResetFromAdmin ? 'Sending...' : 'Forgot Password'}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setChangePasswordError('');
+                            setChangePasswordInfo('');
+                            setIsChangePasswordOpen(true);
+                          }}
+                          className="px-3.5 py-2 text-xs font-semibold bg-neutral-900 hover:bg-black text-white rounded-xl transition-colors cursor-pointer"
+                        >
+                          Change Password
+                        </button>
+                      </div>
+                    </div>
+                  </div>
                 </form>
               )}
 
@@ -2520,13 +2928,23 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                       className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none"
                     >
                       <option value="Event Branding & Poster">Event Branding &amp; Poster</option>
+                      <option value="Commercial Poster Design">Commercial Poster Design</option>
+                      <option value="Festive & Cultural Poster">Festive &amp; Cultural Poster</option>
+                      <option value="Festive & Social Media">Festive &amp; Social Media</option>
+                      <option value="Visual Identity & Branding">Visual Identity &amp; Branding</option>
+                      <option value="Logo Design & Identity">Logo Design &amp; Identity</option>
+                      <option value="Product & Packaging Mockup">Product &amp; Packaging Mockup</option>
+                      <option value="Event Branding & Invitation">Event Branding &amp; Invitation</option>
+                      <option value="Cultural Poster & Digital Art">Cultural Poster &amp; Digital Art</option>
+                      <option value="Brand Identity & Logo">Brand Identity &amp; Logo</option>
+                      <option value="Spiritual Typography & Poster">Spiritual Typography &amp; Poster</option>
                       <option value="Matchday Sports Poster">Matchday Sports Poster</option>
                       <option value="Editorial Typography">Editorial Typography</option>
                       <option value="Digital Artwork & Manipulation">Digital Artwork &amp; Manipulation</option>
-                      <option value="Product & Packaging Mockup">Product &amp; Packaging Mockup</option>
                       <option value="Social Media Campaign">Social Media Campaign</option>
                       <option value="Visual Identity & Logo">Visual Identity &amp; Logo</option>
-                      <option value="Logo Design & Identity">Logo Design &amp; Identity</option>
+                      <option value="Motion Graphics & Video">Motion Graphics &amp; Video</option>
+                      <option value="Motion Video & Wedding">Motion Video &amp; Wedding</option>
                       <option value="Motion Graphic Poster">Motion Graphic Poster</option>
                       <option value="Other">Other (Custom)...</option>
                     </select>
@@ -2579,7 +2997,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                 <div className="pt-2 border-t border-neutral-100 space-y-3">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <label className="block text-xs font-bold uppercase tracking-wider text-neutral-600">
-                      Cover Image / Artwork
+                      Cover Image / Video Artwork
                     </label>
                     <div className="flex items-center gap-1.5 text-[11px] bg-neutral-100 p-1 rounded-xl">
                       <button
@@ -2620,24 +3038,38 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
 
                   {editMediaMode === 'preset' && (
                     <div className="space-y-2">
-                      <div className="grid grid-cols-5 gap-2">
-                        {SHOWCASE_PRESET_IMAGES.map((preset) => (
-                          <button
-                            key={preset.filename}
-                            type="button"
-                            onClick={() => handleSelectPreset(preset, true)}
-                            className={`p-1 rounded-lg border text-left cursor-pointer transition-all ${
-                              editImageUrl === preset.path
-                                ? 'border-neutral-900 bg-neutral-900 text-white ring-2 ring-neutral-900/20'
-                                : 'border-neutral-200 bg-neutral-50 hover:bg-white text-neutral-800'
-                            }`}
-                          >
-                            <div className="w-full aspect-[4/5] rounded overflow-hidden bg-neutral-900 mb-1">
-                              <img src={preset.path} alt={preset.name} className="w-full h-full object-cover" />
-                            </div>
-                            <span className="text-[10px] font-bold truncate block">{preset.name}</span>
-                          </button>
-                        ))}
+                      <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
+                        {SHOWCASE_PRESET_IMAGES.map((preset) => {
+                          const isPresetVid = isVideoMediaUrl(preset.path);
+                          return (
+                            <button
+                              key={preset.filename}
+                              type="button"
+                              onClick={() => handleSelectPreset(preset, true)}
+                              className={`p-1 rounded-lg border text-left cursor-pointer transition-all ${
+                                editImageUrl === preset.path
+                                  ? 'border-neutral-900 bg-neutral-900 text-white ring-2 ring-neutral-900/20'
+                                  : 'border-neutral-200 bg-neutral-50 hover:bg-white text-neutral-800'
+                              }`}
+                            >
+                              <div className="w-full aspect-[4/5] rounded overflow-hidden bg-neutral-900 mb-1">
+                                {isPresetVid ? (
+                                  <video
+                                    src={preset.path}
+                                    muted
+                                    autoPlay
+                                    loop
+                                    playsInline
+                                    className="w-full h-full object-cover"
+                                  />
+                                ) : (
+                                  <img src={preset.path} alt={preset.name} className="w-full h-full object-cover" />
+                                )}
+                              </div>
+                              <span className="text-[10px] font-bold truncate block">{preset.name}</span>
+                            </button>
+                          );
+                        })}
                       </div>
                     </div>
                   )}
@@ -2653,7 +3085,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                         />
                         {editImageUrl && (
                           <div className="w-12 h-14 rounded-lg overflow-hidden border border-neutral-200 shrink-0 bg-neutral-900 shadow-xs">
-                            {isVideoMediaUrl(editImageUrl) ? (
+                            {(editMediaKind === 'video' || (editMediaKind === 'auto' && isVideoMediaUrl(editImageUrl))) ? (
                               <video
                                 src={normalizeShowcaseImagePath(editImageUrl)}
                                 muted
@@ -2694,7 +3126,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                       {editImageUrl && (
                         <div className="flex items-center gap-2">
                           <div className="w-10 h-12 rounded-lg overflow-hidden border border-neutral-200 shrink-0 bg-neutral-900 shadow-xs">
-                            {isVideoMediaUrl(editImageUrl) ? (
+                            {(editMediaKind === 'video' || (editMediaKind === 'auto' && isVideoMediaUrl(editImageUrl))) ? (
                               <video
                                 src={normalizeShowcaseImagePath(editImageUrl)}
                                 poster={editVideoPosterUrl ? normalizeShowcaseImagePath(editVideoPosterUrl) : undefined}
@@ -2714,7 +3146,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                     </div>
                   )}
 
-                  {isVideoMediaUrl(editImageUrl) && (
+                  {(editMediaKind === 'video' || (editMediaKind === 'auto' && isVideoMediaUrl(editImageUrl))) && (
                     <div className="pt-1">
                       <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-600 mb-1">
                         Optional Video Poster / Cover Image URL
@@ -2728,6 +3160,24 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                       />
                     </div>
                   )}
+
+                  <div className="flex items-center gap-2 pt-1 text-[11px] text-neutral-600">
+                    <span className="font-semibold">Media Type:</span>
+                    {(['auto', 'image', 'video'] as const).map((kind) => (
+                      <button
+                        key={kind}
+                        type="button"
+                        onClick={() => setEditMediaKind(kind)}
+                        className={`px-2.5 py-0.5 rounded-lg border cursor-pointer transition-colors ${
+                          editMediaKind === kind
+                            ? 'bg-neutral-900 text-white border-neutral-900 font-semibold'
+                            : 'bg-neutral-50 text-neutral-600 border-neutral-200 hover:bg-neutral-100'
+                        }`}
+                      >
+                        {kind === 'auto' ? 'Auto-Detect' : kind === 'image' ? 'Image' : 'Video'}
+                      </button>
+                    ))}
+                  </div>
                 </div>
 
                 <div className="flex justify-end gap-2 pt-3 border-t border-neutral-100">
@@ -2751,6 +3201,100 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
             </div>
           </div>
         )}
+
+      {/* ================= CHANGE / FORGOT PASSWORD MODAL ================= */}
+      {isChangePasswordOpen && (
+        <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+          <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-neutral-200">
+            <h4 className="text-base font-bold text-neutral-900 mb-3">Change Admin Password</h4>
+
+            {changePasswordInfo && (
+              <div className="p-2.5 bg-emerald-50 text-emerald-800 text-xs rounded-lg mb-3 border border-emerald-200 font-medium">
+                {changePasswordInfo}
+              </div>
+            )}
+
+            {changePasswordError && (
+              <div className="p-2.5 bg-rose-50 text-rose-800 text-xs rounded-lg mb-3 border border-rose-200 font-medium">
+                {changePasswordError}
+              </div>
+            )}
+
+            <form onSubmit={handleChangePassword} className="space-y-3">
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-[11px] font-bold text-neutral-600">Current Password</label>
+                  <button
+                    type="button"
+                    onClick={handleSendResetFromAdmin}
+                    disabled={isSendingResetFromAdmin}
+                    className="text-[11px] text-neutral-500 hover:text-neutral-900 underline cursor-pointer disabled:opacity-60"
+                  >
+                    {isSendingResetFromAdmin ? 'Sending reset...' : 'Forgot password?'}
+                  </button>
+                </div>
+                <input
+                  type={showChangePasswordText ? 'text' : 'password'}
+                  required
+                  value={currentPasswordInput}
+                  onChange={(e) => setCurrentPasswordInput(e.target.value)}
+                  className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3 py-2 text-neutral-900"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold text-neutral-600 mb-1">New Password (min. 6 chars)</label>
+                <input
+                  type={showChangePasswordText ? 'text' : 'password'}
+                  required
+                  minLength={6}
+                  value={changeNewPassword}
+                  onChange={(e) => setChangeNewPassword(e.target.value)}
+                  className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3 py-2 text-neutral-900"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold text-neutral-600 mb-1">Confirm New Password</label>
+                <input
+                  type={showChangePasswordText ? 'text' : 'password'}
+                  required
+                  minLength={6}
+                  value={changeConfirmPassword}
+                  onChange={(e) => setChangeConfirmPassword(e.target.value)}
+                  className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3 py-2 text-neutral-900"
+                />
+              </div>
+
+              <label className="flex items-center gap-2 text-xs text-neutral-600 cursor-pointer pt-1">
+                <input
+                  type="checkbox"
+                  checked={showChangePasswordText}
+                  onChange={(e) => setShowChangePasswordText(e.target.checked)}
+                />
+                <span>Show passwords</span>
+              </label>
+
+              <div className="flex gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setIsChangePasswordOpen(false)}
+                  className="flex-1 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 text-xs font-semibold py-2 rounded-xl cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isChangingPassword}
+                  className="flex-1 bg-neutral-900 hover:bg-black disabled:opacity-60 text-white text-xs font-semibold py-2 rounded-xl cursor-pointer"
+                >
+                  {isChangingPassword ? 'Updating...' : 'Save Password'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

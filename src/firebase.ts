@@ -1,18 +1,28 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider } from 'firebase/auth';
+import { getAuth } from 'firebase/auth';
 import { getFirestore, doc, getDocFromServer } from 'firebase/firestore';
 import firebaseConfig from '../firebase-applet-config.json';
 
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
 export const auth = getAuth(app);
-export const googleProvider = new GoogleAuthProvider();
-googleProvider.setCustomParameters({ prompt: 'select_account' });
 
 export const ADMIN_EMAILS = [
   'hashimtypixel@gmail.com',
   'typixelofficial@gmail.com'
 ];
+
+export const resolveAdminLoginIdentifier = (identifier: string): string => {
+  const clean = identifier.trim().toLowerCase();
+  if (!clean) return '';
+  if (clean === 'typixel' || clean === 'admin' || clean === 'hashim' || clean === 'hashimtypixel') {
+    return 'hashimtypixel@gmail.com';
+  }
+  if (clean === 'typixelofficial') {
+    return 'typixelofficial@gmail.com';
+  }
+  return clean;
+};
 
 export const isAuthorizedAdminEmail = (email?: string | null): boolean => {
   if (!email) return false;
