@@ -12,24 +12,21 @@ import {
   Wrench,
   BookOpen,
   Pencil,
-  Globe,
-  MapPin,
-  Target,
-  Users,
-  Compass,
   Copy,
   Check,
   Download,
   Upload,
   Database,
-  ShieldCheck,
-  Sparkles,
-  ExternalLink,
   ArrowLeft,
   Eye,
   EyeOff,
   KeyRound,
-  RefreshCw
+  RefreshCw,
+  ArrowUpRight,
+  Search,
+  ChevronDown,
+  ChevronUp,
+  ArrowLeftRight
 } from 'lucide-react';
 import {
   ShowcaseItem,
@@ -89,6 +86,27 @@ interface AdminPanelProps {
   onBlogPostsUpdated?: (posts: BlogPost[]) => void;
 }
 
+const SHOWCASE_CATEGORIES = [
+  'Event Branding & Poster',
+  'Commercial Poster Design',
+  'Festive & Cultural Poster',
+  'Festive & Social Media',
+  'Visual Identity & Branding',
+  'Logo Design & Identity',
+  'Product & Packaging Mockup',
+  'Event Branding & Invitation',
+  'Cultural Poster & Digital Art',
+  'Brand Identity & Logo',
+  'Spiritual Typography & Poster',
+  'Matchday Sports Poster',
+  'Editorial Typography',
+  'Digital Artwork & Manipulation',
+  'Social Media Campaign',
+  'Motion Graphics & Video',
+  'Motion Video & Wedding',
+  'Motion Graphic Poster'
+];
+
 export const AdminPanel: React.FC<AdminPanelProps> = ({
   isOpen,
   onClose,
@@ -132,11 +150,19 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   const needsEmailVerification = Boolean(authUser && isAuthorizedAccount && !authUser.emailVerified);
   const isAuthenticated = Boolean(authUser && isAuthorizedAccount && authUser.emailVerified);
 
-  // Admin Dashboard Tabs & Toast (includes SEO Control & Backup)
-  type AdminTab = 'seocontrol' | 'add' | 'manage' | 'tools' | 'blog' | 'settings' | 'backup';
-  const [activeTab, setActiveTab] = useState<AdminTab>('seocontrol');
+  // Unified Minimal Navigation Tabs
+  type AdminTab = 'showcase' | 'tools' | 'seo' | 'settings' | 'backup';
+  const [activeTab, setActiveTab] = useState<AdminTab>('showcase');
   const [successToast, setSuccessToast] = useState('');
   const [cloudErrorToast, setCloudErrorToast] = useState('');
+
+  // Minimal Workspace UI Toggles & Filters
+  const [showAddShowcaseForm, setShowAddShowcaseForm] = useState(false);
+  const [showcaseRowFilter, setShowcaseRowFilter] = useState<'all' | 1 | 2>('all');
+  const [showcaseSearch, setShowcaseSearch] = useState('');
+  const [showAddToolForm, setShowAddToolForm] = useState(false);
+  const [showAddArticleForm, setShowAddArticleForm] = useState(false);
+  const [showEmailJsAdvanced, setShowEmailJsAdvanced] = useState(false);
 
   // Subscribe to Firebase Auth & ID token refreshes
   useEffect(() => {
@@ -144,7 +170,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       setAuthUser(user);
       if (user && !isAuthorizedAdminEmail(user.email)) {
         setLoginError(
-          `Signed in as ${user.email || 'unknown account'}, which is not authorized for typixel admincontrol. Please sign in with hashimtypixel@gmail.com.`
+          `Signed in as ${user.email || 'unknown account'}, which is not authorized for Typixel Studio.`
         );
       } else {
         setLoginError('');
@@ -153,7 +179,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
     return () => unsub();
   }, []);
 
-  // Ensure Firestore collections are seeded when authorized Admin enters Control Room
+  // Ensure Firestore collections are seeded when authorized Admin enters Studio
   useEffect(() => {
     if (isOpen && isAuthenticated && !hasSeededCloud) {
       setHasSeededCloud(true);
@@ -175,7 +201,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   const [copiedSeoField, setCopiedSeoField] = useState<string | null>(null);
   const [backupRestoreError, setBackupRestoreError] = useState('');
 
-  // Form state for adding new project (Only fields showing on website)
+  // Form state for adding new project
   const [newTitle, setNewTitle] = useState('');
   const [newSubtitle, setNewSubtitle] = useState('');
   const [newCategory, setNewCategory] = useState('Event Branding & Poster');
@@ -189,7 +215,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   const [projectMediaMode, setProjectMediaMode] = useState<'preset' | 'upload' | 'link'>('preset');
 
   // Form state for editing existing showcase project
-  const [editingProject, setEditingProject] = useState<ShowcaseItem | null>(null);
+  const [editingProject, setEditingProject] = useState<(ShowcaseItem & { assignedRow?: number }) | null>(null);
   const [editTitle, setEditTitle] = useState('');
   const [editSubtitle, setEditSubtitle] = useState('');
   const [editCategory, setEditCategory] = useState('Event Branding & Poster');
@@ -202,27 +228,27 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   const [editUploadError, setEditUploadError] = useState('');
   const [editMediaMode, setEditMediaMode] = useState<'preset' | 'upload' | 'link'>('link');
 
-  // Form state for adding/editing Experienced Tools
+  // Form state for adding Experienced Tools
   const [newToolName, setNewToolName] = useState('');
   const [newToolCategory, setNewToolCategory] = useState<'Graphic & Vector' | 'Video & Motion' | 'Web & Code' | 'Product & UI'>('Graphic & Vector');
-  const [newToolLevel, setNewToolLevel] = useState('Mastery');
-  const [newToolProficiency, setNewToolProficiency] = useState(95);
-  const [newToolYears, setNewToolYears] = useState('3+ Years');
+  const [newToolLevel] = useState('Mastery');
+  const [newToolProficiency] = useState(95);
+  const [newToolYears] = useState('3+ Years');
   const [newToolBadge, setNewToolBadge] = useState('');
   const [newToolDescription, setNewToolDescription] = useState('');
   const [newToolIconUrl, setNewToolIconUrl] = useState('');
   const [toolIconMode, setToolIconMode] = useState<'upload' | 'link'>('upload');
 
-  // Form state for adding/editing Blog Posts
+  // Form state for adding Blog Posts
   const [newBlogTitle, setNewBlogTitle] = useState('');
   const [newBlogCategory, setNewBlogCategory] = useState<'Graphic Design' | 'Video & Motion' | 'UI/UX & Figma' | 'Design & Code' | 'Branding'>('Graphic Design');
-  const [newBlogReadTime, setNewBlogReadTime] = useState('5 min read');
+  const [newBlogReadTime] = useState('5 min read');
   const [newBlogExcerpt, setNewBlogExcerpt] = useState('');
   const [newBlogContent, setNewBlogContent] = useState('');
   const [newBlogTags, setNewBlogTags] = useState('Graphic Design, Adobe Photoshop, Typography');
   const [newBlogKeywords, setNewBlogKeywords] = useState('graphic design trends 2026, photoshop manipulation, viral reels');
 
-  // EmailJS & Contact Settings Form
+  // Contact & EmailJS Settings Form
   const [settingsEmail, setSettingsEmail] = useState(contactConfig.email);
   const [settingsWhatsApp, setSettingsWhatsApp] = useState(contactConfig.whatsappNumber);
   const [emailJsServiceId, setEmailJsServiceId] = useState(() => localStorage.getItem('kawsar_emailjs_service_id') || 'service_portfolio');
@@ -280,7 +306,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       if (code === 'auth/operation-not-allowed') {
         setShowProviderSetupGuide(true);
         setLoginError(
-          'Email/Password login is not enabled yet in Firebase Authentication. Follow the 1-minute setup steps below.'
+          'Email/Password login is not enabled yet in Firebase Authentication.'
         );
       } else if (code === 'auth/user-not-found' || code === 'auth/invalid-credential' || code === 'auth/wrong-password') {
         setLoginError(
@@ -307,7 +333,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
     setIsAuthLoading(true);
     try {
       await sendPasswordResetEmail(auth, resolvedEmail);
-      setLoginInfo(`Password reset link sent to ${resolvedEmail}. Check your inbox/spam folder.`);
+      setLoginInfo(`Password reset link sent to ${resolvedEmail}. Check your inbox or spam folder.`);
     } catch (err: any) {
       if (err?.code === 'auth/operation-not-allowed') {
         setShowProviderSetupGuide(true);
@@ -403,7 +429,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       setCurrentPasswordInput('');
       setChangeNewPassword('');
       setChangeConfirmPassword('');
-      showToast('Admin password updated successfully!');
+      showToast('Admin password updated successfully.');
     } catch (err: any) {
       if (err?.code === 'auth/wrong-password' || err?.code === 'auth/invalid-credential') {
         setChangePasswordError('Current password is incorrect.');
@@ -427,7 +453,6 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   };
 
   // --- Project Add / Edit / Delete ---
-  // Adaptive Compressor: guarantees images fit comfortably under Firestore's 1MB document ceiling
   const compressImageFile = (
     file: File,
     callback: (compressedDataUrl: string) => void,
@@ -437,7 +462,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
     if (isVideoFile) {
       if (file.size > 600 * 1024) {
         onSizeError(
-          `Video "${file.name}" is ${(file.size / (1024 * 1024)).toFixed(1)} MB. For global visitor playback, upload videos to GitHub/Cloudinary and paste the direct .mp4 URL in the "URL / Path" tab (direct file uploads support videos up to 600 KB).`
+          `Video "${file.name}" is ${(file.size / (1024 * 1024)).toFixed(1)} MB. Direct uploads support videos up to 600 KB; paste a direct .mp4 URL in Link mode for larger HD videos.`
         );
         return;
       }
@@ -603,8 +628,9 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       setNewMediaKind('auto');
       setNewUploadError('');
       setCustomCategoryName('');
+      setShowAddShowcaseForm(false);
 
-      showToast(`"${newItem.title}" published live to Row ${newRow} for all visitors!`);
+      showToast(`"${newItem.title}" published live to Row ${newRow}.`);
     } catch (err: any) {
       showError(err?.message || 'Failed to save project to cloud database.');
     } finally {
@@ -619,28 +645,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
     setEditBadge(item.badge || '');
     setEditUploadError('');
 
-    const standardCategories = [
-      'Event Branding & Poster',
-      'Commercial Poster Design',
-      'Festive & Cultural Poster',
-      'Festive & Social Media',
-      'Visual Identity & Branding',
-      'Logo Design & Identity',
-      'Product & Packaging Mockup',
-      'Event Branding & Invitation',
-      'Cultural Poster & Digital Art',
-      'Brand Identity & Logo',
-      'Spiritual Typography & Poster',
-      'Matchday Sports Poster',
-      'Editorial Typography',
-      'Digital Artwork & Manipulation',
-      'Social Media Campaign',
-      'Motion Graphics & Video',
-      'Motion Video & Wedding',
-      'Motion Graphic Poster'
-    ];
-
-    if (standardCategories.includes(item.category)) {
+    if (SHOWCASE_CATEGORIES.includes(item.category)) {
       setEditCategory(item.category);
       setEditCustomCategory('');
     } else {
@@ -714,7 +719,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       onProjectsUpdated(updatedRow1, updatedRow2);
 
       setEditingProject(null);
-      showToast(`"${updatedItem.title}" saved globally for all visitors!`);
+      showToast(`"${updatedItem.title}" saved globally.`);
     } catch (err: any) {
       showError(err?.message || 'Failed to update showcase item in cloud.');
     } finally {
@@ -738,7 +743,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       await saveShowcaseOrderToCloud(updatedRow1, updatedRow2);
       saveProjectsToStorage(updatedRow1, updatedRow2);
       onProjectsUpdated(updatedRow1, updatedRow2);
-      showToast(`Moved "${item.title}" to Row ${targetRow} globally!`);
+      showToast(`Moved "${item.title}" to Row ${targetRow}.`);
     } catch (err: any) {
       showError(err?.message || 'Failed to move project row.');
     } finally {
@@ -755,7 +760,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       await deleteShowcaseItemFromCloud(id);
       saveProjectsToStorage(updatedRow1, updatedRow2);
       onProjectsUpdated(updatedRow1, updatedRow2);
-      showToast('Project deleted globally.');
+      showToast('Showcase item deleted.');
     } catch (err: any) {
       showError(err?.message || 'Failed to delete project from cloud.');
     } finally {
@@ -793,7 +798,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       setNewToolBadge('');
       setNewToolDescription('');
       setNewToolIconUrl('');
-      showToast(`Software "${newTool.name}" published globally.`);
+      setShowAddToolForm(false);
+      showToast(`Software "${newTool.name}" published.`);
     } catch (err: any) {
       showError(err?.message || 'Failed to save tool to cloud.');
     } finally {
@@ -808,7 +814,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       await deleteToolFromCloud(id);
       saveToolsToStorage(updated);
       if (onToolsUpdated) onToolsUpdated(updated);
-      showToast('Software removed globally.');
+      showToast('Software removed.');
     } catch (err: any) {
       showError(err?.message || 'Failed to remove tool from cloud.');
     } finally {
@@ -855,7 +861,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       setNewBlogTitle('');
       setNewBlogExcerpt('');
       setNewBlogContent('');
-      showToast(`Article "${newPost.title}" published globally!`);
+      setShowAddArticleForm(false);
+      showToast(`Article "${newPost.title}" published.`);
     } catch (err: any) {
       showError(err?.message || 'Failed to publish blog article to cloud.');
     } finally {
@@ -870,7 +877,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       await deleteBlogPostFromCloud(id);
       saveBlogPostsToStorage(updated);
       if (onBlogPostsUpdated) onBlogPostsUpdated(updated);
-      showToast('Article removed globally.');
+      showToast('Article removed.');
     } catch (err: any) {
       showError(err?.message || 'Failed to delete article from cloud.');
     } finally {
@@ -896,7 +903,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       localStorage.setItem('kawsar_emailjs_template_id', emailJsTemplateId.trim());
       localStorage.setItem('kawsar_emailjs_public_key', emailJsPublicKey.trim());
 
-      showToast('Contact channels & settings published globally!');
+      showToast('Contact settings saved globally.');
     } catch (err: any) {
       showError(err?.message || 'Failed to save settings to cloud.');
     } finally {
@@ -934,7 +941,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       if (metaDescTag && seoStrategy.metaDescription) {
         metaDescTag.setAttribute('content', seoStrategy.metaDescription);
       }
-      showToast('SEO Strategy & Metadata saved globally!');
+      showToast('SEO metadata saved globally.');
     } catch (err: any) {
       showError(err?.message || 'Failed to save SEO strategy to cloud.');
     } finally {
@@ -942,7 +949,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
     }
   };
 
-  // --- admincontrol Backup & Restore Handlers ---
+  // --- Backup & Restore Handlers ---
   const handleExportBackup = () => {
     const backupData = {
       backupName: 'admincontrol',
@@ -965,13 +972,13 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `typixel_admincontrol_backup_${new Date().toISOString().slice(0, 10)}.json`;
+    a.download = `typixel_backup_${new Date().toISOString().slice(0, 10)}.json`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 
-    showToast('Full system backup downloaded (admincontrol backup)!');
+    showToast('Backup file downloaded.');
   };
 
   const handleImportBackup = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -1028,7 +1035,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
         }
 
         setBackupRestoreError('');
-        showToast('Backup successfully restored & synced globally!');
+        showToast('Backup restored and synced globally.');
       } catch (err) {
         console.error('Backup import error:', err);
         setBackupRestoreError('Failed to parse or sync backup JSON. Please check file format.');
@@ -1040,152 +1047,149 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
     e.target.value = '';
   };
 
-  if (!isOpen) return null;
+  // Filtered Showcase List
+  const allProjects = [
+    ...row1Projects.map((p) => ({ ...p, assignedRow: 1 as const })),
+    ...row2Projects.map((p) => ({ ...p, assignedRow: 2 as const }))
+  ];
+  const filteredProjects = allProjects.filter((item) => {
+    if (showcaseRowFilter !== 'all' && item.assignedRow !== showcaseRowFilter) return false;
+    if (showcaseSearch.trim()) {
+      const q = showcaseSearch.toLowerCase();
+      return (
+        item.title.toLowerCase().includes(q) ||
+        item.category.toLowerCase().includes(q) ||
+        (item.subtitle || '').toLowerCase().includes(q)
+      );
+    }
+    return true;
+  });
+
+  const navItems: { id: AdminTab; label: string; count?: number; icon: React.ReactNode }[] = [
+    { id: 'showcase', label: 'Showcase', count: allProjects.length, icon: <Layers className="w-4 h-4" /> },
+    { id: 'tools', label: 'Tools', count: tools.length, icon: <Wrench className="w-4 h-4" /> },
+    { id: 'seo', label: 'Blog & SEO', count: blogPosts.length, icon: <BookOpen className="w-4 h-4" /> },
+    { id: 'settings', label: 'Settings', icon: <Mail className="w-4 h-4" /> },
+    { id: 'backup', label: 'Backup', icon: <Database className="w-4 h-4" /> }
+  ];
 
   return (
-    <div className="min-h-screen w-full bg-[#EAE8E3] text-neutral-900 flex flex-col selection:bg-neutral-900 selection:text-white">
-      {/* Top Header Bar for Separate Admin Page */}
-      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-neutral-200/90 px-4 sm:px-8 py-3.5 flex items-center justify-between gap-4 shadow-xs">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-neutral-900 text-white flex items-center justify-center shadow-xs">
-            <Lock className="w-4 h-4" />
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-base sm:text-lg font-bold text-neutral-900 leading-tight">
-                Typixel Admin Control
-              </h1>
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-neutral-100 text-neutral-700 font-semibold border border-neutral-200">
-                admincontrol
-              </span>
-              {isAuthenticated && (
-                <span className="hidden sm:inline-flex items-center gap-1.5 text-[10px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
-                  <span className={`w-1.5 h-1.5 rounded-full ${isCloudSyncing ? 'bg-amber-500' : 'bg-emerald-500'} animate-pulse`} />
-                  {isCloudSyncing ? 'Syncing to Cloud...' : 'Cloud Synced (Live for Everyone)'}
-                </span>
-              )}
-            </div>
-            <p className="text-xs text-neutral-500">
-              {isAuthenticated
-                ? `Signed in as ${authUser?.email || 'Admin'} — Changes update live for all visitors`
-                : 'Sign in with your admin username & password to publish showcase updates globally'}
-            </p>
-          </div>
+    <div className="min-h-screen w-full bg-[#F5F4F0] text-neutral-900 flex flex-col selection:bg-neutral-900 selection:text-white">
+      {/* Minimal 3-Zone Top Bar */}
+      <header className="sticky top-0 z-40 h-14 bg-white/95 backdrop-blur-md border-b border-neutral-200/80 px-4 sm:px-6 flex items-center justify-between gap-4">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <img
+            src="/logos/typixel.jpg"
+            alt="Typixel"
+            className="w-7 h-7 rounded-lg object-cover bg-neutral-900 shrink-0"
+            onError={(e) => {
+              const target = e.currentTarget;
+              if (!target.src.includes('raw.githubusercontent.com')) {
+                target.src = 'https://raw.githubusercontent.com/typixelofficial/typixel/main/logos/typixel.jpg';
+              }
+            }}
+          />
+          <span className="text-sm font-semibold tracking-tight text-neutral-900 whitespace-nowrap shrink-0">
+            Typixel Studio
+          </span>
+          {isAuthenticated && isCloudSyncing && (
+            <span className="text-xs text-neutral-500 whitespace-nowrap hidden sm:inline">
+              · Saving changes...
+            </span>
+          )}
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           {isAuthenticated && (
             <>
+              <span className="hidden md:inline text-xs text-neutral-500 truncate max-w-[200px]">
+                {authUser?.email}
+              </span>
               <button
-                onClick={handleExportBackup}
-                className="hidden md:inline-flex items-center gap-1.5 text-xs text-neutral-800 hover:text-black bg-[#F5F4F0] hover:bg-[#EAE8E2] border border-neutral-200/80 px-3 py-1.5 rounded-xl transition-colors cursor-pointer"
-                title="Download admincontrol Backup JSON"
-              >
-                <Download className="w-3.5 h-3.5 text-neutral-700" />
-                <span>Backup</span>
-              </button>
-
-              <button
-                onClick={() => {
-                  setChangePasswordError('');
-                  setChangePasswordInfo('');
-                  setIsChangePasswordOpen(true);
-                }}
-                className="inline-flex items-center gap-1.5 text-xs text-neutral-800 hover:text-black bg-[#F5F4F0] hover:bg-[#EAE8E2] border border-neutral-200/80 px-3 py-1.5 rounded-xl transition-colors cursor-pointer"
-                title="Change or Reset Admin Password"
-              >
-                <KeyRound className="w-3.5 h-3.5 text-neutral-700" />
-                <span className="hidden sm:inline">Password</span>
-              </button>
-
-              <button
+                type="button"
                 onClick={handleLogout}
-                className="inline-flex items-center gap-1.5 text-xs text-neutral-800 hover:text-black bg-[#F5F4F0] hover:bg-[#EAE8E2] border border-neutral-200/80 px-3 py-1.5 rounded-xl transition-colors cursor-pointer"
+                className="inline-flex items-center gap-1.5 text-xs font-medium text-neutral-600 hover:text-neutral-900 px-3 py-1.5 rounded-lg hover:bg-neutral-100 transition-colors cursor-pointer whitespace-nowrap shrink-0"
               >
-                <LogOut className="w-3.5 h-3.5 text-neutral-700" />
-                <span className="hidden sm:inline">Sign Out</span>
+                <LogOut className="w-3.5 h-3.5" />
+                <span>Sign Out</span>
               </button>
             </>
           )}
-
           <button
+            type="button"
             onClick={onClose}
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-neutral-900 bg-neutral-100 hover:bg-neutral-200 border border-neutral-300/80 px-3.5 py-1.5 rounded-xl transition-colors cursor-pointer"
-            title="Return to Public Portfolio Website"
+            className="inline-flex items-center gap-1.5 text-xs font-medium bg-neutral-900 hover:bg-black text-white px-3.5 py-1.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap shrink-0"
           >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Back to Portfolio</span>
-            <span className="sm:hidden">Exit</span>
+            <span>View Site</span>
+            <ArrowUpRight className="w-3.5 h-3.5" />
           </button>
         </div>
       </header>
 
-      {/* Success Toast */}
+      {/* Clean Toast Notifications */}
       {successToast && (
-        <div className="bg-neutral-900 text-white px-6 py-2.5 flex items-center justify-center gap-2 text-xs font-medium shadow-md sticky top-[61px] z-30">
+        <div className="fixed bottom-5 right-5 z-50 bg-neutral-900 text-white px-4 py-2.5 rounded-xl shadow-lg flex items-center gap-2 text-xs font-medium animate-in fade-in slide-in-from-bottom-2 duration-150">
           <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" />
           <span>{successToast}</span>
         </div>
       )}
 
-      {/* Error Toast */}
       {cloudErrorToast && (
-        <div className="bg-rose-700 text-white px-6 py-2.5 flex items-center justify-center gap-2 text-xs font-medium shadow-md sticky top-[61px] z-30">
+        <div className="fixed bottom-5 right-5 z-50 bg-rose-700 text-white px-4 py-2.5 rounded-xl shadow-lg text-xs font-medium animate-in fade-in slide-in-from-bottom-2 duration-150">
           <span>{cloudErrorToast}</span>
         </div>
       )}
 
-      {/* Auth Barrier if not signed in / verified */}
+      {/* Auth Gate vs Minimal Workspace */}
       {!isAuthenticated ? (
         <div className="flex-1 flex items-center justify-center p-4 sm:p-8">
-          <div className="bg-white rounded-[28px] sm:rounded-3xl max-w-md w-full p-7 sm:p-9 shadow-xl border border-neutral-200/90 animate-in zoom-in-95 duration-200">
-            <div className="w-14 h-14 rounded-2xl bg-neutral-900 flex items-center justify-center text-white mb-4 mx-auto shadow-md">
-              <ShieldCheck className="w-7 h-7" />
-            </div>
-
-            <div className="flex items-center justify-center gap-2 mb-1">
-              <h2 className="text-xl sm:text-2xl font-bold text-neutral-900">
-                Typixel Admin Control
-              </h2>
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-neutral-100 text-neutral-700 font-semibold border border-neutral-200">
-                admincontrol
-              </span>
+          <div className="bg-white rounded-2xl max-w-sm w-full p-7 sm:p-8 border border-neutral-200/90 shadow-sm">
+            <div className="flex flex-col items-center text-center mb-6">
+              <div className="w-11 h-11 rounded-xl bg-neutral-900 text-white flex items-center justify-center mb-3.5">
+                <Lock className="w-5 h-5" />
+              </div>
+              <h1 className="text-lg font-semibold text-neutral-900 tracking-tight">
+                Admin Sign In
+              </h1>
+              <p className="text-xs text-neutral-500 mt-1 leading-relaxed">
+                Sign in to manage Typixel showcase media, tools, articles, and site settings.
+              </p>
             </div>
 
             {needsEmailVerification ? (
-              <div className="mt-4 text-center space-y-4">
-                <p className="text-xs sm:text-[13px] text-neutral-600 leading-relaxed">
-                  Signed in as <span className="font-mono font-semibold text-neutral-900">{authUser?.email}</span>. Click the verification link sent to your email inbox so your image &amp; video edits sync globally.
+              <div className="space-y-4">
+                <p className="text-xs text-neutral-600 text-center leading-relaxed">
+                  Signed in as <span className="font-medium text-neutral-900">{authUser?.email}</span>. Open the verification link sent to your inbox to enable live cloud edits.
                 </p>
 
                 {loginInfo && (
-                  <div className="p-3 bg-emerald-50 text-emerald-800 text-xs rounded-xl border border-emerald-200 text-left font-medium">
+                  <div className="p-3 bg-emerald-50 text-emerald-800 text-xs rounded-xl border border-emerald-200 font-medium">
                     {loginInfo}
                   </div>
                 )}
 
                 {loginError && (
-                  <div className="p-3 bg-rose-50 text-rose-800 text-xs rounded-xl border border-rose-200 text-left font-medium">
+                  <div className="p-3 bg-rose-50 text-rose-800 text-xs rounded-xl border border-rose-200 font-medium">
                     {loginError}
                   </div>
                 )}
 
-                <div className="space-y-2.5 pt-1">
+                <div className="space-y-2 pt-1">
                   <button
                     type="button"
                     disabled={isAuthLoading}
                     onClick={handleRefreshVerification}
-                    className="w-full bg-neutral-900 hover:bg-black disabled:opacity-60 text-white text-xs font-semibold py-3 px-4 rounded-xl shadow-xs transition-all cursor-pointer flex items-center justify-center gap-2"
+                    className="w-full bg-neutral-900 hover:bg-black disabled:opacity-60 text-white text-xs font-medium py-2.5 px-4 rounded-xl transition-colors cursor-pointer flex items-center justify-center gap-2"
                   >
                     <RefreshCw className={`w-3.5 h-3.5 ${isAuthLoading ? 'animate-spin' : ''}`} />
-                    <span>I&apos;ve Verified — Continue to Dashboard</span>
+                    <span>I&apos;ve Verified — Continue</span>
                   </button>
 
                   <button
                     type="button"
                     disabled={isAuthLoading}
                     onClick={handleResendVerification}
-                    className="w-full bg-[#F5F4F0] hover:bg-[#EAE8E2] text-neutral-800 text-xs font-semibold py-2.5 px-4 rounded-xl border border-neutral-200 transition-colors cursor-pointer"
+                    className="w-full bg-neutral-100 hover:bg-neutral-200 text-neutral-800 text-xs font-medium py-2.5 px-4 rounded-xl transition-colors cursor-pointer"
                   >
                     Resend Verification Email
                   </button>
@@ -1193,67 +1197,59 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                   <button
                     type="button"
                     onClick={handleLogout}
-                    className="w-full text-xs font-medium text-neutral-500 hover:text-neutral-900 py-1.5 cursor-pointer"
+                    className="w-full text-xs text-neutral-500 hover:text-neutral-900 py-1.5 cursor-pointer"
                   >
-                    Sign Out / Use Another Account
+                    Sign Out
                   </button>
                 </div>
               </div>
             ) : (
               <>
-                <p className="text-xs sm:text-[13px] text-neutral-500 mb-5 text-center leading-relaxed">
-                  Sign in with your admin username &amp; password so showcase images, videos, and site changes sync globally for everyone.
-                </p>
-
                 {loginInfo && (
-                  <div className="p-3 mb-4 bg-emerald-50 text-emerald-800 text-xs rounded-xl border border-emerald-200 text-left font-medium">
+                  <div className="p-3 mb-4 bg-emerald-50 text-emerald-800 text-xs rounded-xl border border-emerald-200 font-medium">
                     {loginInfo}
                   </div>
                 )}
 
                 {loginError && (
-                  <div className="p-3 mb-4 bg-rose-50 text-rose-800 text-xs rounded-xl border border-rose-200 text-left font-medium space-y-2">
+                  <div className="p-3 mb-4 bg-rose-50 text-rose-800 text-xs rounded-xl border border-rose-200 font-medium space-y-2">
                     <p>{loginError}</p>
-
                     {showProviderSetupGuide && (
-                      <div className="pt-2 border-t border-rose-200/80 text-[11px] text-rose-900 space-y-1.5">
-                        <p className="font-bold">How to enable Username &amp; Password (1 time):</p>
-                        <ol className="list-decimal pl-4 space-y-1">
-                          <li>Open Firebase Console → Authentication → Sign-in method</li>
-                          <li>Click <strong>Add new provider</strong> → choose <strong>Email/Password</strong> → <strong>Enable</strong> → <strong>Save</strong></li>
-                          <li>In <strong>Authentication → Users</strong>, add or set password for <strong>hashimtypixel@gmail.com</strong>, then sign in here.</li>
-                        </ol>
-                      </div>
+                      <ol className="list-decimal pl-4 pt-1.5 border-t border-rose-200/80 text-[11px] text-rose-900 space-y-1">
+                        <li>Open Firebase Console → Authentication → Sign-in method</li>
+                        <li>Add provider <strong>Email/Password</strong> → Enable → Save</li>
+                        <li>Under <strong>Users</strong>, ensure <strong>hashimtypixel@gmail.com</strong> has a password set</li>
+                      </ol>
                     )}
                   </div>
                 )}
 
-                <form onSubmit={handleUsernamePasswordSubmit} className="space-y-3.5 text-left">
+                <form onSubmit={handleUsernamePasswordSubmit} className="space-y-4">
                   <div>
-                    <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-600 mb-1">
-                      Admin Username or Email
+                    <label className="block text-xs font-medium text-neutral-700 mb-1.5">
+                      Username or Email
                     </label>
                     <input
                       type="text"
                       required
                       autoComplete="username"
-                      placeholder="typixel or hashimtypixel@gmail.com"
+                      placeholder="typixel"
                       value={usernameInput}
                       onChange={(e) => setUsernameInput(e.target.value)}
-                      className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900/10 focus:border-neutral-900"
+                      className="w-full text-sm bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none focus:border-neutral-900 transition-colors"
                     />
                   </div>
 
                   <div>
-                    <div className="flex items-center justify-between mb-1">
-                      <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-600">
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="block text-xs font-medium text-neutral-700">
                         Password
                       </label>
                       <button
                         type="button"
                         onClick={handleForgotPassword}
                         disabled={isAuthLoading}
-                        className="text-[11px] text-neutral-500 hover:text-neutral-900 underline cursor-pointer disabled:opacity-60"
+                        className="text-xs text-neutral-500 hover:text-neutral-900 hover:underline cursor-pointer disabled:opacity-60"
                       >
                         Forgot password?
                       </button>
@@ -1264,10 +1260,10 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                         required
                         minLength={6}
                         autoComplete="current-password"
-                        placeholder="Enter password (min. 6 chars)"
+                        placeholder="Enter your password"
                         value={passwordInput}
                         onChange={(e) => setPasswordInput(e.target.value)}
-                        className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl pl-3.5 pr-10 py-2.5 text-neutral-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900/10 focus:border-neutral-900"
+                        className="w-full text-sm bg-neutral-50 border border-neutral-200 rounded-xl pl-3.5 pr-10 py-2.5 text-neutral-900 focus:bg-white focus:outline-none focus:border-neutral-900 transition-colors"
                       />
                       <button
                         type="button"
@@ -1283,10 +1279,9 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                   <button
                     type="submit"
                     disabled={isAuthLoading}
-                    className="w-full bg-neutral-900 hover:bg-black disabled:opacity-60 text-white text-xs font-semibold py-3 px-4 rounded-xl shadow-xs transition-all cursor-pointer flex items-center justify-center gap-2"
+                    className="w-full bg-neutral-900 hover:bg-black disabled:opacity-60 text-white text-xs font-medium py-3 px-4 rounded-xl transition-colors cursor-pointer"
                   >
-                    <Lock className="w-3.5 h-3.5" />
-                    <span>{isAuthLoading ? 'Signing in...' : 'Login to Admin Control'}</span>
+                    {isAuthLoading ? 'Signing in...' : 'Sign In'}
                   </button>
                 </form>
 
@@ -1294,7 +1289,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                   <button
                     type="button"
                     onClick={handleLogout}
-                    className="w-full mt-2.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 text-xs font-semibold py-2 rounded-xl cursor-pointer"
+                    className="w-full mt-3 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 text-xs font-medium py-2 rounded-xl cursor-pointer"
                   >
                     Sign out ({authUser.email})
                   </button>
@@ -1306,636 +1301,193 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
               <button
                 type="button"
                 onClick={onClose}
-                className="inline-flex items-center gap-1.5 text-xs font-medium text-neutral-500 hover:text-neutral-900 transition-colors cursor-pointer"
+                className="inline-flex items-center gap-1.5 text-xs text-neutral-500 hover:text-neutral-900 transition-colors cursor-pointer"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
-                <span>Return to Portfolio Website</span>
+                <span>Return to Portfolio</span>
               </button>
             </div>
           </div>
         </div>
       ) : (
-        /* Logged In Full Page Dashboard */
-        <div className="flex-1 w-full max-w-6xl mx-auto px-4 sm:px-6 md:px-8 py-6 sm:py-8 flex flex-col gap-6">
-          {/* Overview Banner Card */}
-          <div className="bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-neutral-200/90 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-              <div className="flex items-center gap-2">
-                <h2 className="text-lg sm:text-xl font-bold text-neutral-900">
-                  Control Room &amp; Content Manager
-                </h2>
-                <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
-                  Live
-                </span>
-              </div>
-              <p className="text-xs sm:text-sm text-neutral-500 mt-0.5">
-                Manage showcase posters, software marquee tools, SEO keyword strategy, and system backups.
-              </p>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-2">
-              <button
-                type="button"
-                onClick={handleSendResetFromAdmin}
-                disabled={isSendingResetFromAdmin}
-                className="inline-flex items-center gap-1.5 text-xs font-medium bg-[#F5F4F0] hover:bg-[#EAE8E2] disabled:opacity-60 border border-neutral-200 text-neutral-800 px-3 py-1.5 rounded-xl transition-colors cursor-pointer"
-                title="Send password reset link to your admin email"
-              >
-                <KeyRound className="w-3.5 h-3.5 text-neutral-700" />
-                <span>{isSendingResetFromAdmin ? 'Sending...' : 'Forgot Password'}</span>
-              </button>
-              <button
-                onClick={() => setActiveTab('backup')}
-                className="inline-flex items-center gap-1.5 text-xs font-medium bg-[#F5F4F0] hover:bg-[#EAE8E2] border border-neutral-200 text-neutral-800 px-3 py-1.5 rounded-xl transition-colors cursor-pointer"
-              >
-                <Database className="w-3.5 h-3.5 text-neutral-700" />
-                <span>Backup ({row1Projects.length + row2Projects.length} Projects)</span>
-              </button>
-              <button
-                onClick={onClose}
-                className="inline-flex items-center gap-1.5 text-xs font-semibold bg-neutral-900 hover:bg-black text-white px-3.5 py-1.5 rounded-xl shadow-xs transition-colors cursor-pointer"
-              >
-                <ExternalLink className="w-3.5 h-3.5" />
-                <span>View Live Website</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Main Tabbed Workspace in Card */}
-          <div className="bg-white rounded-2xl sm:rounded-3xl border border-neutral-200/90 shadow-sm overflow-hidden flex flex-col">
-            {/* Tab Navigation */}
-            <div className="px-6 sm:px-8 pt-3 pb-2 flex items-center gap-2 border-b border-neutral-100 bg-white overflow-x-auto scrollbar-none">
-              <button
-                onClick={() => setActiveTab('seocontrol')}
-                className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer shrink-0 ${
-                  activeTab === 'seocontrol'
-                    ? 'bg-neutral-900 text-white shadow-2xs'
-                    : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
-                }`}
-              >
-                <Target className="w-3.5 h-3.5 text-emerald-500" />
-                <span>SEO Strategy Control</span>
-              </button>
-
-              <button
-                onClick={() => setActiveTab('add')}
-                className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer shrink-0 ${
-                  activeTab === 'add' ? 'bg-neutral-900 text-white shadow-2xs' : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
-                }`}
-              >
-                <Plus className="w-3.5 h-3.5" />
-                <span>Add Project</span>
-              </button>
-
-              <button
-                onClick={() => setActiveTab('manage')}
-                className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer shrink-0 ${
-                  activeTab === 'manage' ? 'bg-neutral-900 text-white shadow-2xs' : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
-                }`}
-              >
-                <Layers className="w-3.5 h-3.5" />
-                <span>Showcase ({row1Projects.length + row2Projects.length})</span>
-              </button>
-
-              <button
-                onClick={() => setActiveTab('tools')}
-                className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer shrink-0 ${
-                  activeTab === 'tools' ? 'bg-neutral-900 text-white shadow-2xs' : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
-                }`}
-              >
-                <Wrench className="w-3.5 h-3.5" />
-                <span>Experienced Tools ({tools.length})</span>
-              </button>
-
-              <button
-                onClick={() => setActiveTab('blog')}
-                className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer shrink-0 ${
-                  activeTab === 'blog' ? 'bg-neutral-900 text-white shadow-2xs' : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
-                }`}
-              >
-                <BookOpen className="w-3.5 h-3.5" />
-                <span>Blog &amp; SEO ({blogPosts.length})</span>
-              </button>
-
-              <button
-                onClick={() => setActiveTab('settings')}
-                className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer shrink-0 ${
-                  activeTab === 'settings' ? 'bg-neutral-900 text-white shadow-2xs' : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
-                }`}
-              >
-                <Mail className="w-3.5 h-3.5" />
-                <span>Contact &amp; EmailJS</span>
-              </button>
-
-              <button
-                onClick={() => setActiveTab('backup')}
-                className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer shrink-0 ${
-                  activeTab === 'backup'
-                    ? 'bg-neutral-900 text-white shadow-2xs'
-                    : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
-                }`}
-              >
-                <Database className="w-3.5 h-3.5 text-purple-500" />
-                <span>admincontrol Backup</span>
-              </button>
-            </div>
-
-            {/* Tab Body */}
-            <div className="p-6 sm:p-8 overflow-y-auto flex-1">
-              {/* TAB: SEO STRATEGY & METADATA CONTROL */}
-              {activeTab === 'seocontrol' && (
-                <div className="space-y-6 max-w-4xl">
-                  {/* Top Header Card matching the removed banner */}
-                  <div className="bg-[#FAF9F6] border border-neutral-200/90 rounded-2xl p-5 sm:p-6 shadow-xs">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-neutral-200/60">
-                      <div>
-                        <div className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-800 bg-emerald-100/90 px-2.5 py-0.5 rounded-full mb-1.5">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
-                          <span>SEO Publishing Strategy — 2026 Live Architecture</span>
-                        </div>
-                        <h3 className="text-base sm:text-lg font-bold text-neutral-900">
-                          Organic Visibility &amp; Lead Generation Architecture
-                        </h3>
-                        <p className="text-xs text-neutral-500 mt-0.5">
-                          Configure live search targets for Kerala, Malappuram &amp; national enquiries.
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="flex items-center gap-1.5 text-xs font-mono text-neutral-700 bg-white px-3 py-1.5 rounded-xl border border-neutral-200 shadow-2xs">
-                          <Globe className="w-3.5 h-3.5 text-neutral-800" />
-                          <span>{seoStrategy.domain}</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* 4 Strategic Pillars Grid */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-4">
-                      {/* Primary Target */}
-                      <div className="bg-white p-3.5 rounded-xl border border-neutral-200/80">
-                        <div className="flex items-center justify-between gap-1 mb-1.5">
-                          <div className="flex items-center gap-1.5 text-[11px] font-bold text-neutral-400 uppercase tracking-wider">
-                            <Target className="w-3 h-3 text-neutral-700" />
-                            <span>Primary Target</span>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => handleCopySeoText(seoStrategy.primaryTarget, 'strat-target')}
-                            className="p-1 hover:bg-neutral-100 rounded text-neutral-500 cursor-pointer"
-                            title="Copy target"
-                          >
-                            {copiedSeoField === 'strat-target' ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
-                          </button>
-                        </div>
-                        <p className="text-xs font-semibold text-neutral-800 leading-snug">
-                          {seoStrategy.primaryTarget}
-                        </p>
-                      </div>
-
-                      {/* Location Focus */}
-                      <div className="bg-white p-3.5 rounded-xl border border-neutral-200/80">
-                        <div className="flex items-center justify-between gap-1 mb-1.5">
-                          <div className="flex items-center gap-1.5 text-[11px] font-bold text-neutral-400 uppercase tracking-wider">
-                            <MapPin className="w-3 h-3 text-rose-600" />
-                            <span>Location Focus</span>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => handleCopySeoText(seoStrategy.locationFocus, 'strat-loc')}
-                            className="p-1 hover:bg-neutral-100 rounded text-neutral-500 cursor-pointer"
-                            title="Copy location"
-                          >
-                            {copiedSeoField === 'strat-loc' ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
-                          </button>
-                        </div>
-                        <p className="text-xs font-semibold text-neutral-800 leading-snug">
-                          {seoStrategy.locationFocus}
-                        </p>
-                      </div>
-
-                      {/* Audience */}
-                      <div className="bg-white p-3.5 rounded-xl border border-neutral-200/80">
-                        <div className="flex items-center justify-between gap-1 mb-1.5">
-                          <div className="flex items-center gap-1.5 text-[11px] font-bold text-neutral-400 uppercase tracking-wider">
-                            <Users className="w-3 h-3 text-blue-600" />
-                            <span>Audience</span>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => handleCopySeoText(seoStrategy.audience, 'strat-aud')}
-                            className="p-1 hover:bg-neutral-100 rounded text-neutral-500 cursor-pointer"
-                            title="Copy audience"
-                          >
-                            {copiedSeoField === 'strat-aud' ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
-                          </button>
-                        </div>
-                        <p className="text-xs font-semibold text-neutral-800 leading-snug">
-                          {seoStrategy.audience}
-                        </p>
-                      </div>
-
-                      {/* Goal */}
-                      <div className="bg-white p-3.5 rounded-xl border border-neutral-200/80">
-                        <div className="flex items-center justify-between gap-1 mb-1.5">
-                          <div className="flex items-center gap-1.5 text-[11px] font-bold text-neutral-400 uppercase tracking-wider">
-                            <Compass className="w-3 h-3 text-purple-600" />
-                            <span>Goal</span>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => handleCopySeoText(seoStrategy.goal, 'strat-goal')}
-                            className="p-1 hover:bg-neutral-100 rounded text-neutral-500 cursor-pointer"
-                            title="Copy goal"
-                          >
-                            {copiedSeoField === 'strat-goal' ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
-                          </button>
-                        </div>
-                        <p className="text-xs font-semibold text-neutral-800 leading-snug">
-                          {seoStrategy.goal}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Editable SEO Settings & Metadata Form */}
-                  <form onSubmit={handleSaveSeoStrategy} className="space-y-4 bg-white border border-neutral-200 rounded-2xl p-6">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-neutral-100">
-                      <div>
-                        <h4 className="text-sm font-bold text-neutral-900">1. Verified SEO Settings &amp; Metadata Control</h4>
-                        <p className="text-xs text-neutral-500">Edit or copy live values used for search engine indexing and social cards.</p>
-                      </div>
-                      <button
-                        type="submit"
-                        className="inline-flex items-center gap-1.5 px-4 py-2 bg-neutral-900 hover:bg-black text-white rounded-xl text-xs font-semibold cursor-pointer shadow-xs transition-colors self-start sm:self-auto"
+        /* Minimal Sidebar + Content Workspace */
+        <div className="flex-1 w-full max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8 flex flex-col lg:flex-row gap-6 lg:gap-8">
+          {/* Sidebar Navigation (Horizontal bar on mobile, clean fixed column on desktop) */}
+          <aside className="lg:w-52 shrink-0">
+            <nav className="flex lg:flex-col gap-1 overflow-x-auto pb-1 lg:pb-0 lg:sticky lg:top-20">
+              {navItems.map((item) => {
+                const isActive = activeTab === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => setActiveTab(item.id)}
+                    className={`flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
+                      isActive
+                        ? 'bg-neutral-900 text-white'
+                        : 'text-neutral-600 hover:text-neutral-900 hover:bg-white/80'
+                    }`}
+                  >
+                    <span className="flex items-center gap-2.5">
+                      {item.icon}
+                      <span>{item.label}</span>
+                    </span>
+                    {typeof item.count === 'number' && (
+                      <span
+                        className={`text-[11px] font-mono tabular-nums ${
+                          isActive ? 'text-neutral-300' : 'text-neutral-400'
+                        }`}
                       >
-                        <Save className="w-3.5 h-3.5" />
-                        <span>Save SEO Settings</span>
-                      </button>
-                    </div>
-
-                    {/* Blog Title / H1 */}
-                    <div>
-                      <div className="flex items-center justify-between mb-1">
-                        <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-600">
-                          BLOG TITLE / H1
-                        </label>
-                        <button
-                          type="button"
-                          onClick={() => handleCopySeoText(seoStrategy.blogTitle, 'field-blog-title')}
-                          className="inline-flex items-center gap-1 text-[11px] text-neutral-600 hover:text-black font-semibold cursor-pointer"
-                        >
-                          {copiedSeoField === 'field-blog-title' ? (
-                            <>
-                              <Check className="w-3 h-3 text-emerald-600" />
-                              <span className="text-emerald-700">Copied</span>
-                            </>
-                          ) : (
-                            <>
-                              <Copy className="w-3 h-3" />
-                              <span>Copy Blog Title</span>
-                            </>
-                          )}
-                        </button>
-                      </div>
-                      <input
-                        type="text"
-                        required
-                        value={seoStrategy.blogTitle}
-                        onChange={(e) => setSeoStrategy({ ...seoStrategy, blogTitle: e.target.value })}
-                        className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900/10 focus:border-neutral-900 font-medium"
-                      />
-                    </div>
-
-                    {/* SEO Title & URL Slug */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <div className="flex items-center justify-between mb-1">
-                          <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-600">
-                            SEO TITLE (Browser &amp; SERP)
-                          </label>
-                          <button
-                            type="button"
-                            onClick={() => handleCopySeoText(seoStrategy.seoTitle, 'field-seo-title')}
-                            className="inline-flex items-center gap-1 text-[11px] text-neutral-600 hover:text-black font-semibold cursor-pointer"
-                          >
-                            {copiedSeoField === 'field-seo-title' ? (
-                              <>
-                                <Check className="w-3 h-3 text-emerald-600" />
-                                <span className="text-emerald-700">Copied</span>
-                              </>
-                            ) : (
-                              <>
-                                <Copy className="w-3 h-3" />
-                                <span>Copy SEO Title</span>
-                              </>
-                            )}
-                          </button>
-                        </div>
-                        <input
-                          type="text"
-                          required
-                          value={seoStrategy.seoTitle}
-                          onChange={(e) => setSeoStrategy({ ...seoStrategy, seoTitle: e.target.value })}
-                          className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900/10 focus:border-neutral-900"
-                        />
-                      </div>
-
-                      <div>
-                        <div className="flex items-center justify-between mb-1">
-                          <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-600">
-                            URL SLUG
-                          </label>
-                          <button
-                            type="button"
-                            onClick={() => handleCopySeoText(seoStrategy.urlSlug, 'field-url-slug')}
-                            className="inline-flex items-center gap-1 text-[11px] text-neutral-600 hover:text-black font-semibold cursor-pointer"
-                          >
-                            {copiedSeoField === 'field-url-slug' ? (
-                              <>
-                                <Check className="w-3 h-3 text-emerald-600" />
-                                <span className="text-emerald-700">Copied</span>
-                              </>
-                            ) : (
-                              <>
-                                <Copy className="w-3 h-3" />
-                                <span>Copy Slug</span>
-                              </>
-                            )}
-                          </button>
-                        </div>
-                        <input
-                          type="text"
-                          required
-                          value={seoStrategy.urlSlug}
-                          onChange={(e) => setSeoStrategy({ ...seoStrategy, urlSlug: e.target.value })}
-                          className="w-full text-xs font-mono bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900/10 focus:border-neutral-900"
-                        />
-                      </div>
-                    </div>
-
-                    {/* Meta Description */}
-                    <div>
-                      <div className="flex items-center justify-between mb-1">
-                        <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-600">
-                          META DESCRIPTION (Search snippets &amp; social previews)
-                        </label>
-                        <button
-                          type="button"
-                          onClick={() => handleCopySeoText(seoStrategy.metaDescription, 'field-meta-desc')}
-                          className="inline-flex items-center gap-1 text-[11px] text-neutral-600 hover:text-black font-semibold cursor-pointer"
-                        >
-                          {copiedSeoField === 'field-meta-desc' ? (
-                            <>
-                              <Check className="w-3 h-3 text-emerald-600" />
-                              <span className="text-emerald-700">Copied</span>
-                            </>
-                          ) : (
-                            <>
-                              <Copy className="w-3 h-3" />
-                              <span>Copy Meta Description</span>
-                            </>
-                          )}
-                        </button>
-                      </div>
-                      <textarea
-                        rows={3}
-                        required
-                        value={seoStrategy.metaDescription}
-                        onChange={(e) => setSeoStrategy({ ...seoStrategy, metaDescription: e.target.value })}
-                        className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900/10 focus:border-neutral-900 resize-none"
-                      />
-                    </div>
-
-                    {/* Strategic Pillars Editable Fields */}
-                    <div className="pt-3 border-t border-neutral-100 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-600 mb-1">
-                          Primary Target Category
-                        </label>
-                        <input
-                          type="text"
-                          value={seoStrategy.primaryTarget}
-                          onChange={(e) => setSeoStrategy({ ...seoStrategy, primaryTarget: e.target.value })}
-                          className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3 py-2 text-neutral-900"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-600 mb-1">
-                          Location Focus (Regions)
-                        </label>
-                        <input
-                          type="text"
-                          value={seoStrategy.locationFocus}
-                          onChange={(e) => setSeoStrategy({ ...seoStrategy, locationFocus: e.target.value })}
-                          className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3 py-2 text-neutral-900"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-600 mb-1">
-                          Audience Target
-                        </label>
-                        <input
-                          type="text"
-                          value={seoStrategy.audience}
-                          onChange={(e) => setSeoStrategy({ ...seoStrategy, audience: e.target.value })}
-                          className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3 py-2 text-neutral-900"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-600 mb-1">
-                          Core Growth Goal
-                        </label>
-                        <input
-                          type="text"
-                          value={seoStrategy.goal}
-                          onChange={(e) => setSeoStrategy({ ...seoStrategy, goal: e.target.value })}
-                          className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3 py-2 text-neutral-900"
-                        />
-                      </div>
-                    </div>
-                  </form>
-                </div>
-              )}
-
-              {/* TAB 1: ADD NEW SHOWCASE PROJECT */}
-              {activeTab === 'add' && (
-                <div className="space-y-6 max-w-4xl">
-                  {/* Preset Quick Select Banner */}
-                  <div className="bg-[#FAF9F6] border border-neutral-200/90 rounded-2xl p-5 shadow-xs">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
-                      <div>
-                        <h4 className="text-sm font-bold text-neutral-900 flex items-center gap-2">
-                          <Sparkles className="w-4 h-4 text-amber-500" />
-                          <span>{SHOWCASE_PRESET_IMAGES.length} Preset Showcase Artworks &amp; Videos</span>
-                        </h4>
-                        <p className="text-xs text-neutral-500">
-                          Click any asset below to auto-fill its artwork or video, title, category, and marquee row.
-                        </p>
-                      </div>
-                      <span className="text-[11px] font-mono text-neutral-500 bg-white border border-neutral-200 px-2.5 py-0.5 rounded-full self-start sm:self-auto">
-                        1-Click Fill
+                        {item.count}
                       </span>
-                    </div>
+                    )}
+                  </button>
+                );
+              })}
 
-                    <div className="grid grid-cols-2 sm:grid-cols-6 gap-2.5">
-                      {SHOWCASE_PRESET_IMAGES.map((preset) => {
-                        const isSelected = newImageUrl === preset.path;
-                        const isPresetVid = isVideoMediaUrl(preset.path);
-                        return (
-                          <button
-                            key={preset.filename}
-                            type="button"
-                            onClick={() => handleSelectPreset(preset, false)}
-                            className={`group p-2 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
-                              isSelected
-                                ? 'bg-neutral-900 text-white border-neutral-900 shadow-md ring-2 ring-neutral-900/20'
-                                : 'bg-white hover:bg-neutral-50 border-neutral-200 text-neutral-800 hover:border-neutral-400'
-                            }`}
-                          >
-                            <div className="w-full aspect-[4/5] rounded-lg overflow-hidden bg-neutral-900 mb-1.5 relative border border-black/5">
-                              {isPresetVid ? (
-                                <video
-                                  src={preset.path}
-                                  muted
-                                  autoPlay
-                                  loop
-                                  playsInline
-                                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                                />
-                              ) : (
-                                <img
-                                  src={preset.path}
-                                  alt={preset.name}
-                                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                                  onError={(e) => {
-                                    (e.target as HTMLElement).style.opacity = '0.7';
-                                  }}
-                                />
-                              )}
-                              <span className={`absolute top-1 right-1 text-[8px] font-mono font-bold px-1.5 py-0.5 rounded shadow-xs ${
-                                isSelected ? 'bg-emerald-500 text-white' : 'bg-black/70 text-white'
-                              }`}>
-                                R{preset.row}
-                              </span>
-                            </div>
-                            <span className="text-[11px] font-bold truncate block">{preset.name}</span>
-                            <span className={`text-[9px] truncate block ${isSelected ? 'text-neutral-300' : 'text-neutral-500'}`}>
-                              {preset.defaultCategory}
-                            </span>
-                          </button>
-                        );
-                      })}
-                    </div>
+              {/* Quick Password / Forgot Password shortcut in sidebar on desktop */}
+              <div className="hidden lg:block pt-4 mt-3 border-t border-neutral-200/80 space-y-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setChangePasswordError('');
+                    setChangePasswordInfo('');
+                    setIsChangePasswordOpen(true);
+                  }}
+                  className="w-full flex items-center gap-2.5 px-3.5 py-2 rounded-xl text-xs font-medium text-neutral-600 hover:text-neutral-900 hover:bg-white/80 transition-colors cursor-pointer whitespace-nowrap"
+                >
+                  <KeyRound className="w-4 h-4" />
+                  <span>Password &amp; Reset</span>
+                </button>
+              </div>
+            </nav>
+          </aside>
+
+          {/* Main Content Surface */}
+          <main className="flex-1 min-w-0 bg-white rounded-2xl border border-neutral-200/80 p-5 sm:p-7">
+            {/* ==================== TAB: SHOWCASE (MANAGE + ADD) ==================== */}
+            {activeTab === 'showcase' && (
+              <div className="space-y-6">
+                {/* Clean Section Header */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-neutral-100">
+                  <div>
+                    <h2 className="text-lg font-semibold text-neutral-900 tracking-tight">
+                      Showcase Gallery
+                    </h2>
+                    <p className="text-xs text-neutral-500 mt-0.5 tabular-nums">
+                      {allProjects.length} artworks · Row 1 ({row1Projects.length}) · Row 2 ({row2Projects.length})
+                    </p>
                   </div>
 
-                  {/* Add Form */}
-                  <form onSubmit={handleAddProject} className="bg-white rounded-2xl border border-neutral-200/90 p-5 sm:p-6 space-y-5 shadow-xs">
-                    <div className="flex items-center justify-between pb-3 border-b border-neutral-100">
-                      <div>
-                        <h4 className="text-base font-bold text-neutral-900">Add Project Details</h4>
-                        <p className="text-xs text-neutral-500">
-                          Configure title, category, media artwork, and marquee row for the continuous showcase.
-                        </p>
-                      </div>
-                      <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-neutral-100 text-neutral-700">
-                        Row {newRow} Showcase
-                      </span>
-                    </div>
+                  <button
+                    type="button"
+                    onClick={() => setShowAddShowcaseForm(!showAddShowcaseForm)}
+                    className={`inline-flex items-center gap-1.5 text-xs font-medium px-4 py-2 rounded-xl transition-colors cursor-pointer whitespace-nowrap shrink-0 self-start sm:self-auto ${
+                      showAddShowcaseForm
+                        ? 'bg-neutral-100 hover:bg-neutral-200 text-neutral-800'
+                        : 'bg-neutral-900 hover:bg-black text-white'
+                    }`}
+                  >
+                    {showAddShowcaseForm ? (
+                      <>
+                        <X className="w-3.5 h-3.5" />
+                        <span>Close Composer</span>
+                      </>
+                    ) : (
+                      <>
+                        <Plus className="w-3.5 h-3.5" />
+                        <span>Add Artwork</span>
+                      </>
+                    )}
+                  </button>
+                </div>
 
+                {/* Collapsible Add Project Composer */}
+                {showAddShowcaseForm && (
+                  <form onSubmit={handleAddProject} className="pb-6 border-b border-neutral-200 space-y-5">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-xs font-bold uppercase tracking-wider text-neutral-600 mb-1">
+                        <label className="block text-xs font-medium text-neutral-700 mb-1">
                           Project Title *
                         </label>
                         <input
                           type="text"
                           required
-                          placeholder="e.g. Skillovia — Growth Arrow Mark"
+                          placeholder="e.g. Skillovia — Brand Identity"
                           value={newTitle}
                           onChange={(e) => setNewTitle(e.target.value)}
-                          className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900/10 focus:border-neutral-900"
+                          className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none focus:border-neutral-900"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-xs font-bold uppercase tracking-wider text-neutral-600 mb-1">
-                          Subtitle / Tagline
+                        <label className="block text-xs font-medium text-neutral-700 mb-1">
+                          Tagline
                         </label>
                         <input
                           type="text"
-                          placeholder="e.g. Minimalist Vector Emblem & Geometry"
+                          placeholder="Short description"
                           value={newSubtitle}
                           onChange={(e) => setNewSubtitle(e.target.value)}
-                          className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900/10 focus:border-neutral-900"
+                          className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none focus:border-neutral-900"
                         />
                       </div>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                       <div>
-                        <label className="block text-xs font-bold uppercase tracking-wider text-neutral-600 mb-1">
-                          Category / Project Type
+                        <label className="block text-xs font-medium text-neutral-700 mb-1">
+                          Category
                         </label>
                         <select
                           value={newCategory}
                           onChange={(e) => setNewCategory(e.target.value)}
-                          className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900/10 focus:border-neutral-900"
+                          className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none focus:border-neutral-900"
                         >
-                          <option value="Event Branding & Poster">Event Branding &amp; Poster</option>
-                          <option value="Commercial Poster Design">Commercial Poster Design</option>
-                          <option value="Festive & Cultural Poster">Festive &amp; Cultural Poster</option>
-                          <option value="Visual Identity & Branding">Visual Identity &amp; Branding</option>
-                          <option value="Logo Design & Identity">Logo Design &amp; Identity</option>
-                          <option value="Product & Packaging Mockup">Product &amp; Packaging Mockup</option>
-                          <option value="Event Branding & Invitation">Event Branding &amp; Invitation</option>
-                          <option value="Cultural Poster & Digital Art">Cultural Poster &amp; Digital Art</option>
-                          <option value="Brand Identity & Logo">Brand Identity &amp; Logo</option>
-                          <option value="Spiritual Typography & Poster">Spiritual Typography &amp; Poster</option>
-                          <option value="Social Media Campaign">Social Media Campaign</option>
-                          <option value="Motion Graphic Poster">Motion Graphic Poster</option>
-                          <option value="Other">Other (Custom Type)...</option>
+                          {SHOWCASE_CATEGORIES.map((cat) => (
+                            <option key={cat} value={cat}>{cat}</option>
+                          ))}
+                          <option value="Other">Other...</option>
                         </select>
                       </div>
 
                       {newCategory === 'Other' && (
                         <div>
-                          <label className="block text-xs font-bold uppercase tracking-wider text-neutral-600 mb-1">
-                            Custom Type Name *
+                          <label className="block text-xs font-medium text-neutral-700 mb-1">
+                            Custom Category *
                           </label>
                           <input
                             type="text"
                             required
-                            placeholder="e.g. 3D Architectural Visualization"
+                            placeholder="Custom category name"
                             value={customCategoryName}
                             onChange={(e) => setCustomCategoryName(e.target.value)}
-                            className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900/10 focus:border-neutral-900"
+                            className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none focus:border-neutral-900"
                           />
                         </div>
                       )}
 
                       <div>
-                        <label className="block text-xs font-bold uppercase tracking-wider text-neutral-600 mb-1">
-                          Top-Right Badge / Tag
+                        <label className="block text-xs font-medium text-neutral-700 mb-1">
+                          Label / Badge
                         </label>
                         <input
                           type="text"
-                          placeholder="e.g. Festival Campaign, Brand Monogram"
+                          placeholder="e.g. Campaign, Video Reel"
                           value={newBadge}
                           onChange={(e) => setNewBadge(e.target.value)}
-                          className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900/10 focus:border-neutral-900"
+                          className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none focus:border-neutral-900"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-xs font-bold uppercase tracking-wider text-neutral-600 mb-1">
-                          Showcase Marquee Row
+                        <label className="block text-xs font-medium text-neutral-700 mb-1">
+                          Marquee Row
                         </label>
                         <select
                           value={newRow}
                           onChange={(e) => setNewRow(Number(e.target.value) as 1 | 2)}
-                          className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900/10 focus:border-neutral-900"
+                          className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none focus:border-neutral-900"
                         >
                           <option value={1}>Row 1 (Slides Left)</option>
                           <option value={2}>Row 2 (Slides Right)</option>
@@ -1943,275 +1495,239 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                       </div>
                     </div>
 
-                    {/* Artwork Image or Video */}
-                    <div className="pt-2 border-t border-neutral-100 space-y-3">
+                    {/* Media Picker */}
+                    <div className="space-y-3 pt-2">
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                        <label className="block text-xs font-bold uppercase tracking-wider text-neutral-700">
-                          Cover Image / Artwork Source
+                        <label className="text-xs font-medium text-neutral-700">
+                          Image or Video Media
                         </label>
-                        <div className="flex items-center gap-1.5 text-[11px] bg-neutral-100 p-1 rounded-xl">
-                          <button
-                            type="button"
-                            onClick={() => setProjectMediaMode('preset')}
-                            className={`px-3 py-1 rounded-lg cursor-pointer transition-colors font-medium ${
-                              projectMediaMode === 'preset'
-                                ? 'bg-white text-neutral-900 font-bold shadow-xs'
-                                : 'text-neutral-600 hover:text-neutral-900'
-                            }`}
-                          >
-                            ⭐ Showcase Assets ({SHOWCASE_PRESET_IMAGES.length})
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setProjectMediaMode('upload')}
-                            className={`px-3 py-1 rounded-lg cursor-pointer transition-colors font-medium ${
-                              projectMediaMode === 'upload'
-                                ? 'bg-white text-neutral-900 font-bold shadow-xs'
-                                : 'text-neutral-600 hover:text-neutral-900'
-                            }`}
-                          >
-                            📁 Upload File
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setProjectMediaMode('link')}
-                            className={`px-3 py-1 rounded-lg cursor-pointer transition-colors font-medium ${
-                              projectMediaMode === 'link'
-                                ? 'bg-white text-neutral-900 font-bold shadow-xs'
-                                : 'text-neutral-600 hover:text-neutral-900'
-                            }`}
-                          >
-                            🔗 URL / Path
-                          </button>
+                        <div className="flex items-center gap-1 p-1 bg-neutral-100 rounded-lg text-xs self-start">
+                          {(['preset', 'upload', 'link'] as const).map((mode) => (
+                            <button
+                              key={mode}
+                              type="button"
+                              onClick={() => setProjectMediaMode(mode)}
+                              className={`px-3 py-1 rounded-md cursor-pointer transition-colors whitespace-nowrap ${
+                                projectMediaMode === mode
+                                  ? 'bg-white text-neutral-900 font-medium shadow-2xs'
+                                  : 'text-neutral-600 hover:text-neutral-900'
+                              }`}
+                            >
+                              {mode === 'preset' ? `Presets (${SHOWCASE_PRESET_IMAGES.length})` : mode === 'upload' ? 'Upload File' : 'URL / Link'}
+                            </button>
+                          ))}
                         </div>
                       </div>
 
                       {projectMediaMode === 'preset' && (
-                        <div className="p-3 bg-neutral-50 rounded-xl border border-neutral-200">
-                          <p className="text-xs text-neutral-600 mb-2 font-medium">
-                            Current Selected Asset Path:
-                          </p>
-                          <div className="flex items-center gap-3">
-                            <input
-                              type="text"
-                              value={newImageUrl}
-                              onChange={(e) => {
-                                setNewImageUrl(e.target.value);
-                                setNewUploadError('');
-                              }}
-                              placeholder="/showcase/Chamayam.jpg"
-                              className="flex-1 text-xs bg-white border border-neutral-300 rounded-xl px-3 py-2 text-neutral-900 font-mono"
-                            />
-                            {newImageUrl && (
-                              <div className="w-12 h-14 rounded-lg overflow-hidden border border-neutral-300 shrink-0 bg-neutral-900 shadow-xs">
-                                {isVideoMediaUrl(newImageUrl) ? (
-                                  <video
-                                    src={normalizeShowcaseImagePath(newImageUrl)}
-                                    muted
-                                    autoPlay
-                                    loop
-                                    playsInline
-                                    className="w-full h-full object-cover"
-                                  />
-                                ) : (
-                                  <img src={normalizeShowcaseImagePath(newImageUrl)} alt="Preview" className="w-full h-full object-cover" />
-                                )}
-                              </div>
-                            )}
+                        <div className="space-y-3">
+                          <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+                            {SHOWCASE_PRESET_IMAGES.map((preset) => {
+                              const isSelected = newImageUrl === preset.path;
+                              const isPresetVid = isVideoMediaUrl(preset.path);
+                              return (
+                                <button
+                                  key={preset.filename}
+                                  type="button"
+                                  onClick={() => handleSelectPreset(preset, false)}
+                                  className={`group p-1.5 rounded-xl border text-left transition-all cursor-pointer ${
+                                    isSelected
+                                      ? 'border-neutral-900 ring-2 ring-neutral-900/15 bg-neutral-50'
+                                      : 'border-neutral-200 hover:border-neutral-400 bg-white'
+                                  }`}
+                                >
+                                  <div className="w-full aspect-[4/5] rounded-lg overflow-hidden bg-neutral-900 mb-1">
+                                    {isPresetVid ? (
+                                      <video
+                                        src={preset.path}
+                                        muted
+                                        autoPlay
+                                        loop
+                                        playsInline
+                                        className="w-full h-full object-cover"
+                                      />
+                                    ) : (
+                                      <img
+                                        src={preset.path}
+                                        alt={preset.name}
+                                        className="w-full h-full object-cover"
+                                      />
+                                    )}
+                                  </div>
+                                  <span className="text-[11px] font-medium text-neutral-800 truncate block">
+                                    {preset.name}
+                                  </span>
+                                </button>
+                              );
+                            })}
                           </div>
                         </div>
                       )}
 
                       {projectMediaMode === 'upload' && (
-                        <div className="p-4 bg-neutral-50 rounded-xl border border-neutral-200 space-y-2">
+                        <div className="space-y-2">
                           <div className="flex items-center gap-3">
                             <input
                               type="file"
                               accept="image/*,video/mp4,video/webm,video/quicktime"
                               onChange={(e) => handleProjectFileUpload(e, false)}
-                              className="w-full text-xs text-neutral-600 file:mr-3 file:py-2 file:px-3.5 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-neutral-900 file:text-white hover:file:bg-black file:cursor-pointer bg-white border border-neutral-200 rounded-xl p-1"
+                              className="w-full text-xs text-neutral-600 file:mr-3 file:py-2 file:px-3.5 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-neutral-900 file:text-white hover:file:bg-black file:cursor-pointer bg-neutral-50 border border-neutral-200 rounded-xl p-1"
                             />
                             {newImageUrl && (
-                              <div className="w-12 h-14 rounded-lg overflow-hidden border border-neutral-300 shrink-0 bg-neutral-900 shadow-xs">
+                              <div className="w-11 h-14 rounded-lg overflow-hidden border border-neutral-200 shrink-0 bg-neutral-900">
                                 {(newMediaKind === 'video' || (newMediaKind === 'auto' && isVideoMediaUrl(newImageUrl))) ? (
-                                  <video
-                                    src={newImageUrl}
-                                    muted
-                                    autoPlay
-                                    loop
-                                    playsInline
-                                    className="w-full h-full object-cover"
-                                  />
+                                  <video src={newImageUrl} muted autoPlay loop playsInline className="w-full h-full object-cover" />
                                 ) : (
-                                  <img src={newImageUrl} alt="Uploaded Preview" className="w-full h-full object-cover" />
+                                  <img src={newImageUrl} alt="Preview" className="w-full h-full object-cover" />
                                 )}
                               </div>
                             )}
                           </div>
                           {newUploadError && (
-                            <p className="text-[11px] text-rose-700 bg-rose-50 border border-rose-200 rounded-lg px-2.5 py-1.5 font-medium">
+                            <p className="text-xs text-rose-700 bg-rose-50 border border-rose-200 rounded-lg px-3 py-2">
                               {newUploadError}
                             </p>
                           )}
-                          <p className="text-[11px] text-neutral-500">
-                            ✓ Images auto-compress &amp; sync live to all visitors. For large HD videos (&gt;600 KB), paste an external .mp4 URL in the URL tab.
-                          </p>
                         </div>
                       )}
 
                       {projectMediaMode === 'link' && (
-                        <div className="space-y-2">
+                        <div className="flex items-center gap-3">
                           <input
                             type="text"
-                            placeholder="https://... (.jpg, .png, .webp, .mp4 or GitHub raw link)"
+                            placeholder="https://... (.jpg, .png, .webp, .mp4)"
                             value={newImageUrl}
                             onChange={(e) => {
                               setNewImageUrl(e.target.value);
                               setNewUploadError('');
                             }}
-                            className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900/10 focus:border-neutral-900 font-mono"
+                            className="flex-1 text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none focus:border-neutral-900 font-mono"
                           />
-                          <div className="flex flex-wrap gap-1.5 text-[10px] text-neutral-500">
-                            <span>Quick presets:</span>
-                            {SHOWCASE_PRESET_IMAGES.slice(0, 5).map((p) => (
-                              <button
-                                key={p.filename}
-                                type="button"
-                                onClick={() => setNewImageUrl(p.path)}
-                                className="underline hover:text-neutral-900 cursor-pointer"
-                              >
-                                {p.filename}
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      {(newMediaKind === 'video' || (newMediaKind === 'auto' && isVideoMediaUrl(newImageUrl))) && (
-                        <div className="pt-2">
-                          <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-600 mb-1">
-                            Optional Video Poster / Cover Image URL
-                          </label>
-                          <input
-                            type="text"
-                            placeholder="https://... (optional poster image while video loads)"
-                            value={newVideoPosterUrl}
-                            onChange={(e) => setNewVideoPosterUrl(e.target.value)}
-                            className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2 text-neutral-900 font-mono"
-                          />
-                        </div>
-                      )}
-
-                      <div className="flex items-center gap-2 pt-1 text-[11px] text-neutral-600">
-                        <span className="font-semibold">Media Type:</span>
-                        {(['auto', 'image', 'video'] as const).map((kind) => (
-                          <button
-                            key={kind}
-                            type="button"
-                            onClick={() => setNewMediaKind(kind)}
-                            className={`px-2.5 py-0.5 rounded-lg border cursor-pointer transition-colors ${
-                              newMediaKind === kind
-                                ? 'bg-neutral-900 text-white border-neutral-900 font-semibold'
-                                : 'bg-neutral-50 text-neutral-600 border-neutral-200 hover:bg-neutral-100'
-                            }`}
-                          >
-                            {kind === 'auto' ? 'Auto-Detect' : kind === 'image' ? 'Image' : 'Video'}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Card Live Preview Banner */}
-                    {newTitle && (
-                      <div className="pt-3 border-t border-neutral-100 flex items-center gap-4 bg-[#FAF9F6] p-3 rounded-xl border border-neutral-200">
-                        <div className="w-14 h-18 rounded-lg overflow-hidden bg-neutral-900 shrink-0 border border-neutral-300 shadow-xs relative">
-                          {newImageUrl ? (
-                            (newMediaKind === 'video' || (newMediaKind === 'auto' && isVideoMediaUrl(newImageUrl))) ? (
-                              <video
-                                src={normalizeShowcaseImagePath(newImageUrl)}
-                                poster={newVideoPosterUrl ? normalizeShowcaseImagePath(newVideoPosterUrl) : undefined}
-                                muted
-                                autoPlay
-                                loop
-                                playsInline
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <img src={normalizeShowcaseImagePath(newImageUrl)} alt="Card preview" className="w-full h-full object-cover" />
-                            )
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center text-white/50 text-[10px] font-mono">
-                              No Art
+                          {newImageUrl && (
+                            <div className="w-11 h-14 rounded-lg overflow-hidden border border-neutral-200 shrink-0 bg-neutral-900">
+                              {(newMediaKind === 'video' || (newMediaKind === 'auto' && isVideoMediaUrl(newImageUrl))) ? (
+                                <video
+                                  src={normalizeShowcaseImagePath(newImageUrl)}
+                                  poster={newVideoPosterUrl ? normalizeShowcaseImagePath(newVideoPosterUrl) : undefined}
+                                  muted
+                                  autoPlay
+                                  loop
+                                  playsInline
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : (
+                                <img src={normalizeShowcaseImagePath(newImageUrl)} alt="Preview" className="w-full h-full object-cover" />
+                              )}
                             </div>
                           )}
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <span className="text-[9px] uppercase font-mono px-1.5 py-0.5 rounded bg-neutral-200 text-neutral-700 font-bold">
-                            Live Marquee Preview — Row {newRow}
-                          </span>
-                          <h5 className="text-sm font-bold text-neutral-900 truncate mt-0.5">{newTitle}</h5>
-                          <p className="text-xs text-neutral-500 truncate">{newSubtitle || 'Typixel Creative Showcase'}</p>
-                          <span className="text-[10px] text-neutral-400 font-mono block mt-0.5">{newCategory}</span>
-                        </div>
-                      </div>
-                    )}
+                      )}
 
-                    <div className="pt-2 flex items-center justify-end">
+                      <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
+                        <div className="flex items-center gap-1.5 text-xs">
+                          <span className="text-neutral-500">Type:</span>
+                          {(['auto', 'image', 'video'] as const).map((kind) => (
+                            <button
+                              key={kind}
+                              type="button"
+                              onClick={() => setNewMediaKind(kind)}
+                              className={`px-2.5 py-1 rounded-lg border cursor-pointer transition-colors ${
+                                newMediaKind === kind
+                                  ? 'bg-neutral-900 text-white border-neutral-900 font-medium'
+                                  : 'bg-neutral-50 text-neutral-600 border-neutral-200 hover:bg-neutral-100'
+                              }`}
+                            >
+                              {kind === 'auto' ? 'Auto' : kind === 'image' ? 'Image' : 'Video'}
+                            </button>
+                          ))}
+                        </div>
+
+                        {(newMediaKind === 'video' || (newMediaKind === 'auto' && isVideoMediaUrl(newImageUrl))) && (
+                          <input
+                            type="text"
+                            placeholder="Optional video poster image URL"
+                            value={newVideoPosterUrl}
+                            onChange={(e) => setNewVideoPosterUrl(e.target.value)}
+                            className="flex-1 min-w-[200px] text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3 py-1.5 text-neutral-900 font-mono"
+                          />
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-end gap-2 pt-2">
+                      <button
+                        type="button"
+                        onClick={() => setShowAddShowcaseForm(false)}
+                        className="px-4 py-2 text-xs font-medium text-neutral-600 hover:text-neutral-900 rounded-xl hover:bg-neutral-100 cursor-pointer"
+                      >
+                        Cancel
+                      </button>
                       <button
                         type="submit"
                         disabled={isCloudSyncing}
-                        className="inline-flex items-center gap-2 bg-neutral-900 hover:bg-black disabled:opacity-60 text-white px-7 py-3 rounded-full text-xs font-semibold shadow-md transition-all cursor-pointer hover:scale-102"
+                        className="inline-flex items-center gap-1.5 bg-neutral-900 hover:bg-black disabled:opacity-60 text-white px-5 py-2 rounded-xl text-xs font-medium cursor-pointer"
                       >
-                        <Plus className="w-4 h-4" />
-                        <span>{isCloudSyncing ? 'Publishing to Cloud...' : 'Add Project to Showcase'}</span>
+                        <Plus className="w-3.5 h-3.5" />
+                        <span>{isCloudSyncing ? 'Publishing...' : 'Publish to Showcase'}</span>
                       </button>
                     </div>
                   </form>
-                </div>
-              )}
+                )}
 
-              {/* TAB 2: MANAGE SHOWCASE PROJECTS */}
-              {activeTab === 'manage' && (
-                <div className="space-y-6">
-                  {/* Top Bar with Add Button and Item Count (NO reset to default) */}
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-[#FAF9F6] rounded-2xl border border-neutral-200/90">
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <h4 className="text-sm font-bold text-neutral-900">
-                          Showcase Artworks ({row1Projects.length + row2Projects.length} Unlimited Items Active)
-                        </h4>
-                        <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-semibold border border-emerald-200">
-                          Unlimited Rows
-                        </span>
-                      </div>
-                      <p className="text-xs text-neutral-500 mt-0.5">
-                        Row 1 ({row1Projects.length} items) slides Left • Row 2 ({row2Projects.length} items) slides Right. Supports unlimited items in each row.
-                      </p>
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={() => setActiveTab('add')}
-                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-white bg-neutral-900 hover:bg-black px-4 py-2 rounded-xl shadow-xs transition-colors cursor-pointer self-start sm:self-auto"
-                    >
-                      <Plus className="w-3.5 h-3.5" />
-                      <span>Add New Item</span>
-                    </button>
+                {/* Filter & Search Toolbar */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="flex items-center gap-1 p-1 bg-neutral-100 rounded-xl text-xs self-start">
+                    {([
+                      { id: 'all', label: `All (${allProjects.length})` },
+                      { id: 1, label: `Row 1 (${row1Projects.length})` },
+                      { id: 2, label: `Row 2 (${row2Projects.length})` }
+                    ] as const).map((tab) => (
+                      <button
+                        key={String(tab.id)}
+                        type="button"
+                        onClick={() => setShowcaseRowFilter(tab.id)}
+                        className={`px-3 py-1.5 rounded-lg cursor-pointer transition-colors whitespace-nowrap tabular-nums ${
+                          showcaseRowFilter === tab.id
+                            ? 'bg-white text-neutral-900 font-medium shadow-2xs'
+                            : 'text-neutral-600 hover:text-neutral-900'
+                        }`}
+                      >
+                        {tab.label}
+                      </button>
+                    ))}
                   </div>
 
-                  {/* Showcase Cards Grid with Visual Image Thumbnails */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">
-                    {[...row1Projects.map((p) => ({ ...p, assignedRow: 1 })), ...row2Projects.map((p) => ({ ...p, assignedRow: 2 }))].map((item) => {
+                  <div className="relative w-full sm:w-64">
+                    <Search className="w-3.5 h-3.5 text-neutral-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="text"
+                      placeholder="Filter artworks..."
+                      value={showcaseSearch}
+                      onChange={(e) => setShowcaseSearch(e.target.value)}
+                      className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl pl-8 pr-3 py-2 text-neutral-900 focus:bg-white focus:outline-none focus:border-neutral-900"
+                    />
+                  </div>
+                </div>
+
+                {/* Minimal Showcase Gallery Grid */}
+                {filteredProjects.length === 0 ? (
+                  <div className="py-12 text-center border border-dashed border-neutral-200 rounded-2xl">
+                    <p className="text-sm font-medium text-neutral-700">No showcase artworks match your filter</p>
+                    <p className="text-xs text-neutral-500 mt-1">Try clearing your search or add a new image or video.</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {filteredProjects.map((item) => {
                       const isVid = isVideoMediaUrl(item.videoUrl || item.imageUrl, item.mediaType);
                       const displayVideo = isVid ? normalizeShowcaseImagePath(item.videoUrl || item.imageUrl || '') : '';
                       const displayImg = item.imageUrl && !isVideoMediaUrl(item.imageUrl) ? normalizeShowcaseImagePath(item.imageUrl) : '';
                       return (
                         <div
                           key={item.id}
-                          className="bg-[#FAF9F6] p-4 rounded-2xl border border-neutral-200 hover:border-neutral-400 transition-all flex gap-3.5 items-start justify-between shadow-2xs"
+                          className="group rounded-2xl border border-neutral-200/90 overflow-hidden bg-white hover:border-neutral-400 transition-colors flex flex-col"
                         >
-                          {/* Visual Thumbnail */}
-                          <div className="w-16 h-20 rounded-xl overflow-hidden bg-neutral-900 shrink-0 border border-neutral-300 relative shadow-xs">
+                          {/* Artwork Preview */}
+                          <div className="w-full aspect-[4/3] bg-neutral-900 relative overflow-hidden">
                             {isVid && displayVideo ? (
                               <video
                                 src={displayVideo}
@@ -2228,69 +1744,64 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                                 alt={item.title}
                                 className="w-full h-full object-cover"
                                 onError={(e) => {
-                                  (e.target as HTMLElement).style.display = 'none';
+                                  (e.target as HTMLElement).style.opacity = '0.35';
                                 }}
                               />
                             ) : (
-                              <div className="w-full h-full flex items-center justify-center text-white/50 text-[10px] font-mono">
-                                No Art
+                              <div className="w-full h-full flex items-center justify-center text-white/50 text-xs font-mono">
+                                No Media
                               </div>
                             )}
-                            {isVid && (
-                              <span className="absolute top-1 left-1 text-[7px] font-mono font-bold px-1 py-0.5 rounded bg-purple-600 text-white">
-                                VID
-                              </span>
-                            )}
-                            <span className="absolute bottom-1 right-1 text-[8px] font-mono font-bold px-1.5 py-0.5 rounded bg-black/80 text-white">
-                              R{item.assignedRow}
-                            </span>
                           </div>
 
-                          {/* Info */}
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-1.5 text-[10px] font-mono text-neutral-500 mb-1">
-                              <span className="bg-white px-2 py-0.5 rounded border border-neutral-200 text-neutral-800 font-bold">
-                                Row {item.assignedRow}
-                              </span>
-                              {item.badge && (
-                                <span className="bg-white px-2 py-0.5 rounded border border-neutral-200 text-neutral-700 font-medium truncate">
-                                  {item.badge}
-                                </span>
+                          {/* Card Info + Clean Actions */}
+                          <div className="p-3.5 flex-1 flex flex-col justify-between gap-3">
+                            <div>
+                              <div className="flex items-center gap-1.5 text-[11px] text-neutral-500 mb-1 tabular-nums">
+                                <span>Row {item.assignedRow}</span>
+                                <span aria-hidden="true">·</span>
+                                <span>{isVid ? 'Video' : 'Image'}</span>
+                                <span aria-hidden="true">·</span>
+                                <span className="truncate">{item.category}</span>
+                              </div>
+                              <h3 className="text-sm font-medium text-neutral-900 truncate">
+                                {item.title}
+                              </h3>
+                              {item.subtitle && (
+                                <p className="text-xs text-neutral-500 truncate mt-0.5">
+                                  {item.subtitle}
+                                </p>
                               )}
                             </div>
-                            <h4 className="text-sm font-bold text-neutral-900 truncate leading-snug">{item.title}</h4>
-                            <p className="text-xs text-neutral-500 line-clamp-1 mt-0.5">{item.subtitle || item.client}</p>
-                            <span className="text-[11px] text-neutral-400 font-mono mt-1 block truncate">{item.category}</span>
 
-                            {/* Controls */}
-                            <div className="mt-3 pt-2 border-t border-neutral-200 flex items-center justify-between gap-2">
+                            <div className="pt-2.5 border-t border-neutral-100 flex items-center justify-between gap-2">
                               <button
                                 type="button"
                                 onClick={() => handleToggleProjectRow(item, item.assignedRow)}
-                                className="text-[11px] font-medium text-neutral-600 hover:text-neutral-900 bg-white hover:bg-neutral-100 border border-neutral-200 px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
+                                className="inline-flex items-center gap-1 text-xs text-neutral-600 hover:text-neutral-900 cursor-pointer whitespace-nowrap"
                                 title={`Move to Row ${item.assignedRow === 1 ? 2 : 1}`}
                               >
-                                Move to Row {item.assignedRow === 1 ? '2 ➔' : '1 ➔'}
+                                <ArrowLeftRight className="w-3 h-3" />
+                                <span>Row {item.assignedRow === 1 ? '2' : '1'}</span>
                               </button>
 
                               <div className="flex items-center gap-1">
                                 <button
                                   type="button"
                                   onClick={() => handleStartEditProject(item)}
-                                  className="p-1.5 hover:bg-white text-neutral-700 hover:text-black rounded-lg text-xs flex items-center gap-1 cursor-pointer transition-colors border border-transparent hover:border-neutral-200"
-                                  title="Edit project"
+                                  className="px-2.5 py-1 text-xs font-medium text-neutral-700 hover:text-neutral-900 hover:bg-neutral-100 rounded-lg transition-colors cursor-pointer inline-flex items-center gap-1"
                                 >
-                                  <Pencil className="w-3.5 h-3.5" />
+                                  <Pencil className="w-3 h-3" />
                                   <span>Edit</span>
                                 </button>
                                 <button
                                   type="button"
                                   onClick={() => handleDeleteProject(item.id)}
-                                  className="p-1.5 hover:bg-red-50 text-neutral-400 hover:text-red-600 rounded-lg text-xs flex items-center gap-1 cursor-pointer transition-colors"
-                                  title="Delete project"
+                                  className="p-1.5 text-neutral-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+                                  title="Delete artwork"
+                                  aria-label="Delete artwork"
                                 >
                                   <Trash2 className="w-3.5 h-3.5" />
-                                  <span>Delete</span>
                                 </button>
                               </div>
                             </div>
@@ -2299,42 +1810,67 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                       );
                     })}
                   </div>
-                </div>
-              )}
+                )}
+              </div>
+            )}
 
-              {/* TAB 3: EXPERIENCED TOOLS & APPS */}
-              {activeTab === 'tools' && (
-                <div className="space-y-6">
-                  <div className="p-4 bg-[#FAF9F6] rounded-2xl border border-neutral-200">
-                    <div>
-                      <h4 className="text-sm font-bold text-neutral-900">12 Experienced Software &amp; Tools</h4>
-                      <p className="text-xs text-neutral-500">
-                        Photoshop, Illustrator, InDesign, Premiere Pro, After Effects, DaVinci, Canva, CapCut, HTML, CSS, JS, Figma.
-                      </p>
-                    </div>
+            {/* ==================== TAB: EXPERIENCED TOOLS ==================== */}
+            {activeTab === 'tools' && (
+              <div className="space-y-6">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-neutral-100">
+                  <div>
+                    <h2 className="text-lg font-semibold text-neutral-900 tracking-tight">
+                      Software &amp; Tools
+                    </h2>
+                    <p className="text-xs text-neutral-500 mt-0.5 tabular-nums">
+                      {tools.length} items displayed in the experienced apps marquee.
+                    </p>
                   </div>
 
-                  <form onSubmit={handleAddTool} className="p-5 bg-white rounded-2xl border border-neutral-200 space-y-4">
-                    <h5 className="text-xs font-bold uppercase tracking-wider text-neutral-500">Add New Software / Tool</h5>
+                  <button
+                    type="button"
+                    onClick={() => setShowAddToolForm(!showAddToolForm)}
+                    className={`inline-flex items-center gap-1.5 text-xs font-medium px-4 py-2 rounded-xl transition-colors cursor-pointer whitespace-nowrap self-start sm:self-auto ${
+                      showAddToolForm
+                        ? 'bg-neutral-100 hover:bg-neutral-200 text-neutral-800'
+                        : 'bg-neutral-900 hover:bg-black text-white'
+                    }`}
+                  >
+                    {showAddToolForm ? (
+                      <>
+                        <X className="w-3.5 h-3.5" />
+                        <span>Close</span>
+                      </>
+                    ) : (
+                      <>
+                        <Plus className="w-3.5 h-3.5" />
+                        <span>Add Tool</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+
+                {showAddToolForm && (
+                  <form onSubmit={handleAddTool} className="pb-6 border-b border-neutral-200 space-y-4">
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                       <div>
-                        <label className="block text-xs font-bold text-neutral-600 mb-1">Software Name *</label>
+                        <label className="block text-xs font-medium text-neutral-700 mb-1">Software Name *</label>
                         <input
                           type="text"
                           required
-                          placeholder="e.g. Cinema 4D, Blender, XD..."
+                          placeholder="e.g. Blender, Cinema 4D"
                           value={newToolName}
                           onChange={(e) => setNewToolName(e.target.value)}
-                          className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3 py-2 text-neutral-900"
+                          className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none focus:border-neutral-900"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-xs font-bold text-neutral-600 mb-1">Category</label>
+                        <label className="block text-xs font-medium text-neutral-700 mb-1">Category</label>
                         <select
                           value={newToolCategory}
                           onChange={(e) => setNewToolCategory(e.target.value as any)}
-                          className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3 py-2 text-neutral-900"
+                          className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none focus:border-neutral-900"
                         >
                           <option value="Graphic & Vector">Graphic &amp; Vector</option>
                           <option value="Video & Motion">Video &amp; Motion</option>
@@ -2344,103 +1880,76 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                       </div>
 
                       <div>
-                        <label className="block text-xs font-bold text-neutral-600 mb-1">Short Badge (e.g. C4D, BL)</label>
+                        <label className="block text-xs font-medium text-neutral-700 mb-1">Short Code</label>
                         <input
                           type="text"
                           maxLength={5}
-                          placeholder="e.g. C4D"
+                          placeholder="e.g. BL"
                           value={newToolBadge}
                           onChange={(e) => setNewToolBadge(e.target.value)}
-                          className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3 py-2 text-neutral-900 font-mono"
+                          className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 font-mono focus:bg-white focus:outline-none focus:border-neutral-900"
                         />
                       </div>
                     </div>
 
-                    {/* Icon PNG Upload or Image Link */}
-                    <div className="pt-2 border-t border-neutral-100">
-                      <div className="flex items-center justify-between mb-2">
-                        <label className="block text-xs font-bold text-neutral-600">
-                          App Icon (PNG Upload or Image Link)
-                        </label>
-                        <div className="flex items-center gap-1.5 text-[11px]">
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <label className="text-xs font-medium text-neutral-700">Icon (Upload PNG/SVG or Link)</label>
+                        <div className="flex items-center gap-1 p-0.5 bg-neutral-100 rounded-lg text-xs">
                           <button
                             type="button"
                             onClick={() => setToolIconMode('upload')}
-                            className={`px-2.5 py-0.5 rounded-md cursor-pointer transition-colors ${
-                              toolIconMode === 'upload'
-                                ? 'bg-neutral-900 text-white font-semibold'
-                                : 'text-neutral-500 hover:text-neutral-900 bg-neutral-100'
+                            className={`px-2.5 py-1 rounded-md cursor-pointer ${
+                              toolIconMode === 'upload' ? 'bg-white text-neutral-900 font-medium shadow-2xs' : 'text-neutral-600'
                             }`}
                           >
-                            Upload PNG
+                            Upload
                           </button>
-                          <span className="text-neutral-300">/</span>
                           <button
                             type="button"
                             onClick={() => setToolIconMode('link')}
-                            className={`px-2.5 py-0.5 rounded-md cursor-pointer transition-colors ${
-                              toolIconMode === 'link'
-                                ? 'bg-neutral-900 text-white font-semibold'
-                                : 'text-neutral-500 hover:text-neutral-900 bg-neutral-100'
+                            className={`px-2.5 py-1 rounded-md cursor-pointer ${
+                              toolIconMode === 'link' ? 'bg-white text-neutral-900 font-medium shadow-2xs' : 'text-neutral-600'
                             }`}
                           >
-                            Image Link (URL)
+                            URL
                           </button>
                         </div>
                       </div>
 
                       <div className="flex items-center gap-3">
                         {toolIconMode === 'upload' ? (
-                          <div className="flex-1">
-                            <input
-                              type="file"
-                              accept="image/png,image/svg+xml,image/jpeg,image/webp"
-                              onChange={(e) => {
-                                const file = e.target.files?.[0];
-                                if (file) {
-                                  const reader = new FileReader();
-                                  reader.onload = () => {
-                                    if (typeof reader.result === 'string') {
-                                      setNewToolIconUrl(reader.result);
-                                    }
-                                  };
-                                  reader.readAsDataURL(file);
-                                }
-                              }}
-                              className="w-full text-xs text-neutral-600 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-neutral-100 file:text-neutral-800 hover:file:bg-neutral-200 cursor-pointer"
-                            />
-                            <p className="text-[10px] text-neutral-400 mt-1">
-                              Choose any transparent PNG, SVG, or icon image file from your device.
-                            </p>
-                          </div>
+                          <input
+                            type="file"
+                            accept="image/png,image/svg+xml,image/jpeg,image/webp"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) {
+                                const reader = new FileReader();
+                                reader.onload = () => {
+                                  if (typeof reader.result === 'string') setNewToolIconUrl(reader.result);
+                                };
+                                reader.readAsDataURL(file);
+                              }
+                            }}
+                            className="flex-1 text-xs text-neutral-600 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-neutral-900 file:text-white cursor-pointer bg-neutral-50 border border-neutral-200 rounded-xl p-1"
+                          />
                         ) : (
-                          <div className="flex-1">
-                            <input
-                              type="text"
-                              placeholder="e.g. https://cdn.worldvectorlogo.com/logos/blender-2.svg or /icon.png"
-                              value={newToolIconUrl}
-                              onChange={(e) => setNewToolIconUrl(e.target.value)}
-                              className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3 py-2 text-neutral-900 placeholder:text-neutral-400 focus:bg-white focus:outline-none focus:ring-1 focus:ring-neutral-900"
-                            />
-                            <p className="text-[10px] text-neutral-400 mt-1">
-                              Paste an online image link (PNG, SVG, or JPG).
-                            </p>
-                          </div>
+                          <input
+                            type="text"
+                            placeholder="https://.../icon.svg"
+                            value={newToolIconUrl}
+                            onChange={(e) => setNewToolIconUrl(e.target.value)}
+                            className="flex-1 text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 font-mono"
+                          />
                         )}
-
-                        {/* Live Icon Preview if set */}
                         {newToolIconUrl && (
-                          <div className="flex items-center gap-2 bg-neutral-50 p-1.5 rounded-xl border border-neutral-200 shrink-0">
-                            <AppLogo
-                              name={newToolName || 'New'}
-                              badge={newToolBadge || 'App'}
-                              iconUrl={newToolIconUrl}
-                              size={38}
-                            />
+                          <div className="flex items-center gap-2 shrink-0">
+                            <AppLogo name={newToolName || 'New'} badge={newToolBadge || 'App'} iconUrl={newToolIconUrl} size={36} />
                             <button
                               type="button"
                               onClick={() => setNewToolIconUrl('')}
-                              className="text-[10px] text-red-500 hover:text-red-700 underline pr-1 cursor-pointer font-medium"
+                              className="text-xs text-rose-600 hover:underline cursor-pointer"
                             >
                               Clear
                             </button>
@@ -2449,155 +1958,341 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                       </div>
                     </div>
 
-                    <div className="flex justify-end pt-1">
+                    <div className="flex justify-end gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setShowAddToolForm(false)}
+                        className="px-4 py-2 text-xs font-medium text-neutral-600 hover:bg-neutral-100 rounded-xl cursor-pointer"
+                      >
+                        Cancel
+                      </button>
                       <button
                         type="submit"
-                        className="inline-flex items-center gap-1.5 bg-neutral-900 hover:bg-black text-white px-5 py-2 rounded-xl text-xs font-semibold cursor-pointer"
+                        disabled={isCloudSyncing}
+                        className="inline-flex items-center gap-1.5 bg-neutral-900 hover:bg-black text-white px-5 py-2 rounded-xl text-xs font-medium cursor-pointer"
                       >
                         <Plus className="w-3.5 h-3.5" />
-                        <span>Add Tool to Moving Marquee</span>
+                        <span>Add Tool</span>
                       </button>
                     </div>
                   </form>
+                )}
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-                    {tools.map((t) => (
-                      <div key={t.id} className="p-3.5 bg-[#FAF9F6] rounded-xl border border-neutral-200 flex items-center justify-between gap-3">
-                        <div className="flex items-center gap-3">
-                          <AppLogo name={t.name} badge={t.badge} iconUrl={t.iconUrl} size={38} />
-                          <div>
-                            <div className="text-xs font-bold text-neutral-900">{t.name}</div>
-                            <div className="text-[10px] text-neutral-500 font-mono">{t.category}</div>
-                          </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {tools.map((t) => (
+                    <div
+                      key={t.id}
+                      className="p-3.5 rounded-xl border border-neutral-200/80 flex items-center justify-between gap-3 hover:border-neutral-300 transition-colors"
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <AppLogo name={t.name} badge={t.badge} iconUrl={t.iconUrl} size={36} />
+                        <div className="min-w-0">
+                          <div className="text-xs font-medium text-neutral-900 truncate">{t.name}</div>
+                          <div className="text-[11px] text-neutral-500 truncate">{t.category}</div>
                         </div>
-
-                        <button
-                          onClick={() => handleDeleteTool(t.id)}
-                          className="p-1.5 hover:bg-neutral-200 text-neutral-500 hover:text-neutral-900 rounded-lg transition-colors cursor-pointer"
-                          title="Remove tool"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
                       </div>
-                    ))}
-                  </div>
-                </div>
-              )}
 
-              {/* TAB 4: BLOG & TRENDING SEO ARTICLES */}
-              {activeTab === 'blog' && (
-                <div className="space-y-6">
-                  <div className="p-4 bg-[#FAF9F6] rounded-2xl border border-neutral-200">
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteTool(t.id)}
+                        className="p-1.5 text-neutral-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer shrink-0"
+                        title="Remove tool"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* ==================== TAB: BLOG & SEO ==================== */}
+            {activeTab === 'seo' && (
+              <div className="space-y-8">
+                {/* Section 1: Site SEO Metadata */}
+                <form onSubmit={handleSaveSeoStrategy} className="space-y-4 pb-8 border-b border-neutral-200">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div>
-                      <h4 className="text-sm font-bold text-neutral-900">Ranked SEO Articles for Google Search Console</h4>
-                      <p className="text-xs text-neutral-500">
-                        Targeting keywords: Graphic Design Trends, Adobe Photoshop, Figma UI, Premiere Pro, and Front-End.
+                      <h2 className="text-lg font-semibold text-neutral-900 tracking-tight">
+                        SEO Metadata &amp; Strategy
+                      </h2>
+                      <p className="text-xs text-neutral-500 mt-0.5">
+                        Configure search titles, URL slug, and regional targeting for {seoStrategy.domain}.
                       </p>
                     </div>
+                    <button
+                      type="submit"
+                      disabled={isCloudSyncing}
+                      className="inline-flex items-center gap-1.5 px-4 py-2 bg-neutral-900 hover:bg-black text-white rounded-xl text-xs font-medium cursor-pointer self-start sm:self-auto"
+                    >
+                      <Save className="w-3.5 h-3.5" />
+                      <span>Save SEO</span>
+                    </button>
                   </div>
 
-                  <form onSubmit={handleAddBlogPost} className="p-5 bg-white rounded-2xl border border-neutral-200 space-y-4">
-                    <h5 className="text-xs font-bold uppercase tracking-wider text-neutral-500">Publish New Article</h5>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                      <div className="sm:col-span-2">
-                        <label className="block text-xs font-bold text-neutral-600 mb-1">Article Headline *</label>
-                        <input
-                          type="text"
-                          required
-                          placeholder="e.g. 10 High-Converting Poster Design Secrets for 2026"
-                          value={newBlogTitle}
-                          onChange={(e) => setNewBlogTitle(e.target.value)}
-                          className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3 py-2 text-neutral-900"
-                        />
-                      </div>
+                  <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="text-xs font-medium text-neutral-700">Blog Headline / H1</label>
+                      <button
+                        type="button"
+                        onClick={() => handleCopySeoText(seoStrategy.blogTitle, 'field-blog-title')}
+                        className="inline-flex items-center gap-1 text-[11px] text-neutral-500 hover:text-neutral-900 cursor-pointer"
+                      >
+                        {copiedSeoField === 'field-blog-title' ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
+                        <span>{copiedSeoField === 'field-blog-title' ? 'Copied' : 'Copy'}</span>
+                      </button>
+                    </div>
+                    <input
+                      type="text"
+                      required
+                      value={seoStrategy.blogTitle}
+                      onChange={(e) => setSeoStrategy({ ...seoStrategy, blogTitle: e.target.value })}
+                      className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none focus:border-neutral-900"
+                    />
+                  </div>
 
-                      <div>
-                        <label className="block text-xs font-bold text-neutral-600 mb-1">Category</label>
-                        <select
-                          value={newBlogCategory}
-                          onChange={(e) => setNewBlogCategory(e.target.value as any)}
-                          className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3 py-2 text-neutral-900"
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="text-xs font-medium text-neutral-700">SEO Browser Title</label>
+                        <button
+                          type="button"
+                          onClick={() => handleCopySeoText(seoStrategy.seoTitle, 'field-seo-title')}
+                          className="inline-flex items-center gap-1 text-[11px] text-neutral-500 hover:text-neutral-900 cursor-pointer"
                         >
-                          <option value="Graphic Design">Graphic Design</option>
-                          <option value="UI/UX & Figma">UI/UX &amp; Figma</option>
-                          <option value="Video & Motion">Video &amp; Motion</option>
-                          <option value="Design & Code">Design &amp; Code</option>
-                          <option value="Branding">Branding</option>
-                        </select>
+                          {copiedSeoField === 'field-seo-title' ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
+                          <span>{copiedSeoField === 'field-seo-title' ? 'Copied' : 'Copy'}</span>
+                        </button>
                       </div>
+                      <input
+                        type="text"
+                        required
+                        value={seoStrategy.seoTitle}
+                        onChange={(e) => setSeoStrategy({ ...seoStrategy, seoTitle: e.target.value })}
+                        className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none focus:border-neutral-900"
+                      />
                     </div>
 
                     <div>
-                      <label className="block text-xs font-bold text-neutral-600 mb-1">Meta Excerpt / Summary</label>
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="text-xs font-medium text-neutral-700">URL Slug</label>
+                        <button
+                          type="button"
+                          onClick={() => handleCopySeoText(seoStrategy.urlSlug, 'field-url-slug')}
+                          className="inline-flex items-center gap-1 text-[11px] text-neutral-500 hover:text-neutral-900 cursor-pointer"
+                        >
+                          {copiedSeoField === 'field-url-slug' ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
+                          <span>{copiedSeoField === 'field-url-slug' ? 'Copied' : 'Copy'}</span>
+                        </button>
+                      </div>
                       <input
                         type="text"
-                        placeholder="1-2 sentences summarizing the article for Google Search snippet..."
-                        value={newBlogExcerpt}
-                        onChange={(e) => setNewBlogExcerpt(e.target.value)}
+                        required
+                        value={seoStrategy.urlSlug}
+                        onChange={(e) => setSeoStrategy({ ...seoStrategy, urlSlug: e.target.value })}
+                        className="w-full text-xs font-mono bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none focus:border-neutral-900"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="text-xs font-medium text-neutral-700">Meta Description</label>
+                      <button
+                        type="button"
+                        onClick={() => handleCopySeoText(seoStrategy.metaDescription, 'field-meta-desc')}
+                        className="inline-flex items-center gap-1 text-[11px] text-neutral-500 hover:text-neutral-900 cursor-pointer"
+                      >
+                        {copiedSeoField === 'field-meta-desc' ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
+                        <span>{copiedSeoField === 'field-meta-desc' ? 'Copied' : 'Copy'}</span>
+                      </button>
+                    </div>
+                    <textarea
+                      rows={2}
+                      required
+                      value={seoStrategy.metaDescription}
+                      onChange={(e) => setSeoStrategy({ ...seoStrategy, metaDescription: e.target.value })}
+                      className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none focus:border-neutral-900 resize-none"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-1">
+                    <div>
+                      <label className="block text-[11px] font-medium text-neutral-500 mb-1">Primary Target</label>
+                      <input
+                        type="text"
+                        value={seoStrategy.primaryTarget}
+                        onChange={(e) => setSeoStrategy({ ...seoStrategy, primaryTarget: e.target.value })}
                         className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3 py-2 text-neutral-900"
                       />
                     </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-xs font-bold text-neutral-600 mb-1">Tags (Comma-separated)</label>
-                        <input
-                          type="text"
-                          value={newBlogTags}
-                          onChange={(e) => setNewBlogTags(e.target.value)}
-                          className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3 py-2 text-neutral-900"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-bold text-neutral-600 mb-1">SEO Keywords (Comma-separated)</label>
-                        <input
-                          type="text"
-                          value={newBlogKeywords}
-                          onChange={(e) => setNewBlogKeywords(e.target.value)}
-                          className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3 py-2 text-neutral-900"
-                        />
-                      </div>
-                    </div>
-
                     <div>
-                      <label className="block text-xs font-bold text-neutral-600 mb-1">Article Content (Markdown supported)</label>
-                      <textarea
-                        rows={4}
-                        placeholder="## Main Section\n\nDetailed breakdown of typography, color grading, or software pipeline..."
-                        value={newBlogContent}
-                        onChange={(e) => setNewBlogContent(e.target.value)}
-                        className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3 py-2 text-neutral-900 resize-none font-mono"
+                      <label className="block text-[11px] font-medium text-neutral-500 mb-1">Location Focus</label>
+                      <input
+                        type="text"
+                        value={seoStrategy.locationFocus}
+                        onChange={(e) => setSeoStrategy({ ...seoStrategy, locationFocus: e.target.value })}
+                        className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3 py-2 text-neutral-900"
                       />
                     </div>
-
-                    <div className="flex justify-end">
-                      <button
-                        type="submit"
-                        className="inline-flex items-center gap-1.5 bg-neutral-900 hover:bg-black text-white px-5 py-2 rounded-xl text-xs font-semibold cursor-pointer"
-                      >
-                        <Plus className="w-3.5 h-3.5" />
-                        <span>Publish Article</span>
-                      </button>
+                    <div>
+                      <label className="block text-[11px] font-medium text-neutral-500 mb-1">Audience</label>
+                      <input
+                        type="text"
+                        value={seoStrategy.audience}
+                        onChange={(e) => setSeoStrategy({ ...seoStrategy, audience: e.target.value })}
+                        className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3 py-2 text-neutral-900"
+                      />
                     </div>
-                  </form>
+                    <div>
+                      <label className="block text-[11px] font-medium text-neutral-500 mb-1">Goal</label>
+                      <input
+                        type="text"
+                        value={seoStrategy.goal}
+                        onChange={(e) => setSeoStrategy({ ...seoStrategy, goal: e.target.value })}
+                        className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3 py-2 text-neutral-900"
+                      />
+                    </div>
+                  </div>
+                </form>
 
-                  <div className="space-y-3">
-                    {blogPosts.map((post) => (
-                      <div key={post.id} className="p-4 bg-[#FAF9F6] rounded-xl border border-neutral-200 flex items-center justify-between gap-4">
+                {/* Section 2: Published Articles */}
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="text-base font-semibold text-neutral-900">
+                        SEO Articles
+                      </h3>
+                      <p className="text-xs text-neutral-500 tabular-nums">
+                        {blogPosts.length} published articles
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setShowAddArticleForm(!showAddArticleForm)}
+                      className={`inline-flex items-center gap-1.5 text-xs font-medium px-3.5 py-2 rounded-xl transition-colors cursor-pointer ${
+                        showAddArticleForm
+                          ? 'bg-neutral-100 hover:bg-neutral-200 text-neutral-800'
+                          : 'bg-neutral-900 hover:bg-black text-white'
+                      }`}
+                    >
+                      {showAddArticleForm ? <X className="w-3.5 h-3.5" /> : <Plus className="w-3.5 h-3.5" />}
+                      <span>{showAddArticleForm ? 'Close' : 'New Article'}</span>
+                    </button>
+                  </div>
+
+                  {showAddArticleForm && (
+                    <form onSubmit={handleAddBlogPost} className="p-4 bg-neutral-50/70 rounded-2xl border border-neutral-200 space-y-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div className="sm:col-span-2">
+                          <label className="block text-xs font-medium text-neutral-700 mb-1">Headline *</label>
+                          <input
+                            type="text"
+                            required
+                            placeholder="Article title..."
+                            value={newBlogTitle}
+                            onChange={(e) => setNewBlogTitle(e.target.value)}
+                            className="w-full text-xs bg-white border border-neutral-200 rounded-xl px-3 py-2 text-neutral-900"
+                          />
+                        </div>
                         <div>
-                          <div className="flex items-center gap-2 text-[10px] font-mono text-neutral-400 mb-1">
-                            <span className="bg-white px-2 py-0.5 rounded border border-neutral-200 text-neutral-700 font-sans">{post.category}</span>
+                          <label className="block text-xs font-medium text-neutral-700 mb-1">Category</label>
+                          <select
+                            value={newBlogCategory}
+                            onChange={(e) => setNewBlogCategory(e.target.value as any)}
+                            className="w-full text-xs bg-white border border-neutral-200 rounded-xl px-3 py-2 text-neutral-900"
+                          >
+                            <option value="Graphic Design">Graphic Design</option>
+                            <option value="UI/UX & Figma">UI/UX &amp; Figma</option>
+                            <option value="Video & Motion">Video &amp; Motion</option>
+                            <option value="Design & Code">Design &amp; Code</option>
+                            <option value="Branding">Branding</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-medium text-neutral-700 mb-1">Excerpt</label>
+                        <input
+                          type="text"
+                          placeholder="Short summary..."
+                          value={newBlogExcerpt}
+                          onChange={(e) => setNewBlogExcerpt(e.target.value)}
+                          className="w-full text-xs bg-white border border-neutral-200 rounded-xl px-3 py-2 text-neutral-900"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-xs font-medium text-neutral-700 mb-1">Tags</label>
+                          <input
+                            type="text"
+                            value={newBlogTags}
+                            onChange={(e) => setNewBlogTags(e.target.value)}
+                            className="w-full text-xs bg-white border border-neutral-200 rounded-xl px-3 py-2 text-neutral-900"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-neutral-700 mb-1">SEO Keywords</label>
+                          <input
+                            type="text"
+                            value={newBlogKeywords}
+                            onChange={(e) => setNewBlogKeywords(e.target.value)}
+                            className="w-full text-xs bg-white border border-neutral-200 rounded-xl px-3 py-2 text-neutral-900"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-medium text-neutral-700 mb-1">Content (Markdown)</label>
+                        <textarea
+                          rows={4}
+                          placeholder="## Overview..."
+                          value={newBlogContent}
+                          onChange={(e) => setNewBlogContent(e.target.value)}
+                          className="w-full text-xs bg-white border border-neutral-200 rounded-xl px-3 py-2 text-neutral-900 resize-none font-mono"
+                        />
+                      </div>
+
+                      <div className="flex justify-end gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setShowAddArticleForm(false)}
+                          className="px-4 py-2 text-xs font-medium text-neutral-600 hover:bg-neutral-200/70 rounded-xl cursor-pointer"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="submit"
+                          disabled={isCloudSyncing}
+                          className="inline-flex items-center gap-1.5 bg-neutral-900 hover:bg-black text-white px-4 py-2 rounded-xl text-xs font-medium cursor-pointer"
+                        >
+                          <Plus className="w-3.5 h-3.5" />
+                          <span>Publish Article</span>
+                        </button>
+                      </div>
+                    </form>
+                  )}
+
+                  <div className="divide-y divide-neutral-100 border border-neutral-200/80 rounded-2xl overflow-hidden">
+                    {blogPosts.map((post) => (
+                      <div key={post.id} className="p-4 flex items-center justify-between gap-4 hover:bg-neutral-50/70 transition-colors">
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2 text-[11px] text-neutral-500 mb-0.5 tabular-nums">
+                            <span>{post.category}</span>
+                            <span aria-hidden="true">·</span>
                             <span>{post.publishedDate}</span>
-                            <span>&bull;</span>
+                            <span aria-hidden="true">·</span>
                             <span>{post.readTime}</span>
                           </div>
-                          <h5 className="text-sm font-bold text-neutral-900">{post.title}</h5>
-                          <p className="text-xs text-neutral-500 line-clamp-1">{post.excerpt}</p>
+                          <h4 className="text-sm font-medium text-neutral-900 truncate">{post.title}</h4>
+                          <p className="text-xs text-neutral-500 truncate">{post.excerpt}</p>
                         </div>
 
                         <button
+                          type="button"
                           onClick={() => handleDeleteBlogPost(post.id)}
-                          className="p-1.5 hover:bg-neutral-200 text-neutral-500 hover:text-neutral-900 rounded-lg transition-colors cursor-pointer shrink-0"
+                          className="p-1.5 text-neutral-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer shrink-0"
                           title="Delete article"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -2606,616 +2301,521 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                     ))}
                   </div>
                 </div>
-              )}
+              </div>
+            )}
 
-              {/* TAB 5: CONTACT & EMAILJS CONFIGURATION */}
-              {activeTab === 'settings' && (
-                <form onSubmit={handleSaveContactSettings} className="space-y-5 max-w-xl">
-                  <div className="p-4 bg-[#FAF9F6] rounded-2xl border border-neutral-200 mb-4">
-                    <h4 className="text-sm font-bold text-neutral-900 mb-1">EmailJS &amp; Direct Communication</h4>
-                    <p className="text-xs text-neutral-500 leading-relaxed">
-                      Configure your direct email, WhatsApp phone number, and optional custom EmailJS credentials. All contact inquiries send directly through these channels.
+            {/* ==================== TAB: CONTACT, EMAILJS & ADMIN SECURITY ==================== */}
+            {activeTab === 'settings' && (
+              <div className="space-y-8 max-w-2xl">
+                {/* Contact Channels */}
+                <form onSubmit={handleSaveContactSettings} className="space-y-4">
+                  <div className="pb-4 border-b border-neutral-100">
+                    <h2 className="text-lg font-semibold text-neutral-900 tracking-tight">
+                      Contact &amp; Account Settings
+                    </h2>
+                    <p className="text-xs text-neutral-500 mt-0.5">
+                      Update your public email, WhatsApp inquiry number, and admin password controls.
                     </p>
                   </div>
 
-                  <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-neutral-600 mb-1">
-                      Designer Direct Email *
-                    </label>
-                    <input
-                      type="email"
-                      required
-                      value={settingsEmail}
-                      onChange={(e) => setSettingsEmail(e.target.value)}
-                      className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900"
-                    />
-                    <span className="text-[11px] text-neutral-400 mt-1 block">
-                      Updating here updates the email across the entire portfolio (Header, Contact card, and forms).
-                    </span>
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-neutral-600 mb-1">
-                      WhatsApp Number (with country code) *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="e.g. 919061559799"
-                      value={settingsWhatsApp}
-                      onChange={(e) => setSettingsWhatsApp(e.target.value)}
-                      className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 font-mono"
-                    />
-                  </div>
-
-                  <div className="pt-2 border-t border-neutral-100 space-y-3">
-                    <div className="flex items-center justify-between">
-                      <h5 className="text-xs font-bold uppercase tracking-wider text-neutral-500">EmailJS Service Keys</h5>
-                      <span className="text-[11px] text-neutral-400">Used for auto-forwarding inquiries to your inbox</span>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-medium text-neutral-700 mb-1">
+                        Public Email *
+                      </label>
+                      <input
+                        type="email"
+                        required
+                        value={settingsEmail}
+                        onChange={(e) => setSettingsEmail(e.target.value)}
+                        className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none focus:border-neutral-900"
+                      />
                     </div>
 
-                    {/* Step-by-step Setup Helper Box */}
-                    <div className="p-3.5 bg-neutral-50 border border-neutral-200 rounded-2xl text-xs space-y-2 text-neutral-600">
-                      <div className="font-semibold text-neutral-900 flex items-center gap-1.5">
-                        <span>Setup Guide (3 Steps on emailjs.com):</span>
+                    <div>
+                      <label className="block text-xs font-medium text-neutral-700 mb-1">
+                        WhatsApp Number *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="e.g. 919061559799"
+                        value={settingsWhatsApp}
+                        onChange={(e) => setSettingsWhatsApp(e.target.value)}
+                        className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 font-mono focus:bg-white focus:outline-none focus:border-neutral-900"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Collapsible Optional EmailJS Settings */}
+                  <div className="pt-1">
+                    <button
+                      type="button"
+                      onClick={() => setShowEmailJsAdvanced(!showEmailJsAdvanced)}
+                      className="inline-flex items-center gap-1.5 text-xs font-medium text-neutral-600 hover:text-neutral-900 cursor-pointer"
+                    >
+                      {showEmailJsAdvanced ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                      <span>EmailJS Configuration (Optional)</span>
+                    </button>
+
+                    {showEmailJsAdvanced && (
+                      <div className="mt-3 p-4 bg-neutral-50/70 border border-neutral-200 rounded-xl space-y-3">
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                          <div>
+                            <label className="block text-[11px] font-medium text-neutral-600 mb-1">Service ID</label>
+                            <input
+                              type="text"
+                              value={emailJsServiceId}
+                              onChange={(e) => setEmailJsServiceId(e.target.value)}
+                              className="w-full text-xs bg-white border border-neutral-200 rounded-lg px-3 py-2 text-neutral-900 font-mono"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-[11px] font-medium text-neutral-600 mb-1">Template ID</label>
+                            <input
+                              type="text"
+                              value={emailJsTemplateId}
+                              onChange={(e) => setEmailJsTemplateId(e.target.value)}
+                              className="w-full text-xs bg-white border border-neutral-200 rounded-lg px-3 py-2 text-neutral-900 font-mono"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-[11px] font-medium text-neutral-600 mb-1">Public Key</label>
+                            <input
+                              type="text"
+                              value={emailJsPublicKey}
+                              onChange={(e) => setEmailJsPublicKey(e.target.value)}
+                              className="w-full text-xs bg-white border border-neutral-200 rounded-lg px-3 py-2 text-neutral-900 font-mono"
+                            />
+                          </div>
+                        </div>
                       </div>
-                      <ol className="list-decimal pl-4 space-y-1 text-[11px] leading-relaxed">
-                        <li>
-                          <strong>Email Services:</strong> Click <em>Add New Service</em> &rarr; choose <em>Gmail</em> (or your provider), connect it, then copy your <strong>Service ID</strong> below.
-                        </li>
-                        <li>
-                          <strong>Email Templates:</strong> Click <em>Create New Template</em>. In the template body, use variables: <code className="bg-neutral-200/70 px-1 py-0.5 rounded text-neutral-800 font-mono">{"{{from_name}}"}</code>, <code className="bg-neutral-200/70 px-1 py-0.5 rounded text-neutral-800 font-mono">{"{{reply_to}}"}</code>, <code className="bg-neutral-200/70 px-1 py-0.5 rounded text-neutral-800 font-mono">{"{{project_type}}"}</code>, <code className="bg-neutral-200/70 px-1 py-0.5 rounded text-neutral-800 font-mono">{"{{message}}"}</code>. Set <em>To Email</em> to your email, save, and copy your <strong>Template ID</strong>.
-                        </li>
-                        <li>
-                          <strong>Public Key:</strong> In EmailJS go to <em>Account &rarr; API Keys</em> and copy your <strong>Public Key</strong>.
-                        </li>
-                      </ol>
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-bold text-neutral-600 mb-1">EmailJS Service ID</label>
-                      <input
-                        type="text"
-                        placeholder="service_xxxxxxx"
-                        value={emailJsServiceId}
-                        onChange={(e) => setEmailJsServiceId(e.target.value)}
-                        className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2 text-neutral-900 font-mono"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-bold text-neutral-600 mb-1">EmailJS Template ID</label>
-                      <input
-                        type="text"
-                        placeholder="template_xxxxxxx"
-                        value={emailJsTemplateId}
-                        onChange={(e) => setEmailJsTemplateId(e.target.value)}
-                        className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2 text-neutral-900 font-mono"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-bold text-neutral-600 mb-1">EmailJS Public Key</label>
-                      <input
-                        type="text"
-                        placeholder="your_emailjs_public_key"
-                        value={emailJsPublicKey}
-                        onChange={(e) => setEmailJsPublicKey(e.target.value)}
-                        className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2 text-neutral-900 font-mono"
-                      />
-                    </div>
+                    )}
                   </div>
 
                   <div className="pt-2 flex justify-end">
                     <button
                       type="submit"
-                      className="inline-flex items-center gap-2 bg-neutral-900 hover:bg-black text-white px-6 py-2.5 rounded-full text-xs font-semibold shadow-xs transition-colors cursor-pointer"
+                      disabled={isCloudSyncing}
+                      className="inline-flex items-center gap-1.5 bg-neutral-900 hover:bg-black text-white px-5 py-2 rounded-xl text-xs font-medium cursor-pointer"
                     >
                       <Save className="w-3.5 h-3.5" />
-                      <span>Save Settings</span>
+                      <span>Save Contact Settings</span>
+                    </button>
+                  </div>
+                </form>
+
+                {/* Admin Account Password & Forgot Password Section */}
+                <div className="pt-6 border-t border-neutral-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div>
+                    <h3 className="text-sm font-semibold text-neutral-900">
+                      Admin Password &amp; Recovery
+                    </h3>
+                    <p className="text-xs text-neutral-500 mt-0.5">
+                      Signed in as <span className="font-mono text-neutral-700">{authUser?.email}</span>
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button
+                      type="button"
+                      onClick={handleSendResetFromAdmin}
+                      disabled={isSendingResetFromAdmin}
+                      className="px-3.5 py-2 text-xs font-medium bg-neutral-100 hover:bg-neutral-200 text-neutral-800 rounded-xl transition-colors cursor-pointer disabled:opacity-60 whitespace-nowrap"
+                    >
+                      {isSendingResetFromAdmin ? 'Sending...' : 'Forgot Password'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setChangePasswordError('');
+                        setChangePasswordInfo('');
+                        setIsChangePasswordOpen(true);
+                      }}
+                      className="px-3.5 py-2 text-xs font-medium bg-neutral-900 hover:bg-black text-white rounded-xl transition-colors cursor-pointer whitespace-nowrap"
+                    >
+                      Change Password
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ==================== TAB: BACKUP & RESTORE ==================== */}
+            {activeTab === 'backup' && (
+              <div className="space-y-6 max-w-2xl">
+                <div className="pb-4 border-b border-neutral-100">
+                  <h2 className="text-lg font-semibold text-neutral-900 tracking-tight">
+                    Backup &amp; Restore
+                  </h2>
+                  <p className="text-xs text-neutral-500 mt-0.5">
+                    Export or restore your full portfolio configuration as a JSON file.
+                  </p>
+                </div>
+
+                {backupRestoreError && (
+                  <div className="p-3 bg-rose-50 text-rose-800 text-xs rounded-xl border border-rose-200 font-medium">
+                    {backupRestoreError}
+                  </div>
+                )}
+
+                {/* Clean Tabular Summary Strip */}
+                <div className="grid grid-cols-3 gap-3 text-center border border-neutral-200/80 rounded-2xl p-4">
+                  <div>
+                    <span className="block text-xl font-semibold text-neutral-900 font-mono tabular-nums">
+                      {allProjects.length}
+                    </span>
+                    <span className="text-xs text-neutral-500">Artworks</span>
+                  </div>
+                  <div className="border-x border-neutral-100">
+                    <span className="block text-xl font-semibold text-neutral-900 font-mono tabular-nums">
+                      {tools.length}
+                    </span>
+                    <span className="text-xs text-neutral-500">Tools</span>
+                  </div>
+                  <div>
+                    <span className="block text-xl font-semibold text-neutral-900 font-mono tabular-nums">
+                      {blogPosts.length}
+                    </span>
+                    <span className="text-xs text-neutral-500">Articles</span>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="p-5 rounded-2xl border border-neutral-200 flex flex-col justify-between gap-4">
+                    <div>
+                      <h3 className="text-sm font-semibold text-neutral-900 mb-1">Export Portfolio JSON</h3>
+                      <p className="text-xs text-neutral-500 leading-relaxed">
+                        Download all showcase items, tools, blog posts, SEO metadata, and contact settings.
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleExportBackup}
+                      className="w-full inline-flex items-center justify-center gap-2 bg-neutral-900 hover:bg-black text-white text-xs font-medium py-2.5 px-4 rounded-xl transition-colors cursor-pointer"
+                    >
+                      <Download className="w-3.5 h-3.5" />
+                      <span>Download Backup</span>
                     </button>
                   </div>
 
-                  {/* Admin Password & Forgot Password Card inside Admin Page */}
-                  <div className="pt-5 border-t border-neutral-200">
-                    <div className="p-4 bg-[#FAF9F6] rounded-2xl border border-neutral-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                      <div>
-                        <h4 className="text-sm font-bold text-neutral-900 flex items-center gap-1.5">
-                          <KeyRound className="w-4 h-4 text-neutral-700" />
-                          <span>Admin Account Password</span>
-                        </h4>
-                        <p className="text-xs text-neutral-500 mt-0.5">
-                          Signed in as <span className="font-mono font-medium text-neutral-700">{authUser?.email}</span>. Change your password or send a reset link.
-                        </p>
-                      </div>
-                      <div className="flex flex-wrap items-center gap-2 shrink-0">
-                        <button
-                          type="button"
-                          onClick={handleSendResetFromAdmin}
-                          disabled={isSendingResetFromAdmin}
-                          className="px-3.5 py-2 text-xs font-semibold bg-white hover:bg-neutral-100 text-neutral-800 border border-neutral-300 rounded-xl transition-colors cursor-pointer disabled:opacity-60"
-                        >
-                          {isSendingResetFromAdmin ? 'Sending...' : 'Forgot Password'}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setChangePasswordError('');
-                            setChangePasswordInfo('');
-                            setIsChangePasswordOpen(true);
-                          }}
-                          className="px-3.5 py-2 text-xs font-semibold bg-neutral-900 hover:bg-black text-white rounded-xl transition-colors cursor-pointer"
-                        >
-                          Change Password
-                        </button>
-                      </div>
+                  <div className="p-5 rounded-2xl border border-neutral-200 flex flex-col justify-between gap-4">
+                    <div>
+                      <h3 className="text-sm font-semibold text-neutral-900 mb-1">Restore from JSON</h3>
+                      <p className="text-xs text-neutral-500 leading-relaxed">
+                        Upload a previously exported backup file to restore and sync everything globally.
+                      </p>
                     </div>
-                  </div>
-                </form>
-              )}
-
-              {/* TAB: ADMINCONTROL BACKUP & SYSTEM RESTORE */}
-              {activeTab === 'backup' && (
-                <div className="space-y-6 max-w-3xl">
-                  <div className="bg-[#FAF9F6] border border-neutral-200 rounded-2xl p-6">
-                    <div className="flex items-center gap-3 mb-2">
-                      <div className="w-10 h-10 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center">
-                        <Database className="w-5 h-5" />
-                      </div>
-                      <div>
-                        <h4 className="text-base font-bold text-neutral-900">admincontrol System Backup &amp; Archive</h4>
-                        <p className="text-xs text-neutral-500">
-                          Export complete portfolio state, showcase items, tools, SEO architecture, and contact configs to JSON.
-                        </p>
-                      </div>
-                    </div>
-
-                    {backupRestoreError && (
-                      <div className="mt-3 p-3 bg-rose-50 text-rose-800 text-xs rounded-xl border border-rose-200 font-medium">
-                        {backupRestoreError}
-                      </div>
-                    )}
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
-                      {/* Export card */}
-                      <div className="bg-white p-5 rounded-2xl border border-neutral-200 flex flex-col justify-between">
-                        <div>
-                          <div className="flex items-center gap-2 text-neutral-900 font-bold text-sm mb-1.5">
-                            <Download className="w-4 h-4 text-emerald-600" />
-                            <span>Export Full Backup</span>
-                          </div>
-                          <p className="text-xs text-neutral-500 leading-relaxed mb-4">
-                            Creates a downloadable JSON archive of all projects, tools, blog articles, SEO settings, and contact credentials.
-                          </p>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={handleExportBackup}
-                          className="w-full inline-flex items-center justify-center gap-2 bg-neutral-900 hover:bg-black text-white text-xs font-semibold py-2.5 rounded-xl transition-colors cursor-pointer"
-                        >
-                          <Download className="w-3.5 h-3.5" />
-                          <span>Download typixel_admincontrol_backup.json</span>
-                        </button>
-                      </div>
-
-                      {/* Import card */}
-                      <div className="bg-white p-5 rounded-2xl border border-neutral-200 flex flex-col justify-between">
-                        <div>
-                          <div className="flex items-center gap-2 text-neutral-900 font-bold text-sm mb-1.5">
-                            <Upload className="w-4 h-4 text-blue-600" />
-                            <span>Restore from Backup</span>
-                          </div>
-                          <p className="text-xs text-neutral-500 leading-relaxed mb-4">
-                            Upload a previously exported <code className="text-neutral-700 font-mono font-semibold">admincontrol</code> JSON backup file to restore your portfolio instantly.
-                          </p>
-                        </div>
-                        <label className="w-full inline-flex items-center justify-center gap-2 bg-[#F5F4F0] hover:bg-[#EAE8E2] text-neutral-800 text-xs font-semibold py-2.5 rounded-xl border border-neutral-300/80 transition-colors cursor-pointer text-center">
-                          <Upload className="w-3.5 h-3.5 text-neutral-700" />
-                          <span>Select JSON Backup File</span>
-                          <input
-                            type="file"
-                            accept=".json,application/json"
-                            onChange={handleImportBackup}
-                            className="hidden"
-                          />
-                        </label>
-                      </div>
-                    </div>
-
-                    {/* Stats summary */}
-                    <div className="mt-6 pt-5 border-t border-neutral-200/70 grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
-                      <div className="bg-white p-3 rounded-xl border border-neutral-100">
-                        <span className="block text-lg font-bold text-neutral-900 font-mono">
-                          {row1Projects.length + row2Projects.length}
-                        </span>
-                        <span className="text-[10px] uppercase font-bold text-neutral-400">Showcase Items</span>
-                      </div>
-                      <div className="bg-white p-3 rounded-xl border border-neutral-100">
-                        <span className="block text-lg font-bold text-neutral-900 font-mono">
-                          {tools.length}
-                        </span>
-                        <span className="text-[10px] uppercase font-bold text-neutral-400">Software Tools</span>
-                      </div>
-                      <div className="bg-white p-3 rounded-xl border border-neutral-100">
-                        <span className="block text-lg font-bold text-neutral-900 font-mono">
-                          {blogPosts.length}
-                        </span>
-                        <span className="text-[10px] uppercase font-bold text-neutral-400">SEO Articles</span>
-                      </div>
-                      <div className="bg-white p-3 rounded-xl border border-neutral-100">
-                        <span className="block text-lg font-bold text-emerald-600 font-mono">
-                          Active
-                        </span>
-                        <span className="text-[10px] uppercase font-bold text-neutral-400">admincontrol</span>
-                      </div>
-                    </div>
+                    <label className="w-full inline-flex items-center justify-center gap-2 bg-neutral-100 hover:bg-neutral-200 text-neutral-800 text-xs font-medium py-2.5 px-4 rounded-xl transition-colors cursor-pointer">
+                      <Upload className="w-3.5 h-3.5" />
+                      <span>Select Backup File</span>
+                      <input
+                        type="file"
+                        accept=".json,application/json"
+                        onChange={handleImportBackup}
+                        className="hidden"
+                      />
+                    </label>
                   </div>
                 </div>
-              )}
-            </div>
-          </div>
-
-          {/* Bottom Footer Note */}
-          <footer className="text-center py-4 text-xs text-neutral-500 flex items-center justify-center gap-2">
-            <span>Typixel admincontrol</span>
-            <span>•</span>
-            <span>All changes are live in real-time</span>
-            <span>•</span>
-            <button onClick={onClose} className="hover:text-neutral-900 underline cursor-pointer">
-              Return to Portfolio
-            </button>
-          </footer>
+              </div>
+            )}
+          </main>
         </div>
       )}
 
       {/* ================= EDIT SHOWCASE MODAL ================= */}
-        {editingProject && (
-          <div className="fixed inset-0 z-60 flex items-center justify-center p-3 sm:p-6 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
-            <div
-              className="bg-white rounded-[24px] sm:rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col shadow-2xl border border-neutral-200 text-neutral-900"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="px-6 py-4 border-b border-neutral-100 flex items-center justify-between bg-white">
-                <div className="flex items-center gap-2">
-                  <Pencil className="w-4 h-4 text-neutral-700" />
-                  <h4 className="text-base font-bold text-neutral-900">Edit Showcase Poster</h4>
+      {editingProject && (
+        <div className="fixed inset-0 z-60 flex items-center justify-center p-3 sm:p-6 bg-black/50 backdrop-blur-xs">
+          <div
+            className="bg-white rounded-2xl max-w-xl w-full max-h-[90vh] overflow-hidden flex flex-col shadow-xl border border-neutral-200 text-neutral-900"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="px-6 py-4 border-b border-neutral-100 flex items-center justify-between">
+              <h3 className="text-base font-semibold text-neutral-900">Edit Showcase Item</h3>
+              <button
+                type="button"
+                onClick={() => setEditingProject(null)}
+                className="w-8 h-8 rounded-lg hover:bg-neutral-100 text-neutral-500 hover:text-neutral-900 flex items-center justify-center transition-colors cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveEditProject} className="p-6 overflow-y-auto space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-medium text-neutral-700 mb-1">
+                    Project Title *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={editTitle}
+                    onChange={(e) => setEditTitle(e.target.value)}
+                    className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none focus:border-neutral-900"
+                  />
                 </div>
-                <button
-                  type="button"
-                  onClick={() => setEditingProject(null)}
-                  className="w-8 h-8 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-700 flex items-center justify-center transition-colors cursor-pointer"
-                >
-                  <X className="w-4 h-4" />
-                </button>
+
+                <div>
+                  <label className="block text-xs font-medium text-neutral-700 mb-1">
+                    Tagline
+                  </label>
+                  <input
+                    type="text"
+                    value={editSubtitle}
+                    onChange={(e) => setEditSubtitle(e.target.value)}
+                    className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none focus:border-neutral-900"
+                  />
+                </div>
               </div>
 
-              <form onSubmit={handleSaveEditProject} className="p-6 overflow-y-auto space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-xs font-medium text-neutral-700 mb-1">
+                    Category
+                  </label>
+                  <select
+                    value={editCategory}
+                    onChange={(e) => setEditCategory(e.target.value)}
+                    className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none focus:border-neutral-900"
+                  >
+                    {SHOWCASE_CATEGORIES.map((cat) => (
+                      <option key={cat} value={cat}>{cat}</option>
+                    ))}
+                    <option value="Other">Other...</option>
+                  </select>
+                </div>
+
+                {editCategory === 'Other' && (
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-neutral-600 mb-1">
-                      Project Title *
+                    <label className="block text-xs font-medium text-neutral-700 mb-1">
+                      Custom Category *
                     </label>
                     <input
                       type="text"
                       required
-                      value={editTitle}
-                      onChange={(e) => setEditTitle(e.target.value)}
-                      className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900/10 focus:border-neutral-900"
+                      value={editCustomCategory}
+                      onChange={(e) => setEditCustomCategory(e.target.value)}
+                      className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none focus:border-neutral-900"
                     />
                   </div>
+                )}
 
-                  <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-neutral-600 mb-1">
-                      Subtitle / Tagline
-                    </label>
-                    <input
-                      type="text"
-                      value={editSubtitle}
-                      onChange={(e) => setEditSubtitle(e.target.value)}
-                      className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900/10 focus:border-neutral-900"
-                    />
-                  </div>
+                <div>
+                  <label className="block text-xs font-medium text-neutral-700 mb-1">
+                    Label / Badge
+                  </label>
+                  <input
+                    type="text"
+                    value={editBadge}
+                    onChange={(e) => setEditBadge(e.target.value)}
+                    className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none focus:border-neutral-900"
+                  />
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-neutral-600 mb-1">
-                      Category
-                    </label>
-                    <select
-                      value={editCategory}
-                      onChange={(e) => setEditCategory(e.target.value)}
-                      className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none"
-                    >
-                      <option value="Event Branding & Poster">Event Branding &amp; Poster</option>
-                      <option value="Commercial Poster Design">Commercial Poster Design</option>
-                      <option value="Festive & Cultural Poster">Festive &amp; Cultural Poster</option>
-                      <option value="Festive & Social Media">Festive &amp; Social Media</option>
-                      <option value="Visual Identity & Branding">Visual Identity &amp; Branding</option>
-                      <option value="Logo Design & Identity">Logo Design &amp; Identity</option>
-                      <option value="Product & Packaging Mockup">Product &amp; Packaging Mockup</option>
-                      <option value="Event Branding & Invitation">Event Branding &amp; Invitation</option>
-                      <option value="Cultural Poster & Digital Art">Cultural Poster &amp; Digital Art</option>
-                      <option value="Brand Identity & Logo">Brand Identity &amp; Logo</option>
-                      <option value="Spiritual Typography & Poster">Spiritual Typography &amp; Poster</option>
-                      <option value="Matchday Sports Poster">Matchday Sports Poster</option>
-                      <option value="Editorial Typography">Editorial Typography</option>
-                      <option value="Digital Artwork & Manipulation">Digital Artwork &amp; Manipulation</option>
-                      <option value="Social Media Campaign">Social Media Campaign</option>
-                      <option value="Visual Identity & Logo">Visual Identity &amp; Logo</option>
-                      <option value="Motion Graphics & Video">Motion Graphics &amp; Video</option>
-                      <option value="Motion Video & Wedding">Motion Video &amp; Wedding</option>
-                      <option value="Motion Graphic Poster">Motion Graphic Poster</option>
-                      <option value="Other">Other (Custom)...</option>
-                    </select>
-                  </div>
-
-                  {editCategory === 'Other' && (
-                    <div>
-                      <label className="block text-xs font-bold uppercase tracking-wider text-neutral-600 mb-1">
-                        Custom Type Name *
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        value={editCustomCategory}
-                        onChange={(e) => setEditCustomCategory(e.target.value)}
-                        className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none"
-                      />
-                    </div>
-                  )}
-
-                  <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-neutral-600 mb-1">
-                      Top-Right Badge / Tag
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="e.g. Logo Lockup, Artboard Series"
-                      value={editBadge}
-                      onChange={(e) => setEditBadge(e.target.value)}
-                      className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-neutral-600 mb-1">
-                      Marquee Row
-                    </label>
-                    <select
-                      value={editRow}
-                      onChange={(e) => setEditRow(Number(e.target.value) as 1 | 2)}
-                      className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none"
-                    >
-                      <option value={1}>Row 1 (Slides Left)</option>
-                      <option value={2}>Row 2 (Slides Right)</option>
-                    </select>
-                  </div>
+                <div>
+                  <label className="block text-xs font-medium text-neutral-700 mb-1">
+                    Marquee Row
+                  </label>
+                  <select
+                    value={editRow}
+                    onChange={(e) => setEditRow(Number(e.target.value) as 1 | 2)}
+                    className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none focus:border-neutral-900"
+                  >
+                    <option value={1}>Row 1 (Slides Left)</option>
+                    <option value={2}>Row 2 (Slides Right)</option>
+                  </select>
                 </div>
+              </div>
 
-                {/* Media Artwork */}
-                <div className="pt-2 border-t border-neutral-100 space-y-3">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                    <label className="block text-xs font-bold uppercase tracking-wider text-neutral-600">
-                      Cover Image / Video Artwork
-                    </label>
-                    <div className="flex items-center gap-1.5 text-[11px] bg-neutral-100 p-1 rounded-xl">
+              {/* Media Source */}
+              <div className="pt-3 border-t border-neutral-100 space-y-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <label className="text-xs font-medium text-neutral-700">
+                    Image or Video Media
+                  </label>
+                  <div className="flex items-center gap-1 p-1 bg-neutral-100 rounded-lg text-xs self-start">
+                    {(['link', 'upload', 'preset'] as const).map((mode) => (
                       <button
+                        key={mode}
                         type="button"
-                        onClick={() => setEditMediaMode('preset')}
-                        className={`px-2.5 py-0.5 rounded-lg cursor-pointer transition-colors ${
-                          editMediaMode === 'preset'
-                            ? 'bg-white text-neutral-900 font-bold shadow-xs'
-                            : 'text-neutral-500 hover:text-neutral-900'
+                        onClick={() => setEditMediaMode(mode)}
+                        className={`px-3 py-1 rounded-md cursor-pointer transition-colors ${
+                          editMediaMode === mode
+                            ? 'bg-white text-neutral-900 font-medium shadow-2xs'
+                            : 'text-neutral-600 hover:text-neutral-900'
                         }`}
                       >
-                        ⭐ Preset Assets
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setEditMediaMode('upload')}
-                        className={`px-2.5 py-0.5 rounded-lg cursor-pointer transition-colors ${
-                          editMediaMode === 'upload'
-                            ? 'bg-white text-neutral-900 font-bold shadow-xs'
-                            : 'text-neutral-500 hover:text-neutral-900'
-                        }`}
-                      >
-                        📁 Upload File
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setEditMediaMode('link')}
-                        className={`px-2.5 py-0.5 rounded-lg cursor-pointer transition-colors ${
-                          editMediaMode === 'link'
-                            ? 'bg-white text-neutral-900 font-bold shadow-xs'
-                            : 'text-neutral-500 hover:text-neutral-900'
-                        }`}
-                      >
-                        🔗 Image / Video Link
-                      </button>
-                    </div>
-                  </div>
-
-                  {editMediaMode === 'preset' && (
-                    <div className="space-y-2">
-                      <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
-                        {SHOWCASE_PRESET_IMAGES.map((preset) => {
-                          const isPresetVid = isVideoMediaUrl(preset.path);
-                          return (
-                            <button
-                              key={preset.filename}
-                              type="button"
-                              onClick={() => handleSelectPreset(preset, true)}
-                              className={`p-1 rounded-lg border text-left cursor-pointer transition-all ${
-                                editImageUrl === preset.path
-                                  ? 'border-neutral-900 bg-neutral-900 text-white ring-2 ring-neutral-900/20'
-                                  : 'border-neutral-200 bg-neutral-50 hover:bg-white text-neutral-800'
-                              }`}
-                            >
-                              <div className="w-full aspect-[4/5] rounded overflow-hidden bg-neutral-900 mb-1">
-                                {isPresetVid ? (
-                                  <video
-                                    src={preset.path}
-                                    muted
-                                    autoPlay
-                                    loop
-                                    playsInline
-                                    className="w-full h-full object-cover"
-                                  />
-                                ) : (
-                                  <img src={preset.path} alt={preset.name} className="w-full h-full object-cover" />
-                                )}
-                              </div>
-                              <span className="text-[10px] font-bold truncate block">{preset.name}</span>
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  )}
-
-                  {editMediaMode === 'upload' && (
-                    <div className="bg-neutral-50 p-3 rounded-xl border border-neutral-200 space-y-2">
-                      <div className="flex items-center gap-3">
-                        <input
-                          type="file"
-                          accept="image/*,video/mp4,video/webm,video/quicktime"
-                          onChange={(e) => handleProjectFileUpload(e, true)}
-                          className="w-full text-xs text-neutral-600 file:mr-3 file:py-2 file:px-3.5 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-neutral-900 file:text-white hover:file:bg-black file:cursor-pointer bg-white border border-neutral-200 rounded-xl p-1"
-                        />
-                        {editImageUrl && (
-                          <div className="w-12 h-14 rounded-lg overflow-hidden border border-neutral-200 shrink-0 bg-neutral-900 shadow-xs">
-                            {(editMediaKind === 'video' || (editMediaKind === 'auto' && isVideoMediaUrl(editImageUrl))) ? (
-                              <video
-                                src={normalizeShowcaseImagePath(editImageUrl)}
-                                muted
-                                autoPlay
-                                loop
-                                playsInline
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <img src={normalizeShowcaseImagePath(editImageUrl)} alt="Preview" className="w-full h-full object-cover" />
-                            )}
-                          </div>
-                        )}
-                      </div>
-                      {editUploadError && (
-                        <p className="text-[11px] text-rose-700 bg-rose-50 border border-rose-200 rounded-lg px-2.5 py-1.5 font-medium">
-                          {editUploadError}
-                        </p>
-                      )}
-                      <p className="text-[11px] text-neutral-500">
-                        ✓ Images auto-compress &amp; publish live to all visitors. For HD videos (&gt;600 KB), use the Image / Video Link tab.
-                      </p>
-                    </div>
-                  )}
-
-                  {editMediaMode === 'link' && (
-                    <div className="space-y-2">
-                      <input
-                        type="text"
-                        placeholder="https://... (.jpg, .png, .webp, .mp4 or GitHub raw link)"
-                        value={editImageUrl}
-                        onChange={(e) => {
-                          setEditImageUrl(e.target.value);
-                          setEditUploadError('');
-                        }}
-                        className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none font-mono"
-                      />
-                      {editImageUrl && (
-                        <div className="flex items-center gap-2">
-                          <div className="w-10 h-12 rounded-lg overflow-hidden border border-neutral-200 shrink-0 bg-neutral-900 shadow-xs">
-                            {(editMediaKind === 'video' || (editMediaKind === 'auto' && isVideoMediaUrl(editImageUrl))) ? (
-                              <video
-                                src={normalizeShowcaseImagePath(editImageUrl)}
-                                poster={editVideoPosterUrl ? normalizeShowcaseImagePath(editVideoPosterUrl) : undefined}
-                                muted
-                                autoPlay
-                                loop
-                                playsInline
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <img src={normalizeShowcaseImagePath(editImageUrl)} alt="Preview" className="w-full h-full object-cover" />
-                            )}
-                          </div>
-                          <span className="text-[11px] text-neutral-500 font-mono truncate">{normalizeShowcaseImagePath(editImageUrl)}</span>
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  {(editMediaKind === 'video' || (editMediaKind === 'auto' && isVideoMediaUrl(editImageUrl))) && (
-                    <div className="pt-1">
-                      <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-600 mb-1">
-                        Optional Video Poster / Cover Image URL
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="https://... (optional poster image while video loads)"
-                        value={editVideoPosterUrl}
-                        onChange={(e) => setEditVideoPosterUrl(e.target.value)}
-                        className="w-full text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2 text-neutral-900 font-mono"
-                      />
-                    </div>
-                  )}
-
-                  <div className="flex items-center gap-2 pt-1 text-[11px] text-neutral-600">
-                    <span className="font-semibold">Media Type:</span>
-                    {(['auto', 'image', 'video'] as const).map((kind) => (
-                      <button
-                        key={kind}
-                        type="button"
-                        onClick={() => setEditMediaKind(kind)}
-                        className={`px-2.5 py-0.5 rounded-lg border cursor-pointer transition-colors ${
-                          editMediaKind === kind
-                            ? 'bg-neutral-900 text-white border-neutral-900 font-semibold'
-                            : 'bg-neutral-50 text-neutral-600 border-neutral-200 hover:bg-neutral-100'
-                        }`}
-                      >
-                        {kind === 'auto' ? 'Auto-Detect' : kind === 'image' ? 'Image' : 'Video'}
+                        {mode === 'link' ? 'URL / Link' : mode === 'upload' ? 'Upload' : 'Presets'}
                       </button>
                     ))}
                   </div>
                 </div>
 
-                <div className="flex justify-end gap-2 pt-3 border-t border-neutral-100">
-                  <button
-                    type="button"
-                    onClick={() => setEditingProject(null)}
-                    className="px-4 py-2 text-xs font-semibold text-neutral-600 hover:text-neutral-900 bg-neutral-100 hover:bg-neutral-200 rounded-full transition-colors cursor-pointer"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={isCloudSyncing}
-                    className="inline-flex items-center gap-1.5 px-5 py-2 text-xs font-semibold bg-neutral-900 hover:bg-black disabled:opacity-60 text-white rounded-full transition-all cursor-pointer shadow-xs"
-                  >
-                    <Save className="w-3.5 h-3.5" />
-                    <span>{isCloudSyncing ? 'Saving...' : 'Save Changes'}</span>
-                  </button>
+                {editMediaMode === 'preset' && (
+                  <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
+                    {SHOWCASE_PRESET_IMAGES.map((preset) => {
+                      const isPresetVid = isVideoMediaUrl(preset.path);
+                      const isSelected = normalizeShowcaseImagePath(editImageUrl) === preset.path;
+                      return (
+                        <button
+                          key={preset.filename}
+                          type="button"
+                          onClick={() => handleSelectPreset(preset, true)}
+                          className={`p-1 rounded-lg border text-left cursor-pointer transition-all ${
+                            isSelected ? 'border-neutral-900 ring-2 ring-neutral-900/15' : 'border-neutral-200 hover:border-neutral-400'
+                          }`}
+                        >
+                          <div className="w-full aspect-square rounded-md overflow-hidden bg-neutral-900">
+                            {isPresetVid ? (
+                              <video src={preset.path} muted autoPlay loop playsInline className="w-full h-full object-cover" />
+                            ) : (
+                              <img src={preset.path} alt={preset.name} className="w-full h-full object-cover" />
+                            )}
+                          </div>
+                          <span className="text-[10px] font-medium block truncate mt-1">{preset.name}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {editMediaMode === 'upload' && (
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="file"
+                        accept="image/*,video/mp4,video/webm,video/quicktime"
+                        onChange={(e) => handleProjectFileUpload(e, true)}
+                        className="w-full text-xs text-neutral-600 file:mr-3 file:py-2 file:px-3.5 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-neutral-900 file:text-white cursor-pointer bg-neutral-50 border border-neutral-200 rounded-xl p-1"
+                      />
+                      {editImageUrl && (
+                        <div className="w-11 h-14 rounded-lg overflow-hidden border border-neutral-200 shrink-0 bg-neutral-900">
+                          {(editMediaKind === 'video' || (editMediaKind === 'auto' && isVideoMediaUrl(editImageUrl))) ? (
+                            <video src={normalizeShowcaseImagePath(editImageUrl)} muted autoPlay loop playsInline className="w-full h-full object-cover" />
+                          ) : (
+                            <img src={normalizeShowcaseImagePath(editImageUrl)} alt="Preview" className="w-full h-full object-cover" />
+                          )}
+                        </div>
+                      )}
+                    </div>
+                    {editUploadError && (
+                      <p className="text-xs text-rose-700 bg-rose-50 border border-rose-200 rounded-lg px-3 py-2">
+                        {editUploadError}
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                {editMediaMode === 'link' && (
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="text"
+                      placeholder="https://... (.jpg, .png, .webp, .mp4)"
+                      value={editImageUrl}
+                      onChange={(e) => {
+                        setEditImageUrl(e.target.value);
+                        setEditUploadError('');
+                      }}
+                      className="flex-1 text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-neutral-900 focus:bg-white focus:outline-none focus:border-neutral-900 font-mono"
+                    />
+                    {editImageUrl && (
+                      <div className="w-11 h-14 rounded-lg overflow-hidden border border-neutral-200 shrink-0 bg-neutral-900">
+                        {(editMediaKind === 'video' || (editMediaKind === 'auto' && isVideoMediaUrl(editImageUrl))) ? (
+                          <video
+                            src={normalizeShowcaseImagePath(editImageUrl)}
+                            poster={editVideoPosterUrl ? normalizeShowcaseImagePath(editVideoPosterUrl) : undefined}
+                            muted
+                            autoPlay
+                            loop
+                            playsInline
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <img src={normalizeShowcaseImagePath(editImageUrl)} alt="Preview" className="w-full h-full object-cover" />
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
+                  <div className="flex items-center gap-1.5 text-xs">
+                    <span className="text-neutral-500">Type:</span>
+                    {(['auto', 'image', 'video'] as const).map((kind) => (
+                      <button
+                        key={kind}
+                        type="button"
+                        onClick={() => setEditMediaKind(kind)}
+                        className={`px-2.5 py-1 rounded-lg border cursor-pointer transition-colors ${
+                          editMediaKind === kind
+                            ? 'bg-neutral-900 text-white border-neutral-900 font-medium'
+                            : 'bg-neutral-50 text-neutral-600 border-neutral-200 hover:bg-neutral-100'
+                        }`}
+                      >
+                        {kind === 'auto' ? 'Auto' : kind === 'image' ? 'Image' : 'Video'}
+                      </button>
+                    ))}
+                  </div>
+
+                  {(editMediaKind === 'video' || (editMediaKind === 'auto' && isVideoMediaUrl(editImageUrl))) && (
+                    <input
+                      type="text"
+                      placeholder="Optional video poster image URL"
+                      value={editVideoPosterUrl}
+                      onChange={(e) => setEditVideoPosterUrl(e.target.value)}
+                      className="flex-1 min-w-[200px] text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3 py-1.5 text-neutral-900 font-mono"
+                    />
+                  )}
                 </div>
-              </form>
-            </div>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-3 border-t border-neutral-100">
+                <button
+                  type="button"
+                  onClick={() => setEditingProject(null)}
+                  className="px-4 py-2 text-xs font-medium text-neutral-600 hover:text-neutral-900 bg-neutral-100 hover:bg-neutral-200 rounded-xl transition-colors cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isCloudSyncing}
+                  className="inline-flex items-center gap-1.5 px-5 py-2 text-xs font-medium bg-neutral-900 hover:bg-black disabled:opacity-60 text-white rounded-xl transition-colors cursor-pointer"
+                >
+                  <Save className="w-3.5 h-3.5" />
+                  <span>{isCloudSyncing ? 'Saving...' : 'Save Changes'}</span>
+                </button>
+              </div>
+            </form>
           </div>
-        )}
+        </div>
+      )}
 
       {/* ================= CHANGE / FORGOT PASSWORD MODAL ================= */}
       {isChangePasswordOpen && (
-        <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-          <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-neutral-200">
-            <h4 className="text-base font-bold text-neutral-900 mb-3">Change Admin Password</h4>
+        <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs">
+          <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-xl border border-neutral-200">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-base font-semibold text-neutral-900">Password &amp; Recovery</h3>
+              <button
+                type="button"
+                onClick={() => setIsChangePasswordOpen(false)}
+                className="w-7 h-7 rounded-lg hover:bg-neutral-100 text-neutral-500 flex items-center justify-center cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
 
             {changePasswordInfo && (
-              <div className="p-2.5 bg-emerald-50 text-emerald-800 text-xs rounded-lg mb-3 border border-emerald-200 font-medium">
+              <div className="p-2.5 bg-emerald-50 text-emerald-800 text-xs rounded-xl mb-3 border border-emerald-200 font-medium">
                 {changePasswordInfo}
               </div>
             )}
 
             {changePasswordError && (
-              <div className="p-2.5 bg-rose-50 text-rose-800 text-xs rounded-lg mb-3 border border-rose-200 font-medium">
+              <div className="p-2.5 bg-rose-50 text-rose-800 text-xs rounded-xl mb-3 border border-rose-200 font-medium">
                 {changePasswordError}
               </div>
             )}
@@ -3223,12 +2823,12 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
             <form onSubmit={handleChangePassword} className="space-y-3">
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <label className="block text-[11px] font-bold text-neutral-600">Current Password</label>
+                  <label className="block text-xs font-medium text-neutral-700">Current Password</label>
                   <button
                     type="button"
                     onClick={handleSendResetFromAdmin}
                     disabled={isSendingResetFromAdmin}
-                    className="text-[11px] text-neutral-500 hover:text-neutral-900 underline cursor-pointer disabled:opacity-60"
+                    className="text-xs text-neutral-500 hover:text-neutral-900 hover:underline cursor-pointer disabled:opacity-60"
                   >
                     {isSendingResetFromAdmin ? 'Sending reset...' : 'Forgot password?'}
                   </button>
@@ -3243,7 +2843,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold text-neutral-600 mb-1">New Password (min. 6 chars)</label>
+                <label className="block text-xs font-medium text-neutral-700 mb-1">New Password (min. 6 chars)</label>
                 <input
                   type={showChangePasswordText ? 'text' : 'password'}
                   required
@@ -3255,7 +2855,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold text-neutral-600 mb-1">Confirm New Password</label>
+                <label className="block text-xs font-medium text-neutral-700 mb-1">Confirm New Password</label>
                 <input
                   type={showChangePasswordText ? 'text' : 'password'}
                   required
@@ -3279,14 +2879,14 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                 <button
                   type="button"
                   onClick={() => setIsChangePasswordOpen(false)}
-                  className="flex-1 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 text-xs font-semibold py-2 rounded-xl cursor-pointer"
+                  className="flex-1 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 text-xs font-medium py-2 rounded-xl cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isChangingPassword}
-                  className="flex-1 bg-neutral-900 hover:bg-black disabled:opacity-60 text-white text-xs font-semibold py-2 rounded-xl cursor-pointer"
+                  className="flex-1 bg-neutral-900 hover:bg-black disabled:opacity-60 text-white text-xs font-medium py-2 rounded-xl cursor-pointer"
                 >
                   {isChangingPassword ? 'Updating...' : 'Save Password'}
                 </button>
